@@ -35,8 +35,9 @@ class _CustomButtonState extends State<CustomButton> {
     return ElevatedButton(
 
         onPressed: () {
-         print('press press');
-         widget?.function;
+          print("Press click");
+
+           widget?.function;
         },
         style: ElevatedButton.styleFrom(
             backgroundColor: widget.bgcolor,

@@ -12,7 +12,14 @@ class CartToAdd extends CartEvent{
 
 }
 
+class CartRemoveAll extends CartEvent{
+  CartItem? cartitem;
 
+
+  CartRemoveAll({this.cartitem});
+
+
+}
 class CartToRemove extends CartEvent{
   CartItem? cartitem;
 

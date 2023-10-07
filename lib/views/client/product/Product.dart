@@ -232,7 +232,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton:      Container(
+        floatingActionButton:      BlocConsumer<CartBloc, AllCart>(
+  listener: (context, state) {
+    // TODO: implement listener
+    // print("Listener run");
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("Added to cart") ));
+  },
+  builder: (context, state) {
+    return Container(
           margin: EdgeInsets.all(10),
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -320,7 +328,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ]
           ),
-        ),
+        );
+  },
+),
       );
     }
 }

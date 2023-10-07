@@ -7,8 +7,18 @@ import '../../model/Product/CartModel.dart';
 import '../widget/Product/CustomButton.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class CartScreen extends StatelessWidget {
+import 'Checkout.dart';
+
+class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +39,24 @@ class CartScreen extends StatelessWidget {
           child: BlocConsumer<CartBloc, AllCart>(
             listener: (context, state) {
               // TODO: implement listener
+              print(state.itemcart?.length);
+
+              // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("Added to cart") ));
+
+
+
             },
             builder: (context, state) {
-              return ListView.builder(
+              return
+                state.itemcart?.length == 0 ?
+                  Center(
+                    child: Text("Your cart is empty",style: TextStyle(
+                      fontSize: 12.8
+                    ),),
+                  ) :
+             ListView.builder(
                 itemCount: state.itemcart?.length ?? 0,
 
                 itemBuilder: (context, index) {
@@ -54,8 +79,24 @@ class CartScreen extends StatelessWidget {
                         children: [
 
                           Text('${cart.producttitle}'),
-                          Icon(
-                            Icons.delete, color: Color(0xffC73737), size: 17,),
+                          InkWell(
+                            onTap: () {
+                              BlocProvider.of<CartBloc>(
+                                  context, listen: false).add(
+                                  CartRemoveAll(cartitem: CartItem(
+                                    discount: cart.discount,
+                                    qty: cart.qty,
+                                    productid: cart.productid,
+                                    attribution: cart.attribution,
+                                    imgurl: cart.imgurl,
+                                    price: cart.price,
+                                    producttitle: cart.producttitle,
+
+                                  )));
+                            },
+                            child: Icon(
+                              Icons.delete, color: Color(0xffC73737), size: 17,),
+                          ),
                         ],
                       ),
                       subtitle: Column(
@@ -141,8 +182,10 @@ class CartScreen extends StatelessWidget {
         },
         builder: (context, state) {
           double total = 0;
+          var qtytotal = 0;
           state.itemcart?.forEach((element) {
             total += (element!.price * element.qty);
+            qtytotal += element!.qty!;
 
           });
           return Container(
@@ -202,9 +245,51 @@ class CartScreen extends StatelessWidget {
                   ],
                 ),
                 Divider(),
-                CustomButton(bgcolor: Colors.black,
-                  textbtn: 'Proceed to CheckOut',
-                  logo: 'assets/logo/shopping-cart.png',),
+           ElevatedButton(
+
+              onPressed: () {
+            print("Press click");
+            Navigator.push(context, MaterialPageRoute(
+              fullscreenDialog: true,
+              builder: (context) {
+              return Checkout(cartitem: state.itemcart,
+
+              discount: 0,
+                qtytotal: qtytotal,
+                subtotal: total,
+
+              );
+            },));
+
+
+
+          },
+          style: ElevatedButton.styleFrom(
+          backgroundColor:Colors.black,
+          elevation: 0,
+          padding: EdgeInsets.all(15),
+          shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.black.withOpacity(0.14)),
+          borderRadius: BorderRadius.circular(3)
+          )
+          ),
+          child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+          Image.asset('assets/logo/shopping-cart.png',
+          width: 20,
+          height: 20,
+          fit: BoxFit.cover,
+
+          ),
+          SizedBox(width: 10,),
+          Text("Proceed to Checkout",style: TextStyle(
+          fontSize: 12.8,
+
+          ),)
+          ],
+          ))
 
               ],
             ),
@@ -302,6 +387,13 @@ class CartScreen extends StatelessWidget {
       // ),
 
     );
+  }
+
+  PushScreen(BuildContext context) {
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Checkout();
+    },));
   }
 }
 

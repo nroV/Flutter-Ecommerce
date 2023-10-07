@@ -4,15 +4,34 @@ import 'package:ecommerce/views/order/GoogleMap/GoogleMapScreen.dart';
 import 'package:ecommerce/views/order/Success.dart';
 import 'package:flutter/material.dart';
 
+import '../../model/Product/CartModel.dart';
 import '../widget/Product/FloatingAction.dart';
 
 import 'package:location/location.dart';
-class Checkout extends StatelessWidget {
-  const  Checkout ({Key? key}) : super(key: key);
+class Checkout extends StatefulWidget {
+  List<CartItem>? cartitem;
+
+  var subtotal;
+  var qtytotal;
+
+  var discount;
+  Checkout ({Key? key,this.cartitem,this.subtotal,this.discount,this.qtytotal}) : super(key: key);
 
   @override
+  State<Checkout> createState() => _CheckoutState();
+}
+
+class _CheckoutState extends State<Checkout> {
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
   Widget build(BuildContext context) {
     // TODO: implement build
+    var cart = widget.cartitem;
     return Scaffold(
       appBar:AppBar(
 
@@ -44,7 +63,7 @@ class Checkout extends StatelessWidget {
                 SizedBox(
                   height: MediaQuery.of(context).size.height*0.25,
                   child: ListView.builder(
-                    itemCount: 2,
+                    itemCount:cart?.length ?? 0,
                     itemBuilder: (context, index) {
                   return Container(
 
@@ -58,23 +77,23 @@ class Checkout extends StatelessWidget {
 
 
                       contentPadding: EdgeInsets.all(0),
-                      leading: Image.network('https://images.unsplash.com/photo-1499013819532-e4ff41b00669?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80'
+                      leading: Image.network('${cart![index].imgurl}'
 
                       ,fit: BoxFit.cover,
                         width: 100,
                         height:double.maxFinite,
                       ),
 
-                      title: Text('Air Jordan 1',style: TextStyle(
+                      title: Text('${cart![index].producttitle}',style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500
                       ),),
-                      subtitle: Text('\$ 18.99',style: TextStyle(
+                      subtitle: Text('\$  ${cart![index].price}',style: TextStyle(
                           fontSize: 16.8,
                           fontWeight: FontWeight.w500,
                         color: Color(0xff508A7B)
                       ),),
-                      trailing: Text('Qty: 3',style: TextStyle(
+                      trailing: Text('Qty: ${cart![index].qty}',style: TextStyle(
                           fontSize: 12.8,
 
                           fontWeight: FontWeight.w400
@@ -248,7 +267,7 @@ class Checkout extends StatelessWidget {
                               Text('Product Qty',style: TextStyle(
                                 color: Colors.grey
                               ),),
-                              Text('x2'),
+                              Text('x ${widget.qtytotal}'),
                             ],
                           ),
                         ),
@@ -257,10 +276,10 @@ class Checkout extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Product Price',style: TextStyle(
+                              Text('Total ',style: TextStyle(
                                   color: Colors.grey
                               ),),
-                              Text('\$50.60'),
+                              Text('\$ ${widget.subtotal}'),
                             ],
                           ),
                         ),
@@ -272,7 +291,7 @@ class Checkout extends StatelessWidget {
                               Text('Promotion Discount',style: TextStyle(
                                   color: Colors.grey
                               ),),
-                              Text('50%'),
+                              Text('${widget.discount}'),
                             ],
                           ),
                         ),
@@ -289,7 +308,7 @@ class Checkout extends StatelessWidget {
                               Text('SubTotal',style: TextStyle(
                                   color: Colors.black
                               ),),
-                              Text('\$ 25.24'),
+                              Text('\$ ${widget.subtotal}'),
                             ],
                           ),
                         ),

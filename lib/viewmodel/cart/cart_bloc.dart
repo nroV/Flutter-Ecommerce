@@ -63,29 +63,48 @@ class CartBloc extends Bloc<CartEvent, AllCart> {
       List<CartItem>? curr = state.itemcart;
 
       CartItem? item =curr?.firstWhere((element) => element.productid == event.cartitem!.productid);
+      int index = curr!.indexOf(item!);
       if(     item!.qty! > 0){
         item!.qty =   item!.qty! - 1;
+
+        print(index);
+        curr.removeAt(index);
+        curr.insert(index, item);
       }
-      else{
+     if(item!.qty! == 0){
         item!.qty = 0;
+
+        curr!.removeAt(index);
+
+
       }
-
-      int index = curr!.indexOf(item);
-      print(index);
-      curr.removeAt(index);
-      curr.insert(index, item);
-
-
-
-
       emit(AllCart(itemcart: curr));
-
 
 
       // emit(CartToAdd());
 
       //TODO getthe even add
     });
+    on<CartRemoveAll>((event, emit) {
+      // TODO: implement event handler
+      print("Event Cart to Remove Send to bloc");
 
+      List<CartItem>? curr = state.itemcart;
+
+      CartItem? item =curr?.firstWhere((element) => element.productid == event.cartitem!.productid);
+      int index = curr!.indexOf(item!);
+
+
+
+      curr!.removeAt(index);
+
+
+      emit(AllCart(itemcart: curr));
+
+
+      // emit(CartToAdd());
+
+      //TODO getthe even add
+    });
   }
 }
