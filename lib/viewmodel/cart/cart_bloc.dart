@@ -106,5 +106,20 @@ class CartBloc extends Bloc<CartEvent, AllCart> {
 
       //TODO getthe even add
     });
+    on<CartClear>((event, emit) {
+      // TODO: implement event handler
+      print("Event Cart to Clear Send to bloc");
+
+      List<CartItem>? curr = state.itemcart;
+      curr!.clear();
+
+
+      emit(AllCart(itemcart: curr));
+
+
+      // emit(CartToAdd());
+
+      //TODO getthe even add
+    });
   }
 }

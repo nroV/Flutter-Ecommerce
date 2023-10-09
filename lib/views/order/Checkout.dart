@@ -1,13 +1,19 @@
 
 import 'package:ecommerce/res/constant/appcolor.dart';
+import 'package:ecommerce/viewmodel/products/address_bloc.dart';
 import 'package:ecommerce/views/order/GoogleMap/GoogleMapScreen.dart';
 import 'package:ecommerce/views/order/Success.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../model/Order/OrderRequest.dart';
 import '../../model/Product/CartModel.dart';
+import '../../viewmodel/order/order_bloc.dart';
 import '../widget/Product/FloatingAction.dart';
 
 import 'package:location/location.dart';
+
+import 'CompleteOrder.dart';
 class Checkout extends StatefulWidget {
   List<CartItem>? cartitem;
 
@@ -15,7 +21,9 @@ class Checkout extends StatefulWidget {
   var qtytotal;
 
   var discount;
-  Checkout ({Key? key,this.cartitem,this.subtotal,this.discount,this.qtytotal}) : super(key: key);
+  var uid;
+  var selectedIndexAddress = 0;
+  Checkout ({Key? key,this.cartitem,this.subtotal,this.discount,this.qtytotal,this.uid}) : super(key: key);
 
   @override
   State<Checkout> createState() => _CheckoutState();
@@ -23,11 +31,17 @@ class Checkout extends StatefulWidget {
 
 class _CheckoutState extends State<Checkout> {
 
+ var address;
 
+  int? addressid;
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
+    print("Checkout userid");
+    print(widget.uid);
+    // BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget!.uid));
   }
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -47,14 +61,41 @@ class _CheckoutState extends State<Checkout> {
 
 
       ),
-      body: SafeArea(
+      body: BlocConsumer<OrderBloc, OrderState>(
+  listener: (context, state) {
+    // TODO: implement listener
+    print("State is updated");
+  },
+  builder: (context, state) {
+    if(state is OrderLoading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    if(state is OrderSuccessCompleted) {
+      print("Success");
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
+      });
+      //TODO use this whenever u want to push neww screen after state updated
+      // Navigator.push(context, MaterialPageRoute(
+      //   builder: (context) {
+      //   return Success();
+      // },));
+    }
+    if(state is OrderError) {
+      return Center(
+        child: Text("Error has been occur"),
+      );
+    }
+    return SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(top: 5,left: 15,right: 15),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Toy and Me Cambodia",style: TextStyle(
+                Text("Shop Owner",style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500
                 ),),
@@ -127,14 +168,23 @@ class _CheckoutState extends State<Checkout> {
                                 print(location.latitude);
 
 
-                                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                address = await Navigator.push(context, MaterialPageRoute(builder: (context) {
                                     return GoogleMapScreen(positionlong:     location.longitude,
                                         positionlat:    location.latitude,
                                         );
 
                                 },));
+
+                                setState(() {
+                                  print("Got Address back");
+                                  print(address);
+                                });
+
+
                               },
-                              child: Text('Edit')),
+                              child: Text('Add New',style: TextStyle(
+                                fontSize: 11
+                              ),)),
                         )
                       ],
                     ),
@@ -142,27 +192,156 @@ class _CheckoutState extends State<Checkout> {
                     SizedBox(height: 10,),
                     //TODO address
 
-                    Container(
-                      padding: EdgeInsets.all(10),
+        //           Container(
+        //      width: double.maxFinite,
+        //      padding: EdgeInsets.only(top: 35,bottom: 35,left: 15,right: 15),
+        //
+        //     child: Column(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       Text('My Home address',style: TextStyle(
+        //           fontSize: 14,
+        //           fontWeight: FontWeight.w500
+        //       ),),
+        //
+        //       address?["homeadd"] == null ?
+        //       Text('${ "No address"}',style: TextStyle(
+        //           fontSize: 12.8,
+        //           color: Colors.grey
+        //       ),) :
+        //       Text('${  address?["homeadd"]}',style: TextStyle(
+        //           fontSize: 12.8,
+        //           color: Colors.grey
+        //       ),)
+        //
+        //
+        //     ],
+        //   ),
+        //   decoration: BoxDecoration(
+        //       color: Color(0xffF5F5F5)
+        //   ),
+        // ),
+              Container(
+                width: double.maxFinite,
+                height: 170,
 
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('My Home address',style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500
-                          ),),
-                          Text('Lorem ipsum dolor sit amet consectetur adipiscing'
-                              ' elit Ut et massa mi. Aliquam in hendrerit.',style: TextStyle(
-                            fontSize: 12.8,
-                            color: Colors.grey
-                          ),)
-                        ],
-                      ),
-                      decoration: BoxDecoration(
-                        color: Color(0xffF5F5F5)
-                      ),
-                    ),
+                child: BlocConsumer<AddressBloc, AddressState>(
+                  listener: (context, state) {
+                    // TODO: implement listener
+                  },
+                  builder: (context, state) {
+                    if(state is AddressLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(
+
+                        ),
+                      );
+
+                    }
+                    if(state is AddressError) {
+                      return Center(
+                        child: CircularProgressIndicator(
+
+                        ),
+                      );
+                    }
+                    if(state is AddressDone) {
+                      return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: state.add?.results?.length ?? 0,
+
+                        itemBuilder: (context, index) {
+                          addressid =   state.add?.results?[0].id;
+                          return
+
+                            state.add?.results?.length  == null ?
+
+
+                            Center(child: Text("You have no address yet"),) :
+                            Container(
+                              width: 200,
+
+                              margin: EdgeInsets.only(bottom: 10,right: 10),
+
+                              padding: EdgeInsets.only(
+                                  top: 35, bottom: 35, left: 15, right: 15),
+
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('${state.add?.results![index].description}', style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500
+                                      ),),
+
+
+
+                                      InkWell(
+                                        onTap: () {
+
+                                        },
+                                        child: InkWell(
+                                            onTap: () async {
+                                              var location = await Location()
+                                                  .getLocation();
+                                              print("User current location");
+                                              print(location.longitude);
+                                              print(location.latitude);
+
+
+                                              address = await Navigator.push(context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) {
+                                                      return GoogleMapScreen(
+                                                        positionlong: location
+                                                            .longitude,
+                                                        positionlat: location
+                                                            .latitude,
+                                                      );
+                                                    },));
+
+                                              setState(() {
+                                                print("Got Address back");
+                                                print(address);
+                                              });
+                                            },
+                                            child: Text('Edit', style: TextStyle(
+                                                fontSize: 10.8
+                                            ),)),
+                                      )
+                                    ],
+                                  ),
+
+                                  SizedBox(height: 10,),
+
+                                  Text('${state.add?.results![index].street}', style: TextStyle(
+                                      fontSize: 11.8,
+                                      color: Colors.grey
+                                  ),)
+
+
+                                ],
+                              ),
+                              decoration: BoxDecoration(
+                                  color: Color(0xffF5F5F5)
+                              ),
+                            );
+                        },);
+                    }
+                    else{
+                      return Center(
+                        child: CircularProgressIndicator(
+
+                        ),
+                      );
+                    }
+                  },
+                ),
+              )   ,
                     //TODO Payment
                     SizedBox(height: 40,),
 
@@ -323,10 +502,65 @@ class _CheckoutState extends State<Checkout> {
 
           )
         ),
-      ),
+      );
+  },
+),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      floatingActionButton:CustomFLoating(title: 'Placed Order',)
+      floatingActionButton:Row(
+
+        children: [
+          Expanded(
+            child: FloatingActionButton.extended(
+                backgroundColor: Color(0xff508A7B),
+
+                elevation: 0,
+                isExtended: true,
+                extendedPadding: EdgeInsets.all(0),
+
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0)
+                ),
+                onPressed: () {
+                  //TODO submit order
+                  //TODO do some event
+
+                  List<Productss>? item =[];
+
+                  for(int index=0;index<cart!.length;index++) {
+                                  item.add(Productss(
+                                    id: cart![index].productid,
+                                    quantity:  cart![index].qty
+                                  ));
+                  }
+                  print("Item in cart");
+                  print(item.length);
+                //TODO orderrequest
+                  print(item);
+                  print(widget.uid);
+
+                  OrderRequestV2 order = OrderRequestV2(
+
+                    customer:widget.uid,
+
+                    method: "Cash",
+                    products:item
+
+                );
+
+                  BlocProvider.of<OrderBloc>(context,listen: false).add(PostOrderEvent( addressid:addressid ,orderRequestV2: order));
+
+
+                  // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  //   return Success();
+                  // },));
+
+                }, label:Text('Place Order',style: TextStyle(
+                fontSize: 12.8
+            ),)),
+          ),
+        ],
+      )
 
 
     );

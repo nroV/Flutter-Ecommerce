@@ -3,6 +3,7 @@ import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/views/client/profile/EditProfile.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../Address/AddressScreen.dart';
 import '../../authentication/Require.dart';
 import '../../order/Cart.dart';
 import '../../order/GoogleMap/GoogleMapScreen.dart';
@@ -17,6 +18,7 @@ class MyProfileScreen extends StatefulWidget {
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
   var positionlong;
+  var userid;
 
   var positionlat;
   Future<void> currentUserLocation () async {
@@ -45,6 +47,7 @@ var islogin;
     prefs.getBool("islogin");
     islogin =   prefs.getBool("islogin") ?? false;
     print(   prefs!.getInt("userid"));
+    userid=prefs!.getInt("userid");
   }
   void PopUpUnauthorize(BuildContext context) {
 
@@ -201,16 +204,9 @@ var islogin;
 
                       trailing: Icon(Icons.arrow_forward_ios,size: 15,),
                       onTap: () async {
-                        var location = await Location().getLocation();
-                        print("User current location");
-                        print(location.longitude);
-                        print(location.latitude);
-
-                        positionlong = location.longitude;
-                        positionlat = location.latitude;
-                        await Navigator.push(context, MaterialPageRoute(builder: (context) {
-                            return  GoogleMapScreen(positionlat:   positionlat,positionlong:      positionlong ,);
-                        },));
+                          Navigator.push(context, MaterialPageRoute(builder:(context) {
+                              return AddressProductScr(userid: userid,);
+                          }, ));
                       },
                     ),
                     Divider(),

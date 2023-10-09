@@ -19,6 +19,10 @@ class AllCart {
     itemcart!.add(item);
 
   }
+
+  void removeFromCart(CartItem item){
+    itemcart!.removeWhere((element) => element == item);
+  }
 }
 class InitState extends AllCart {
   InitState():super(itemcart: []);

@@ -1,18 +1,31 @@
 
 
+import 'package:ecommerce/viewmodel/order/order_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../order/Success.dart';
 
-class CustomFLoating extends StatelessWidget {
+class CustomFLoating extends StatefulWidget {
   var title;
+  var addressid;
  CustomFLoating({
     super.key,
-   this.title
+   this.title,
+   this.addressid
   });
 
   @override
+  State<CustomFLoating> createState() => _CustomFLoatingState();
+}
+
+class _CustomFLoatingState extends State<CustomFLoating> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print(widget.addressid);
+  }
   Widget build(BuildContext context) {
     return Row(
 
@@ -29,11 +42,16 @@ class CustomFLoating extends StatelessWidget {
                   borderRadius: BorderRadius.circular(0)
               ),
               onPressed: () {
+                //TODO submit order
+                //TODO do some event
+                BlocProvider.of<OrderBloc>(context).add(PostOrderEvent( addressid:widget.addressid ));
+
+
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return Success();
                 },));
 
-              }, label:Text('${title}',style: TextStyle(
+              }, label:Text('${widget.title}',style: TextStyle(
               fontSize: 12.8
           ),)),
         ),

@@ -5,11 +5,12 @@ import 'package:ecommerce/views/client/product/CreateProduct.dart';
 import 'package:ecommerce/views/client/specialdeal.dart';
 import 'package:flutter/material.dart';
 
+import '../../viewmodel/products/address_bloc.dart';
 import '../order/OrderHistory.dart';
 import 'MyOrder.dart';
 import 'profile/ProfileScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyNavScreen extends StatefulWidget {
   var login;
@@ -65,7 +66,7 @@ class _MyNavScreenState extends State<MyNavScreen> {
     prefs.getBool("islogin");
     islogin =   prefs.getBool("islogin") ?? false;
     print(   prefs!.getInt("userid"));
-
+    BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid:  prefs!.getInt("userid")));
   }
   Widget build(BuildContext context) {
     // TODO: implement build

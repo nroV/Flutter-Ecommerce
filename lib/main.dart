@@ -3,6 +3,8 @@ import 'package:ecommerce/viewmodel/authlogin/login_bloc.dart';
 import 'package:ecommerce/viewmodel/authlogin/register_bloc.dart';
 import 'package:ecommerce/viewmodel/cart/cart_bloc.dart';
 import 'package:ecommerce/viewmodel/category/category_bloc.dart';
+import 'package:ecommerce/viewmodel/order/order_bloc.dart';
+import 'package:ecommerce/viewmodel/products/address_bloc.dart';
 import 'package:ecommerce/viewmodel/products/product_bloc.dart';
 import 'package:ecommerce/views/authentication/Require.dart';
 import 'package:ecommerce/views/authentication/Register.dart';
@@ -111,6 +113,12 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider<CartBloc>(
           create: (BuildContext context) => CartBloc(),
+        ),
+        BlocProvider<AddressBloc>(
+          create: (BuildContext context) => AddressBloc(),
+        ),
+        BlocProvider<OrderBloc>(
+          create: (BuildContext context) => OrderBloc(),
         ),
       ],
       child: MaterialApp(

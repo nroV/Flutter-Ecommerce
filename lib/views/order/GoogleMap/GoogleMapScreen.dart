@@ -1,12 +1,15 @@
 
 import 'package:ecommerce/helper/GoogleLocation.dart';
+import 'package:ecommerce/model/Address.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
+import 'package:ecommerce/viewmodel/products/address_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import '../../client/NavScreen.dart';
 import '../../widget/Product/CustomButton.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class GoogleMapScreen extends StatefulWidget {
   var positionlat;
   var positionlong;
@@ -25,8 +28,10 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 var mapofaddress;
 
 var homeadd;
-var homeadd2;
-var homeadd3;
+var city;
+var country;
+var userid;
+Map<String?,dynamic > googleaddress = {};
 
 
 
@@ -49,14 +54,20 @@ var homeadd3;
 
   }
   SendLatandLong(lat,long)  async{
-    print('call');
     mapofaddress = await locationhelper.getPlaceWithLatLng( lat,long);
+  setState(() {
+    print('call');
+
+    print(mapofaddress[5]["address_components"][5]["long_name"]);
     homeadd = mapofaddress[0]['formatted_address'];
-    print(mapofaddress[0]['formatted_address']);
-    setState(() {
+    print(mapofaddress[0]["address_components"][6]["long_name"]);
+    country = mapofaddress[0]["address_components"][6]["long_name"];
+    city = mapofaddress[5]["address_components"][5]["long_name"];
 
-    });
 
+    print("Position loong ${widget.positionlong}");
+    print("Position lat ${widget.positionlat}");
+  });
   }
   Future<void> currentUserLocation () async {
     var location = await Location().getLocation();
@@ -72,7 +83,7 @@ var homeadd3;
   @override
   void initState() {
     // TODO: implement initState
-
+  checkuserinstance();
     super.initState();
 
   }
@@ -189,8 +200,16 @@ var homeadd3;
 
 
 
+
               ),
               myLocationEnabled: true,
+              compassEnabled: false,
+              myLocationButtonEnabled: false,
+              scrollGesturesEnabled: true,
+              zoomGesturesEnabled: true,
+              rotateGesturesEnabled: false,
+              zoomControlsEnabled: false,
+              mapToolbarEnabled: false,
 
               onMapCreated: (controller) async {
                 setState(() {
@@ -240,7 +259,59 @@ var homeadd3;
                         color: Color(0xffF5F5F5)
                     ),
                   ),
-                  CustomButton(bgcolor: Colors.black,textbtn: 'Comfirm',function: SendLatandLong ),
+
+                  ElevatedButton(
+
+
+                  onPressed: () {
+
+                    //TODO bloc address put
+                    print("Sending Post Address");
+                    BlocProvider.of<AddressBloc>( context,listen: false).add(PostAddress(
+                      add: AddressBody(
+                        city: city,
+                        country: country,
+                        lat: widget.positionlat,
+                        lon: widget.positionlong,
+                        street: homeadd,
+
+
+                      ),
+                      userid:userid
+                    ));
+                    print(userid);
+
+
+                    Navigator.pop(context,{
+                      "homeadd":homeadd,
+                      "country":country,
+                      "city":city,
+                      "lat":widget.positionlat,
+
+                      "lon":widget.positionlong
+                    });
+
+                  },
+    style: ElevatedButton.styleFrom(
+    backgroundColor:Colors.black,
+    elevation: 0,
+    padding: EdgeInsets.all(15),
+    shape: RoundedRectangleBorder(
+    side: BorderSide(color: Colors.black.withOpacity(0.14)),
+    borderRadius: BorderRadius.circular(3)
+    )
+    ),
+    child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+
+    SizedBox(width: 10,),
+    Text("Comfirm",style: TextStyle(
+    fontSize: 12.8,
+
+    ),)
+    ],
+    ))
                 ],
               ),
             ),
@@ -254,5 +325,13 @@ var homeadd3;
 
     );
 
+  }
+
+  void checkuserinstance() async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+    userid = prefs!.getInt("userid");
   }
 }

@@ -8,7 +8,7 @@ import '../widget/Product/CustomButton.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'Checkout.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
 
@@ -17,10 +17,17 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  int? userid;
+
 
 
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    GetUserSharePrefs();
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -257,6 +264,8 @@ class _CartScreenState extends State<CartScreen> {
               discount: 0,
                 qtytotal: qtytotal,
                 subtotal: total,
+                uid: userid,
+                
 
               );
             },));
@@ -389,11 +398,19 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  PushScreen(BuildContext context) {
+  PushScreen(BuildContext context,userid) {
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return Checkout();
+      return Checkout(uid: userid,);
     },));
+  }
+
+  void GetUserSharePrefs() async {
+    
+    
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("object ${prefs.getInt("userid")}");
+    userid = prefs.getInt("userid");
   }
 }
 
