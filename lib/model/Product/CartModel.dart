@@ -8,9 +8,11 @@ class CartItem{
   var price;
   Attribution? attribution;
   var discount;
+  var colorid;
+  var imgid;
 
   CartItem({this.productid, this.qty, this.producttitle, this.imgurl, this.price,
-      this.attribution, this.discount});
+      this.attribution, this.discount,this.colorid,this.imgid});
 }
 
 class CartModel {

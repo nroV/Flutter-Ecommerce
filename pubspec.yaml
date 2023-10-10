@@ -54,6 +54,7 @@ dev_dependencies:
   google_maps_flutter: ^2.5.0
   shared_preferences: ^2.2.1
   lottie: ^2.6.0
+  intl:
   material_design_icons_flutter: 7.0.7296
   flutter_stripe: ^9.4.0
   google_sign_in: ^6.1.5
@@ -64,6 +65,8 @@ dev_dependencies:
   carousel_slider: ^4.2.1
   badges: ^3.1.2
   location: ^5.0.3
+  google_nav_bar: ^5.0.6
+
 
 
 

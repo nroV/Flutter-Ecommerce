@@ -9,6 +9,7 @@ import '../../model/Order/OrderDetail.dart';
 import '../../model/Order/OrderReq.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../model/Order/OrderUser.dart';
 import '../../repository/Order/OrderRepository.dart';
 part 'order_event.dart';
 part 'order_state.dart';
@@ -44,10 +45,48 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       try{
         print("Event Order Detail Summar");
         var res = await orderRepository.GetOrderSummary(event.orderid);
+        print("response");
+        print(res);
         emit(OrderDetailSuccess(res));
       }catch(error) {
         emit(OrderDetailError());
       }
     });
+    on<GetUserorder>((event, emit) async {
+      // TODO: implement event handler
+
+      emit(OrderUserLoading());
+
+      try{
+        print("Event User Order Sent");
+        var res = await orderRepository.GetOrderUser(event.userid);
+        emit(OrderUserComplete(res));
+      }catch(error) {
+        emit(OrderUserError());
+      }
+    });
+  }
+}
+
+class OrderBlocUser extends Bloc<OrderEvent, OrderState> {
+  OrderRepository orderRepository = OrderRepository();
+  OrderBlocUser() : super(OrderInitial()) {
+
+    on<GetOrderDetail>((event, emit) async {
+      // TODO: implement event handler
+
+      emit(OrderDetailLoading());
+
+      try{
+        print("Event Order Detail Summar");
+        var res = await orderRepository.GetOrderSummary(event.orderid);
+        print("response");
+        print(res);
+        emit(OrderDetailSuccess(res));
+      }catch(error) {
+        emit(OrderDetailError());
+      }
+    });
+
   }
 }

@@ -1,7 +1,7 @@
 class ApiUrl {
 
   static var main = "http://192.168.241.29:8000/";
-  static var authlogin = "http://192.168.5.21:8000/auth/login";
+  static var authlogin = "${main}auth/login";
   static var authsignup = "${main}/auth/register";
   static var authgoogleauth = "";
   static var producturl = "${main}product";
@@ -15,4 +15,7 @@ class ApiUrl {
 
   static var orderurl = "${main}order/product/";
   static var ordergetorder = "${main}order/";
+
+
+  static var orderuserurl = '${main}order/user/';
 }

@@ -100,7 +100,7 @@ class ProductSearchBloc extends Bloc<ProductEvent, ProductState> {
     try{
       var response = await productRepository.FetchProduct();
       print("Product bloc here");
-      print(response);
+      // print(response);
 
 
       emit(ProductCompleted(product:response));
@@ -120,7 +120,7 @@ class ProductSearchBloc extends Bloc<ProductEvent, ProductState> {
     try{
       var response = await productRepository.FetchProduct();
       print("Product sort bloc here");
-      print(response);
+      // print(response);
 
 
       emit(ProductCompleted(product:response));
@@ -139,7 +139,7 @@ class ProductSearchBloc extends Bloc<ProductEvent, ProductState> {
     try{
       var response = await productRepository.QueryProduct(event.search);
       print("Product query event send");
-      print(response);
+      // print(response);
 
 
       emit(ProductSerachCompleted(product:response));

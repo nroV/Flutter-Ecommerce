@@ -530,7 +530,9 @@ class _CheckoutState extends State<Checkout> {
                   for(int index=0;index<cart!.length;index++) {
                                   item.add(Productss(
                                     id: cart![index].productid,
-                                    quantity:  cart![index].qty
+                                    quantity:  cart![index].qty,
+                                    colorselection: cart![index].colorid,
+                                    imageproduct:  cart![index].imgid,
                                   ));
                   }
                   print("Item in cart");

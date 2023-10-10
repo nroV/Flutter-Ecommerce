@@ -39,7 +39,21 @@ class OrderDetailError extends OrderState{
 
 }
 class OrderDetailSuccess extends OrderState{
-OrderDetail? orderDetail;
+OrderList? orderDetail;
 
 OrderDetailSuccess(this.orderDetail);
+}
+
+class OrderUserLoading extends OrderState {
+
+}
+class OrderUserComplete extends OrderState {
+  OrderListUser? orderDetail;
+
+  OrderUserComplete(this.orderDetail);
+}
+class OrderUserError extends OrderState {
+
+
+  OrderUserError( );
 }

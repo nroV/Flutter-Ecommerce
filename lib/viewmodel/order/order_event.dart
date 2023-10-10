@@ -16,3 +16,9 @@ var orderid;
 
   GetOrderDetail({this.orderid});
 }
+
+class GetUserorder extends OrderEvent {
+    var userid;
+
+    GetUserorder({this.userid});
+}

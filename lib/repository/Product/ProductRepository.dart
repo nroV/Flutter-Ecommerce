@@ -12,12 +12,7 @@ class ProductRepository {
 
     try{
 
-      //
-      // if(sort == true) {
-      //
-      //   var res = await apiService.GetAllproduct(ApiUrl.producturlsort);
-      //   return ProductModel.fromJson(res);
-      // }
+
 
         print("New Arrival");
         var res = await apiService.GetAllproduct(ApiUrl.producturl,"");

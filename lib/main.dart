@@ -120,6 +120,9 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<OrderBloc>(
           create: (BuildContext context) => OrderBloc(),
         ),
+        BlocProvider<OrderBlocUser>(
+          create: (BuildContext context) => OrderBlocUser(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

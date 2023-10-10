@@ -53,25 +53,25 @@ class ProductDiscountCompleted extends ProductState {
 class ProductLoading extends ProductState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 }
 class ProductSearchLoading extends ProductState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 }
 class ProductSearchError extends ProductState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 }
 class ProductError extends ProductState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 }
 class ProductLoadingDiscount extends ProductState {

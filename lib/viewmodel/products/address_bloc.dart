@@ -20,7 +20,7 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
       try{
         print("Send post event");
         var response = await addressRepository.PostAddress(event.add, event.userid);
-        print(response);
+        // print(response);
 
 
 

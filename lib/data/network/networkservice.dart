@@ -83,7 +83,7 @@ class NetworkApiService {
       print(res.statusCode);
       // print(res.body.toString());
       if (res.statusCode == 201) {
-        return json.decode(res.body);
+        // return json.decode(res.body);
         print(res.body);
       }
       else {
@@ -101,7 +101,7 @@ class NetworkApiService {
 
       );
       print(res.statusCode);
-      print(res.body.toString());
+      // print(res.body.toString());
       if (res.statusCode == 200) {
         return json.decode(res.body);
       }
@@ -119,7 +119,7 @@ class NetworkApiService {
 
       );
       print(res.statusCode);
-      print(res.body.toString());
+      // print(res.body.toString());
       if (res.statusCode == 200) {
         return json.decode(res.body);
       }
@@ -152,7 +152,7 @@ class NetworkApiService {
         // }
       );
       // print(res.statusCode);
-      print(res.body.toString());
+      // print(res.body.toString());
       if (res.statusCode == 200) {
         return json.decode(res.body);
         print(res.body);
@@ -181,7 +181,7 @@ class NetworkApiService {
         // }
       );
       // print(res.statusCode);
-      print(res.body.toString());
+      // print(res.body.toString());
       if (res.statusCode == 200) {
         return json.decode(res.body);
         print(res.body);
@@ -203,7 +203,7 @@ class NetworkApiService {
 
       );
       print(res.statusCode);
-      print(res.body.toString());
+      // print(res.body.toString());
       if (res.statusCode == 200) {
         return json.decode(res.body);
       }
@@ -225,7 +225,7 @@ class NetworkApiService {
 
       );
       print(res.statusCode);
-      print(res.body.toString());
+      // print(res.body.toString());
       if (res.statusCode == 200) {
         return json.decode(res.body);
       }
@@ -236,6 +236,29 @@ class NetworkApiService {
       print("No internet during communication");
     }
   }
+
+  Future<dynamic> GetOrderUser(url,uid) async {
+    try {
+      print(url);
+      print(uid);
+      var urlhere = "${url}${uid}";
+      print(urlhere);
+      var res = await http.get(Uri.parse('${urlhere}'),
+
+      );
+      print(res.statusCode);
+      // print(res.body.toString());
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+
   Future<dynamic> PostOrder(String? url, addressid, OrderRequestV2? orderRequestV2) async {
     var headers = {
       'Content-Type': 'application/json',
