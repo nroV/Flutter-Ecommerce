@@ -11,9 +11,7 @@ class AllCart {
   AllCart({this.itemcart});
 
 
-  @override
-  // TODO: implement props
-  List<Object?> get props => [itemcart];
+
 
   void InsertToCart(CartItem item){
     itemcart!.add(item);

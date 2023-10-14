@@ -31,15 +31,15 @@ class Productss {
   int? id;
   int? quantity;
   int? colorselection;
-  int? imageproduct;
+  int? size;
 
-  Productss({this.id, this.quantity, this.colorselection, this.imageproduct});
+  Productss({this.id, this.quantity, this.colorselection, this.size});
 
   Productss.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     quantity = json['quantity'];
     colorselection = json['colorselection'];
-    imageproduct = json['imageproduct'];
+    size = json['size'];
   }
 
   Map<String, dynamic> toJson() {
@@ -47,7 +47,7 @@ class Productss {
     data['id'] = this.id;
     data['quantity'] = this.quantity;
     data['colorselection'] = this.colorselection;
-    data['imageproduct'] = this.imageproduct;
+    data['size'] = this.size;
     return data;
   }
 }

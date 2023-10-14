@@ -12,6 +12,7 @@ part 'cart_state.dart';
 class CartBloc extends Bloc<CartEvent, AllCart> {
   CartBloc() : super(InitState()) {
     on<CartToAdd>((event, emit) {
+      print("event cart");
       // TODO: implement event handler
 
       List<CartItem>? curr = state.itemcart;

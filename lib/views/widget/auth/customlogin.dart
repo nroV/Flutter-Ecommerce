@@ -11,6 +11,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../client/NavScreen.dart';
 class LoginForm extends StatefulWidget {
   var error;
  LoginForm({
@@ -23,7 +25,7 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  var istap = false;
+  var istap = true;
 
   var txtemail = TextEditingController();
   var txtpassword = TextEditingController();
@@ -78,6 +80,7 @@ class _LoginFormState extends State<LoginForm> {
                         fontSize: 13
                     ),
                     controller: txtemail,
+                    keyboardType: TextInputType.emailAddress,
                     onSubmitted: (value) {
                       setState(() {
                         txtemail.text = value;
@@ -89,11 +92,16 @@ class _LoginFormState extends State<LoginForm> {
                         istap = false;
                       });
                     },
+                    cursorColor: Colors.grey,
+                    textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                         filled: true,
 
+
                         fillColor: Color(AppColorConfig.bgfill),
+
                         label: Text("Email"),
+
                         floatingLabelStyle: TextStyle(
                             color: Colors.black
                         ),
@@ -112,7 +120,12 @@ class _LoginFormState extends State<LoginForm> {
                     style: TextStyle(
                         fontSize: 13
                     ),
+                    cursorColor: Colors.grey,
                     controller: txtpassword,
+                    obscureText:
+                    istap == true ? istap :
+
+                    false,
                     onSubmitted: (value) {
                       setState(() {
                         txtpassword.text = value;
@@ -128,7 +141,9 @@ class _LoginFormState extends State<LoginForm> {
 
                         suffixIcon:
                         istap == true ?
-                        Icon(Icons.remove_red_eye, color: Colors.grey,) : null,
+                        Icon(Icons.remove_red_eye, color: Colors.grey,) :
+                        Icon(Icons.remove_red_eye_outlined, color: Colors.grey,),
+
                         fillColor: Color(AppColorConfig.bgfill),
                         label: Text("Password"),
                         floatingLabelStyle: TextStyle(
@@ -268,7 +283,7 @@ class _LoginFormState extends State<LoginForm> {
                           onPressed: () {
                             Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(builder: (context) {
-                                return MyHomeScreen();
+                                return MyNavScreen();
                               },), (route) {
                                 return false;
                               },);

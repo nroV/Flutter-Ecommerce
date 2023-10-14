@@ -39,16 +39,17 @@ class _TrackingScreenState extends State<TrackingScreen> {
   }
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
 
         title: Text('${widget.appbar ?? 'Tracking'}', style: TextStyle(
-            color: Colors.black
+            color: Colors.white
         ),),
         centerTitle: true,
         iconTheme: IconThemeData(
             color: Colors.black
         ),
-        backgroundColor: Colors.white.withOpacity(0.34),
+        backgroundColor: Colors.black,
         elevation: 0,
 
 
@@ -253,9 +254,9 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
                       contentPadding: EdgeInsets.all(0),
                       leading: Image.network(
-                        '${ApiUrl.main}${order.product?.imgid![0].images}'
+                        '${ApiUrl.main}${order.colorselection?.imgid?.images}'
 
-                        , fit: BoxFit.cover,
+                        , fit: BoxFit.contain,
                         width: 100,
                         height: double.maxFinite,
                       ),

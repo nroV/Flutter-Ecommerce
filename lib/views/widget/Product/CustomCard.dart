@@ -32,9 +32,11 @@ class _CustomCardListState extends State<CustomCardList> {
         },));
       },
       child: Container(
-        height:180,
+
+
         margin: EdgeInsets.only(bottom: 10),
         child: Card(
+          elevation: 0,
 
 
           child: Container(
@@ -50,8 +52,10 @@ class _CustomCardListState extends State<CustomCardList> {
                 Expanded(
 
                   child: Image.network('${widget.product!.imgid![0].images}',
-                    fit: BoxFit.contain,
-                    width: double.maxFinite,
+                    fit: BoxFit.cover,
+                    height: 155,
+
+
 
 
 
@@ -157,7 +161,8 @@ class _CustomCardListState extends State<CustomCardList> {
                           children: [
                             Text("Free Shipping",style: TextStyle(
                                 fontSize: 10.8,
-                                fontWeight: FontWeight.w400
+                                fontWeight: FontWeight.w400,
+                              color: Color(AppColorConfig.success)
                             ),),
 
                             Container(

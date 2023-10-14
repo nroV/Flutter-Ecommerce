@@ -4,9 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/Product/CartModel.dart';
+import '../../viewmodel/products/address_bloc.dart';
 import '../widget/Product/CustomButton.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../widget/other/EmptyWidget.dart';
 import 'Checkout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class CartScreen extends StatefulWidget {
@@ -17,11 +19,11 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  int? userid;
 
 
 
-
+var cartlength = 0;
+int? userid;
   @override
   void initState() {
     // TODO: implement initState
@@ -29,7 +31,9 @@ class _CartScreenState extends State<CartScreen> {
     GetUserSharePrefs();
   }
   Widget build(BuildContext context) {
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
 
           title: Text("Your Cart", style: TextStyle(
@@ -38,152 +42,176 @@ class _CartScreenState extends State<CartScreen> {
           iconTheme: IconThemeData(
               color: Colors.black
           ),
-          centerTitle: true,
+          // centerTitle: true,
           backgroundColor: Colors.white.withOpacity(0.34),
           elevation: 0),
       body: SafeArea(
+
         child: SizedBox.expand(
-          child: BlocConsumer<CartBloc, AllCart>(
-            listener: (context, state) {
-              // TODO: implement listener
-              print(state.itemcart?.length);
 
-              // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          child: Padding(
+            padding: const EdgeInsets.all(11.0),
+            child: BlocConsumer<CartBloc, AllCart>(
+              listener: (context, state) {
+                // TODO: implement listener
 
-                // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("Added to cart") ));
+                setState(() {
+                  cartlength = state.itemcart?.length ?? 0;
+                  print(state.itemcart?.length);
+                });
+
+                // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                  // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("Added to cart") ));
 
 
 
-            },
-            builder: (context, state) {
-              return
-                state.itemcart?.length == 0 ?
-                  Center(
-                    child: Text("Your cart is empty",style: TextStyle(
-                      fontSize: 12.8
-                    ),),
-                  ) :
-             ListView.builder(
-                itemCount: state.itemcart?.length ?? 0,
+              },
+              builder: (context, state) {
+                if (state.itemcart?.length == 0) {
+                  return EmptyCard(
+                    maintitle: 'Opps Your Cart is Empty',
 
-                itemBuilder: (context, index) {
-                  var cart = state.itemcart![index];
-                  return Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                            color: Colors.black.withOpacity(0.2)
-                        )
-                    ),
-                    child: ListTile(
-                      isThreeLine: true,
-                      style: ListTileStyle.drawer,
-
-                      leading: Image.network(
-                          '${cart.imgurl}'),
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-
-                          Text('${cart.producttitle}'),
-                          InkWell(
-                            onTap: () {
-                              BlocProvider.of<CartBloc>(
-                                  context, listen: false).add(
-                                  CartRemoveAll(cartitem: CartItem(
-                                    discount: cart.discount,
-                                    qty: cart.qty,
-                                    productid: cart.productid,
-                                    attribution: cart.attribution,
-                                    imgurl: cart.imgurl,
-                                    price: cart.price,
-                                    producttitle: cart.producttitle,
-
-                                  )));
-                            },
-                            child: Icon(
-                              Icons.delete, color: Color(0xffC73737), size: 17,),
-                          ),
-                        ],
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('\$ ${cart.price}'),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                            children: [
-
-                              Row(
-                                children: [
-                                  Text('Size: L ', style: TextStyle(
-                                      fontSize: 10.8
-                                  ),),
-                                  Text('Color: Red ', style: TextStyle(
-                                      fontSize: 10.8
-                                  ),),
-                                ],
-                              ),
-                              Row(
-                                children: [
-
-                                  InkWell(
-                                      onTap: () {
-                                        BlocProvider.of<CartBloc>(
-                                            context, listen: false).add(
-                                            CartToRemove(cartitem: CartItem(
-                                              discount: cart.discount,
-                                              qty: cart.qty,
-                                              productid: cart.productid,
-                                              attribution: cart.attribution,
-                                              imgurl: cart.imgurl,
-                                              price: cart.price,
-                                              producttitle: cart.producttitle,
-
-                                            )));
-                                      },
-
-                                      child: Icon(Icons.remove_circle,
-                                        color: Color(
-                                            AppColorConfig.negativecolor),)),
-                                  SizedBox(width: 20,),
-                                  Text('${cart.qty}'),
-                                  SizedBox(width: 20,),
-                                  InkWell(
-                                      onTap: () {
-                                        BlocProvider.of<CartBloc>(
-                                            context, listen: false).add(
-                                            CartToAdd(cartitem: CartItem(
-                                              discount: cart.discount,
-                                              qty: cart.qty,
-                                              productid: cart.productid,
-                                              attribution: cart.attribution,
-                                              imgurl: cart.imgurl,
-                                              price: cart.price,
-                                              producttitle: cart.producttitle,
-
-                                            )));
-                                      },
-                                      child: Icon(Icons.add_circle_rounded,
-                                        color: Color(AppColorConfig.success),))
-                                ],
-                              ),
-                            ],
-                          ),
-
-                        ],
-                      ),
-                      // trailing: ,
-                    ),
+                    subtitle: 'Check out our store product right away',
+                  img: 'assets/logo/shoppingbag.jpg',
+                    btntitle: 'Order Now',
 
                   );
-                },);
-            },
+                } else {
+                  return ListView.builder(
+                  itemCount: state.itemcart?.length ?? 0,
+
+                  itemBuilder: (context, index) {
+                    var cart = state.itemcart![index];
+                    return Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: Colors.black.withOpacity(0.2)
+                          )
+                      ),
+                      child: ListTile(
+                        isThreeLine: true,
+                        style: ListTileStyle.drawer,
+
+                        leading: Image.network(
+                            '${cart.imgurl}'),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+
+                            Text('${cart.producttitle}'),
+                            InkWell(
+                              onTap: () {
+                                BlocProvider.of<CartBloc>(
+                                    context, listen: false).add(
+                                    CartRemoveAll(cartitem: CartItem(
+                                      discount: cart.discount,
+                                      qty: cart.qty,
+                                      productid: cart.productid,
+                                      attribution: cart.attribution,
+                                      imgurl: cart.imgurl,
+                                      price: cart.price,
+                                      producttitle: cart.producttitle,
+
+                                    )));
+                              },
+                              child: Icon(
+                                Icons.delete, color: Color(0xffC73737), size: 17,),
+                            ),
+                          ],
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('\$ ${cart.price}'),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                              children: [
+
+                                Row(
+                                  children: [
+                                    Text('Size: ${cart.sizetext} ', style: TextStyle(
+                                        fontSize: 10.8
+                                    ),),
+                                    Text('Color: ${cart.colorid} ', style: TextStyle(
+                                        fontSize: 10.8
+                                    ),),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+
+                                    InkWell(
+                                        onTap: () {
+                                          BlocProvider.of<CartBloc>(
+                                              context, listen: false).add(
+                                              CartToRemove(cartitem: CartItem(
+                                                discount: cart.discount,
+                                                qty: cart.qty,
+                                                productid: cart.productid,
+                                                attribution: cart.attribution,
+                                                imgurl: cart.imgurl,
+                                                price: cart.price,
+                                                producttitle: cart.producttitle,
+                                                sizeid: cart.sizeid,
+                                                colorid: cart.colorid,
+                                                imgid: cart.imgid,
+
+
+                                              )));
+                                        },
+
+                                        child: Icon(Icons.remove_circle,
+                                          color: Color(
+                                              AppColorConfig.negativecolor),)),
+                                    SizedBox(width: 20,),
+                                    Text('${cart.qty}'),
+                                    SizedBox(width: 20,),
+                                    InkWell(
+                                        onTap: () {
+                                          BlocProvider.of<CartBloc>(
+                                              context, listen: false).add(
+                                              CartToAdd(cartitem: CartItem(
+                                                discount: cart.discount,
+                                                qty: cart.qty,
+                                                productid: cart.productid,
+                                                attribution: cart.attribution,
+                                                imgurl: cart.imgurl,
+                                                price: cart.price,
+                                                producttitle: cart.producttitle,
+                                                sizeid: cart.sizeid,
+                                                colorid: cart.colorid,
+                                                imgid: cart.imgid,
+
+
+                                              )));
+                                        },
+                                        child: Icon(Icons.add_circle_rounded,
+                                          color: Color(AppColorConfig.success),))
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                          ],
+                        ),
+                        // trailing: ,
+                      ),
+
+                    );
+                  },);
+                }
+              },
+            ),
           ),
         ),
       ),
-      bottomSheet: BlocConsumer<CartBloc, AllCart>(
+      bottomSheet:
+
+
+      BlocConsumer<CartBloc, AllCart>(
         listener: (context, state) {
           // TODO: implement listener
         },
@@ -195,7 +223,12 @@ class _CartScreenState extends State<CartScreen> {
             qtytotal += element!.qty!;
 
           });
-          return Container(
+          return
+            state.itemcart?.length == 0 ?
+            Container(
+              height: 1,
+            ) :
+            Container(
 
             decoration: BoxDecoration(
               color: Colors.white,
@@ -251,7 +284,8 @@ class _CartScreenState extends State<CartScreen> {
                     ),)
                   ],
                 ),
-                Divider(),
+           SizedBox(height: 14,),
+
            ElevatedButton(
 
               onPressed: () {
@@ -265,6 +299,8 @@ class _CartScreenState extends State<CartScreen> {
                 qtytotal: qtytotal,
                 subtotal: total,
                 uid: userid,
+
+
                 
 
               );
@@ -279,7 +315,7 @@ class _CartScreenState extends State<CartScreen> {
           padding: EdgeInsets.all(15),
           shape: RoundedRectangleBorder(
           side: BorderSide(color: Colors.black.withOpacity(0.14)),
-          borderRadius: BorderRadius.circular(3)
+          borderRadius: BorderRadius.circular(10)
           )
           ),
           child: Row(
@@ -304,7 +340,7 @@ class _CartScreenState extends State<CartScreen> {
             ),
           );
         },
-      ),
+      )
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       // floatingActionButton:     Container(
       //
@@ -413,5 +449,7 @@ class _CartScreenState extends State<CartScreen> {
     userid = prefs.getInt("userid");
   }
 }
+
+
 
 

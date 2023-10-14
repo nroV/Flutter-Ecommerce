@@ -73,6 +73,7 @@ class Address {
   String? latitude;
   String? longitude;
   String? description;
+  String? country;
 
   Address(
       {this.id,
@@ -81,7 +82,8 @@ class Address {
         this.city,
         this.latitude,
         this.longitude,
-        this.description});
+        this.description,
+        this.country});
 
   Address.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -93,6 +95,7 @@ class Address {
     latitude = json['latitude'];
     longitude = json['longitude'];
     description = json['description'];
+    country = json['country'];
   }
 
   Map<String, dynamic> toJson() {
@@ -106,6 +109,7 @@ class Address {
     data['latitude'] = this.latitude;
     data['longitude'] = this.longitude;
     data['description'] = this.description;
+    data['country'] = this.country;
     return data;
   }
 }
@@ -114,43 +118,31 @@ class CustomerId {
   int? id;
   String? firstname;
   String? lastname;
-  String? username;
   String? email;
-  String? password;
   String? telephone;
-  bool? isowner;
-  String? lastLogin;
-  bool? isActivated;
   String? gender;
   Null? imgid;
+  String? password;
 
   CustomerId(
       {this.id,
         this.firstname,
         this.lastname,
-        this.username,
         this.email,
-        this.password,
         this.telephone,
-        this.isowner,
-        this.lastLogin,
-        this.isActivated,
         this.gender,
-        this.imgid});
+        this.imgid,
+        this.password});
 
   CustomerId.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     firstname = json['firstname'];
     lastname = json['lastname'];
-    username = json['username'];
     email = json['email'];
-    password = json['password'];
     telephone = json['telephone'];
-    isowner = json['isowner'];
-    lastLogin = json['last_login'];
-    isActivated = json['is_activated'];
     gender = json['gender'];
     imgid = json['imgid'];
+    password = json['password'];
   }
 
   Map<String, dynamic> toJson() {
@@ -158,15 +150,11 @@ class CustomerId {
     data['id'] = this.id;
     data['firstname'] = this.firstname;
     data['lastname'] = this.lastname;
-    data['username'] = this.username;
     data['email'] = this.email;
-    data['password'] = this.password;
     data['telephone'] = this.telephone;
-    data['isowner'] = this.isowner;
-    data['last_login'] = this.lastLogin;
-    data['is_activated'] = this.isActivated;
     data['gender'] = this.gender;
     data['imgid'] = this.imgid;
+    data['password'] = this.password;
     return data;
   }
 }
@@ -175,7 +163,7 @@ class Products {
   Product? product;
   int? quantity;
   Colorid? colorselection;
-  Imgid? imageproduct;
+  Null? imageproduct;
 
   Products(
       {this.product, this.quantity, this.colorselection, this.imageproduct});
@@ -187,9 +175,7 @@ class Products {
     colorselection = json['colorselection'] != null
         ? new Colorid.fromJson(json['colorselection'])
         : null;
-    imageproduct = json['imageproduct'] != null
-        ? new Imgid.fromJson(json['imageproduct'])
-        : null;
+    imageproduct = json['imageproduct'];
   }
 
   Map<String, dynamic> toJson() {
@@ -201,9 +187,7 @@ class Products {
     if (this.colorselection != null) {
       data['colorselection'] = this.colorselection!.toJson();
     }
-    if (this.imageproduct != null) {
-      data['imageproduct'] = this.imageproduct!.toJson();
-    }
+    data['imageproduct'] = this.imageproduct;
     return data;
   }
 }
@@ -351,7 +335,7 @@ class Owner {
 class Attribution {
   int? id;
   List<Colorid>? colorid;
-  String? size;
+  List<Size>? size;
   double? weight;
   String? brand;
   String? model;
@@ -374,7 +358,12 @@ class Attribution {
         colorid!.add(new Colorid.fromJson(v));
       });
     }
-    size = json['size'];
+    if (json['size'] != null) {
+      size = <Size>[];
+      json['size'].forEach((v) {
+        size!.add(new Size.fromJson(v));
+      });
+    }
     weight = json['weight'];
     brand = json['brand'];
     model = json['model'];
@@ -387,7 +376,9 @@ class Attribution {
     if (this.colorid != null) {
       data['colorid'] = this.colorid!.map((v) => v.toJson()).toList();
     }
-    data['size'] = this.size;
+    if (this.size != null) {
+      data['size'] = this.size!.map((v) => v.toJson()).toList();
+    }
     data['weight'] = this.weight;
     data['brand'] = this.brand;
     data['model'] = this.model;
@@ -398,13 +389,15 @@ class Attribution {
 
 class Colorid {
   int? id;
+  Imgid? imgid;
   String? color;
   String? desc;
 
-  Colorid({this.id, this.color, this.desc});
+  Colorid({this.id, this.imgid, this.color, this.desc});
 
   Colorid.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    imgid = json['imgid'] != null ? new Imgid.fromJson(json['imgid']) : null;
     color = json['color'];
     desc = json['desc'];
   }
@@ -412,8 +405,30 @@ class Colorid {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    if (this.imgid != null) {
+      data['imgid'] = this.imgid!.toJson();
+    }
     data['color'] = this.color;
     data['desc'] = this.desc;
+    return data;
+  }
+}
+
+class Size {
+  int? id;
+  String? size;
+
+  Size({this.id, this.size});
+
+  Size.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    size = json['size'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['size'] = this.size;
     return data;
   }
 }

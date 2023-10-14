@@ -2,8 +2,9 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/category/category_bloc.dart';
 import 'package:ecommerce/viewmodel/products/product_bloc.dart';
+import 'package:ecommerce/views/client/ProductAllScreen.dart';
 import 'package:ecommerce/views/client/category/category.dart';
-import 'package:ecommerce/views/client/product/NewArrival.dart';
+import 'package:ecommerce/views/client/product/BestSelling.dart';
 import 'package:ecommerce/views/client/utilities/searchscreen.dart';
 import 'package:ecommerce/views/order/Cart.dart';
 import 'package:flutter/material.dart';
@@ -25,14 +26,23 @@ class _CardCategoryScrollState extends State<CardCategoryScroll> {
   @override
   void initState() {
     // TODO: implement initState
-    BlocProvider.of<CategoryBloc>(context).add(FetchCategory());
+    context.read<CategoryBloc>().add(FetchCategory());
     super.initState();
+
+
   }
   Widget build(BuildContext context) {
     // TODO: implement build
+
     return BlocConsumer<CategoryBloc, CategoryState>(
   listener: (context, state) {
     // TODO: implement listener
+    print(state);
+    if (state is CategoryByidCompleted) {
+      // Do nothing
+      print("true");
+
+    }
   },
   builder: (context, state) {
     if(state is CategoryLoading){
@@ -40,7 +50,7 @@ class _CardCategoryScrollState extends State<CardCategoryScroll> {
           child: CircularProgressIndicator(),
         );
     }
-    if(state is CategoryCompleted){
+    if(state is CategoryCompleted ){
       var len = state.category!.results!.length;
 
       return ListView.builder(
@@ -49,20 +59,29 @@ class _CardCategoryScrollState extends State<CardCategoryScroll> {
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           var category =  state.category!.results![index];
-          return Container(
-            margin: EdgeInsets.only(right: 18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                //TODO image here
-                CircleAvatar(
-                  radius: 40,
+          return InkWell(
+             onTap: () {
+               print(category.id);
+               Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return ProductAllPage(category:  state.category!.results,
+                    selectedcategory:  category.id,);
+               },));
+             },
+            child: Container(
+              margin: EdgeInsets.only(right: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  //TODO image here
+                  CircleAvatar(
+                    radius: 40,
 
-                  backgroundImage: NetworkImage('${category.imgid!.images}'),
-                ),
-                SizedBox(height: 10,),
-                Text("${category.categoryname}",style: Theme.of(context).textTheme.headlineSmall,)
-              ],
+                    backgroundImage: NetworkImage('${category.imgid!.images}'),
+                  ),
+                  SizedBox(height: 10,),
+                  Text("${category.categoryname}",style: Theme.of(context).textTheme.headlineSmall,)
+                ],
+              ),
             ),
           );
         },);

@@ -7,13 +7,13 @@ abstract class ProductState extends Equatable{
 class ProductInitialSearch extends ProductState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props =>[];
 
 }
 class ProductInitial extends ProductState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 }
 class ProductCompleted extends ProductState {
@@ -27,6 +27,41 @@ class ProductCompleted extends ProductState {
   List<Object?> get props => [product];
 
 }
+
+class ProductSortCompleted extends ProductState {
+  ProductModel? product;
+
+
+  ProductSortCompleted({this.product});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [product];
+
+}
+class ProductSortLoading extends ProductState {
+
+
+
+  ProductSortLoading();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
+class ProductSortError extends ProductState {
+
+
+
+  ProductSortError();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
+
 
 class ProductSerachCompleted extends ProductState {
   ProductModel? product;
@@ -77,13 +112,13 @@ class ProductError extends ProductState {
 class ProductLoadingDiscount extends ProductState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props =>[];
 
 }
 
 class ProductErrorDiscount extends ProductState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 }

@@ -3,6 +3,8 @@ class ProductModel {
   int? pageSize;
   int? totalPages;
   int? currentPageNumber;
+  Null? next;
+  Null? previous;
   List<Results>? results;
 
   ProductModel(
@@ -10,6 +12,8 @@ class ProductModel {
         this.pageSize,
         this.totalPages,
         this.currentPageNumber,
+        this.next,
+        this.previous,
         this.results});
 
   ProductModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +21,8 @@ class ProductModel {
     pageSize = json['page_size'];
     totalPages = json['total_pages'];
     currentPageNumber = json['current_page_number'];
+    next = json['next'];
+    previous = json['previous'];
     if (json['results'] != null) {
       results = <Results>[];
       json['results'].forEach((v) {
@@ -31,6 +37,8 @@ class ProductModel {
     data['page_size'] = this.pageSize;
     data['total_pages'] = this.totalPages;
     data['current_page_number'] = this.currentPageNumber;
+    data['next'] = this.next;
+    data['previous'] = this.previous;
     if (this.results != null) {
       data['results'] = this.results!.map((v) => v.toJson()).toList();
     }
@@ -39,20 +47,17 @@ class ProductModel {
 }
 
 class Results {
-
-
-
   int? id;
   Category? category;
   Owner? owner;
   List<Imgid>? imgid;
+  Attribution? attribution;
   String? productname;
   double? price;
   int? stockqty;
   double? avgRating;
   int? discount;
   int? sellRating;
-  Attribution? attribution;
   String? description;
 
   Results(
@@ -184,7 +189,7 @@ class Owner {
 class Attribution {
   int? id;
   List<Colorid>? colorid;
-  String? size;
+  List<Size>? size;
   double? weight;
   String? brand;
   String? model;
@@ -207,7 +212,12 @@ class Attribution {
         colorid!.add(new Colorid.fromJson(v));
       });
     }
-    size = json['size'];
+    if (json['size'] != null) {
+      size = <Size>[];
+      json['size'].forEach((v) {
+        size!.add(new Size.fromJson(v));
+      });
+    }
     weight = json['weight'];
     brand = json['brand'];
     model = json['model'];
@@ -220,7 +230,9 @@ class Attribution {
     if (this.colorid != null) {
       data['colorid'] = this.colorid!.map((v) => v.toJson()).toList();
     }
-    data['size'] = this.size;
+    if (this.size != null) {
+      data['size'] = this.size!.map((v) => v.toJson()).toList();
+    }
     data['weight'] = this.weight;
     data['brand'] = this.brand;
     data['model'] = this.model;
@@ -231,22 +243,43 @@ class Attribution {
 
 class Colorid {
   int? id;
+  Imgid? imgid;
   String? color;
-  String? desc;
 
-  Colorid({this.id, this.color, this.desc});
+  Colorid({this.id, this.imgid, this.color});
 
   Colorid.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    imgid = json['imgid'] != null ? new Imgid.fromJson(json['imgid']) : null;
     color = json['color'];
-    desc = json['desc'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    if (this.imgid != null) {
+      data['imgid'] = this.imgid!.toJson();
+    }
     data['color'] = this.color;
-    data['desc'] = this.desc;
+    return data;
+  }
+}
+
+class Size {
+  int? id;
+  String? size;
+
+  Size({this.id, this.size});
+
+  Size.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    size = json['size'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['size'] = this.size;
     return data;
   }
 }

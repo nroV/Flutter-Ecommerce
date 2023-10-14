@@ -3,6 +3,7 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/res/constant/stripesecretkey.dart';
 import 'package:ecommerce/views/authentication/PhoneNumberScreen.dart';
+import 'package:ecommerce/views/client/NavScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -11,6 +12,7 @@ import 'dart:convert';
 
 import 'package:flutter_stripe/flutter_stripe.dart';
 
+import '../../../model/Ulti/Genders.dart';
 import '../../authentication/AccountRoleScreen.dart';
 import '../../authentication/LoginScreen.dart';
 import '../../client/Home.dart';
@@ -28,6 +30,8 @@ class _RegisterFormState extends State<RegisterForm> {
   var fname = TextEditingController();
   var lname = TextEditingController();
   var username = TextEditingController();
+  var genderlist = [Genders.Male.name,Genders.Female.name,Genders.Other.name];
+  var gender =Genders.Male.name;
   @override
   void initState() {
     // TODO: implement initState
@@ -36,12 +40,13 @@ class _RegisterFormState extends State<RegisterForm> {
 
   }
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(28.0),
+    return SingleChildScrollView(
+
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
+              SizedBox(height: 20,),
           //TODO login gmail or facebook here
           Container(
             width: MediaQuery.of(context).size.width*1,
@@ -112,7 +117,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(context,
                         MaterialPageRoute(builder: (context) {
-                          return MyHomeScreen();
+                          return MyNavScreen();
                         },), (route) {
                           return false;
                         },);
@@ -167,7 +172,7 @@ class _RegisterFormState extends State<RegisterForm> {
             child: TextField(
               style: TextStyle(
                   fontSize: 13
-              ),
+              ),cursorColor: Colors.grey,
               controller: fname,
               onSubmitted: (value) {
                 setState(() {
@@ -201,6 +206,7 @@ class _RegisterFormState extends State<RegisterForm> {
             height: 45,
             margin: EdgeInsets.only(top: 25),
             child: TextField(
+              cursorColor: Colors.grey,
               style: TextStyle(
                   fontSize: 13
               ),
@@ -236,14 +242,13 @@ class _RegisterFormState extends State<RegisterForm> {
             height: 45,
             margin: EdgeInsets.only(top: 25),
             child: TextField(
+              cursorColor: Colors.grey,
               style: TextStyle(
                   fontSize: 13
               ),
 
               onTap: () {
-                setState(() {
-                  istap =!istap;
-                });
+
               },
               controller: username,
               onSubmitted: (value) {
@@ -255,10 +260,9 @@ class _RegisterFormState extends State<RegisterForm> {
                   filled: true,
 
 
-                  suffixIcon:
-                  istap == true ?
-                  Icon(Icons.remove_red_eye,color: Colors.grey,) : null,
-                  fillColor: Color(AppColorConfig.bgfill),
+
+
+
                   label: Text("username"),
                   floatingLabelStyle: TextStyle(
                       color: Colors.black
@@ -272,7 +276,56 @@ class _RegisterFormState extends State<RegisterForm> {
 
             ),
           ),
+
           //TODO forget password
+          SizedBox(height: 15,),
+          Container(
+            width: double.maxFinite,
+            margin: EdgeInsets.only(top: 15),
+            decoration: BoxDecoration(
+              color: Color(0xffF1F1F1),
+              borderRadius: BorderRadius.circular(6),
+
+            ),
+            child: DropdownButton(
+              elevation: 0,
+              padding: EdgeInsets.only(left: 10,right: 10,top: 0,bottom: 0),
+              underline: SizedBox(),
+
+
+              // Initial Value
+              value:gender  ,
+
+
+              // Down Arrow Icon
+              icon: const Icon(Icons.keyboard_arrow_down),
+              alignment: Alignment.center,
+              isExpanded: true,
+              style: TextStyle(
+                  fontSize: 12.8,color: Colors.black,
+                  fontWeight: FontWeight.w400
+
+              ),
+
+              // Array list of items
+              items: genderlist.map((items) {
+                return DropdownMenuItem(
+                  value: items,
+                  child: Text(items.toString()),
+                );
+              }).toList(),
+              onChanged: (dynamic value) {
+                setState(() {
+                  gender   = value!;
+
+                });
+              },
+              // After selecting the desired option,it will
+              // change button value to selected value
+
+
+            ),
+          ),
           SizedBox(height: 15,),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -287,6 +340,7 @@ class _RegisterFormState extends State<RegisterForm> {
               ),),
             ],
           ),
+          SizedBox(height: 5,),
 
           Container(
             margin: EdgeInsets.only(top: 15,bottom: 15),
@@ -303,11 +357,14 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
               onPressed: () {
                 //TODO login Register here
+                print(username.text);
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return  AccountRoleScreen(
+                      return  PhoneNumberScreen(
                         firstname: fname.text,
                         lastname: lname.text,
                         username: username.text,
+                        isowner: false,
+                        gender: gender,
                         );
                 },));
 
@@ -317,12 +374,15 @@ class _RegisterFormState extends State<RegisterForm> {
               Theme.of(context).textTheme.displaySmall,),
             ),
           ),
-
+          SizedBox(height: 10,),
           InkWell(
             onTap: () {
               Navigator.pushAndRemoveUntil(context,
                 MaterialPageRoute(builder: (context) {
-                  return  loginScreen();
+                  return  loginScreen(
+
+
+                  );
                 },), (route) {
                   return false;
                 },);
@@ -338,7 +398,7 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             ),
           ),
-
+          SizedBox(height: 7,),
         ],
       ),
     );

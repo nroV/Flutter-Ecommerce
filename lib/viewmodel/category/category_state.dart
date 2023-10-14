@@ -37,6 +37,40 @@ class CategoryError extends CategoryState {
 
 }
 
+class CategoryByidCompleted  extends CategoryState {
+
+  CategoryProduct? product;
+
+
+  CategoryByidCompleted({this.product});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props =>[product];
+
+
+}
+
+
+
+class  CategoryByidError  extends CategoryState {
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+
+
+}
+
+
+
+class  CategoryByidLoading  extends CategoryState {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+
+}
+
 
 
 

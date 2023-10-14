@@ -1,4 +1,6 @@
+import 'package:ecommerce/provider/AppProvider.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
+import 'package:ecommerce/viewmodel/User/user_bloc.dart';
 import 'package:ecommerce/viewmodel/authlogin/login_bloc.dart';
 import 'package:ecommerce/viewmodel/authlogin/register_bloc.dart';
 import 'package:ecommerce/viewmodel/cart/cart_bloc.dart';
@@ -92,38 +94,7 @@ class _MyAppState extends State<MyApp> {
     setPreference();
     return MultiBlocProvider(
 
-      providers: [
-        BlocProvider<LoginBloc>(
-          create: (BuildContext context) => LoginBloc(),
-        ),
-        BlocProvider<RegisterBloc>(
-          create: (BuildContext context) => RegisterBloc(),
-        ),
-        BlocProvider<ProductBloc>(
-          create: (BuildContext context) => ProductBloc(),
-        ),
-        BlocProvider<CategoryBloc>(
-          create: (BuildContext context) => CategoryBloc(),
-        ),
-        BlocProvider<ProductDiscountBloc>(
-          create: (BuildContext context) => ProductDiscountBloc(),
-        ),
-        BlocProvider<ProductSearchBloc>(
-          create: (BuildContext context) => ProductSearchBloc(),
-        ),
-        BlocProvider<CartBloc>(
-          create: (BuildContext context) => CartBloc(),
-        ),
-        BlocProvider<AddressBloc>(
-          create: (BuildContext context) => AddressBloc(),
-        ),
-        BlocProvider<OrderBloc>(
-          create: (BuildContext context) => OrderBloc(),
-        ),
-        BlocProvider<OrderBlocUser>(
-          create: (BuildContext context) => OrderBlocUser(),
-        ),
-      ],
+      providers: AppProvider.allblocprovider,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Ecommerce',
@@ -154,7 +125,7 @@ class _MyAppState extends State<MyApp> {
         // },
         // home  : RequireLoginandSignup(),
         home:
-        prefs?.getBool("islogin")  == null  ?
+        prefs?.getString("token")  == null  ?
         RequireLoginandSignup() :
 
         MyNavScreen() ,
@@ -166,9 +137,11 @@ class _MyAppState extends State<MyApp> {
 
   void setPreference() async{
    prefs = await SharedPreferences.getInstance();
-
+  print("Starting");
    print(prefs?.getBool("islogin"));
-   prefs!.getInt("userid");
+ print("User id: ${  prefs!.getInt("userid")}");
+   prefs!.getString('token');
+   print( prefs!.getString('token'));
   }
 }
 

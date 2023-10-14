@@ -28,6 +28,7 @@ class loginScreen extends StatefulWidget {
 }
 
 class _loginScreenState extends State<loginScreen> {
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -55,7 +56,8 @@ class _loginScreenState extends State<loginScreen> {
             if  (state is LoginCompleted) {
 
               // Navigator.pop(context);
-              setLoginTrue(state.token!.user!.id ?? 0);
+              print(state.token?.access);
+              setLoginTrue(state.token!.user!.id ?? 0,state.token?.access);
 
               // return Text("${state.token?.refresh}");
               // throw "done";
@@ -91,11 +93,12 @@ class _loginScreenState extends State<loginScreen> {
       );
     },);
   }
-  void setLoginTrue(int userid) async {
+  void setLoginTrue(int userid,String? tok) async {
     SharedPreferences? prefs = await SharedPreferences.getInstance();
     prefs.setBool("islogin",true);
     print(userid);
     prefs.setInt("userid",userid);
+    prefs.setString("token", tok!);
     print(prefs.getBool("islogin"));
   }
 }

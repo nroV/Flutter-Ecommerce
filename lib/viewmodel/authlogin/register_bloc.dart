@@ -18,7 +18,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         // fname,lname,String? email,String? password,telephone,username
         var responsebody = await user.AuthUserSignUp(
             event.fname, event.lname, event.email, event.pass,event.tele,
-            event.username);
+            event.username,event.gender);
         print(responsebody);
         emit(RegisterCompleted());
       }catch(error) {

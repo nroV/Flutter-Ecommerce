@@ -11,9 +11,10 @@ class PhoneNumberScreen extends StatefulWidget {
   var lastname;
   var isowner ;
   var firstname;
+  var gender;
  PhoneNumberScreen({Key? key,
    this.isowner, this.username,
-   this.lastname, this.firstname}) : super(key: key);
+   this.lastname, this.firstname,this.gender}) : super(key: key);
 
   @override
   State<PhoneNumberScreen> createState() => _PhoneNumberScreenState();
@@ -47,6 +48,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                     username: widget.username,
                     isowner: widget.isowner,
                     tele: userphone,
+                    gender: widget.gender,
 
                   );
               },));

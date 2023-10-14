@@ -32,6 +32,38 @@ class ProductRepository {
       rethrow ;
     }
   }
+  Future<dynamic> SortProduct(sort,rank,{search}) async {
+
+    try{
+
+
+      var res;
+
+      print(ApiUrl.producturl);
+      print(sort);
+      print(rank);
+      print(search);
+
+       res = await apiService.Sortproduct(ApiUrl.producturl,sort,rank ,search: search );
+
+      // print(res);
+
+      return ProductModel.fromJson(res);
+
+
+
+
+
+      // return TokenModel.fromJson(res);
+
+
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
 
   Future<dynamic> QueryProduct(search) async {
 

@@ -20,6 +20,7 @@ class _CompletedOrderState extends State<CompletedOrder> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar:AppBar(
 
         title: Text('Order Summary',style: TextStyle(
@@ -71,7 +72,7 @@ class _CompletedOrderState extends State<CompletedOrder> {
 
 
                   contentPadding: EdgeInsets.all(0),
-                  leading: Image.network('${urlimg}${cart!.product!.imgid?[0].images}'
+                  leading: Image.network('${urlimg}${cart!.colorselection?.imgid?.images}'
 
                     ,fit: BoxFit.cover,
                     width: 100,

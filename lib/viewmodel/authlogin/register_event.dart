@@ -16,8 +16,9 @@ var email;
 var pass;
 var tele;
 var username;
+var gender;
 
 OnRegister(
-      this.fname, this.lname, this.email, this.pass, this.tele, this.username);
+      this.fname, this.lname, this.email, this.pass, this.tele, this.username,this.gender);
 }
 

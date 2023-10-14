@@ -19,7 +19,8 @@ class CredentialScreen extends StatefulWidget {
    var lastname;
    var firstname;
    var tele;
-   CredentialScreen ({Key? key,this.isowner,this.username,this.lastname,this.firstname,this.tele}) : super(key: key);
+   var gender;
+   CredentialScreen ({Key? key,this.isowner,this.username,this.lastname,this.firstname,this.tele,this.gender}) : super(key: key);
 
   @override
   State<CredentialScreen> createState() => _CredentialScreenState();
@@ -28,6 +29,7 @@ class CredentialScreen extends StatefulWidget {
 class _CredentialScreenState extends State<CredentialScreen> {
   var txtemail = TextEditingController();
   var txtpassword = TextEditingController();
+  var istap = true;
   @override
   void initState() {
     // TODO: implement initState
@@ -35,17 +37,19 @@ class _CredentialScreenState extends State<CredentialScreen> {
     print(widget.isowner);
     print(widget.firstname);
     print(widget.lastname);
+    print(widget.username);
   }
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: null,
+
       body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
               return BlocConsumer<RegisterBloc,RegisterState>(
   listener: (context, state) {
     // TODO: implement listener
+    print(state);
   },
   builder: (context, state) {
 
@@ -55,13 +59,14 @@ class _CredentialScreenState extends State<CredentialScreen> {
         );
     }
     if(state is RegisterCompleted) {
-
       storeemailandpass(txtemail.text,txtpassword.text);
+
       return VerifyScreen();
+
     }
     if(state is RegisterError) {
       return Center(
-        child: CircularProgressIndicator(),
+        child: Text("Email is already existed"),
       );
     }
     else{
@@ -71,19 +76,11 @@ class _CredentialScreenState extends State<CredentialScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //TODO image phone here
-            Container(
-              height: constraints.maxHeight*0.45,
-              child: Column(
-                children: [
-                  Center(
-                    child: Lottie.asset("assets/lotties/lock.json",
-                        fit: BoxFit.cover,
-                        height: 190,
-                        width:constraints.maxWidth*0.85
-                    ),
-                  ),
+            Center(
+              child: Lottie.asset("assets/lotties/lock.json",
+                  fit: BoxFit.cover,
 
-                ],
+                  width:double.maxFinite
               ),
             ),
 
@@ -119,6 +116,7 @@ class _CredentialScreenState extends State<CredentialScreen> {
                         });
                       },
                       controller: txtemail,
+                      cursorColor: Colors.grey,
                       onSubmitted: (value) {
                         setState(() {
                           txtemail.text = value;
@@ -145,36 +143,42 @@ class _CredentialScreenState extends State<CredentialScreen> {
                   ),
 
                   Container(
-                    height: 50,
-
-                    width: double.maxFinite,
-                    margin: EdgeInsets.only(bottom: 5),
+                    height: 45,
+                    margin: EdgeInsets.only(top: 5),
                     child: TextField(
                       style: TextStyle(
                           fontSize: 13
                       ),
-
-                      onTap: () {
-                        setState(() {
-
-                        });
-                      },
+                      cursorColor: Colors.grey,
                       controller: txtpassword,
+                      obscureText:
+                      istap == true ? istap :
+
+                      false,
                       onSubmitted: (value) {
                         setState(() {
                           txtpassword.text = value;
                         });
                       },
+                      onTap: () {
+                        setState(() {
+                          istap = !istap;
+                        });
+                      },
                       decoration: InputDecoration(
                           filled: true,
-                          hintText:'',
-                          label: Text("Password"),
+
+                          suffixIcon:
+                          istap == true ?
+                          Icon(Icons.remove_red_eye, color: Colors.grey,) :
+                          Icon(Icons.remove_red_eye_outlined, color: Colors.grey,),
 
                           fillColor: Color(AppColorConfig.bgfill),
-
+                          label: Text("Password"),
                           floatingLabelStyle: TextStyle(
                               color: Colors.black
                           ),
+
                           border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.circular(10)
@@ -201,9 +205,9 @@ class _CredentialScreenState extends State<CredentialScreen> {
                 ),
                 onPressed: () {
                   print("HEllo world");
-                  BlocProvider.of<RegisterBloc>(context).add(OnRegister(
+                  BlocProvider.of<RegisterBloc>(context,listen: false).add(OnRegister(
                       widget.firstname, widget.lastname,
-                      txtemail.text, txtpassword.text, widget.tele, widget.username));
+                      txtemail.text, txtpassword.text, widget.tele, widget.username,widget.gender));
 
                   // Navigator.pushAndRemoveUntil(context,
                   //   MaterialPageRoute(builder: (context) {

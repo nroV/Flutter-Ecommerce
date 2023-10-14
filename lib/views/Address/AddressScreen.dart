@@ -23,10 +23,11 @@ class _AddressProductScrState extends State<AddressProductScr> {
     // TODO: implement initState
     super.initState();
     print(widget.userid);
-    BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget.userid));
+
   }
   Widget build(BuildContext context) {
     // TODO: implement build
+    BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget.userid));
     print("State updated");
     return Scaffold(
       appBar: AppBar(

@@ -56,19 +56,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
               return VerifyScreen();
             }
             else{
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              return SingleChildScrollView(
 
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  //TODO image
-                  Expanded(
-                    flex: 1,
-                    child: Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+
+                  children: [
+                    //TODO image
+                    Container(
                       child: Image.asset('assets/images/unsplash_D4jRahaUaIc.png',
                         width: double.maxFinite,
-                        height: double.maxFinite,
+                        height: 200,
                         color: Colors.black12,
 
 
@@ -78,18 +78,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                       ),
                     ),
-                  ),
-
-                  Container(
-                      width: double.maxFinite,
-
-                      child: RegisterForm()),
 
 
-                  //TODO login part here
+                   Container(
+                      padding: const EdgeInsets.only(left: 20,right: 20),
+                      margin: EdgeInsets.only(bottom: 30),
+
+                      child: RegisterForm(),
+                    ),
 
 
-                ],
+                    //TODO login part here
+
+
+                  ],
+                ),
               );
             }
 

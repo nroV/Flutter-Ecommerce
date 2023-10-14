@@ -35,7 +35,25 @@ class NetworkApiService {
       print("No internet during communication");
     }
   }
-
+  Future<dynamic> FetchUser(String? url) async {
+    try {
+      var res = await http.get(Uri.parse(url!));
+      // print(res.statusCode);
+      print(res.body.toString());
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+        print(res.body);
+      }
+      if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
   // Future<dynamic> AuthVerify(String? email,String? password) async {
   //
   //   try{
@@ -63,11 +81,13 @@ class NetworkApiService {
   // }
 
   Future<dynamic> AuthSignUpUser(fname, lname, String? email, String? password,
-      String? telephone, username) async {
+      String? telephone, String? username,String gender) async {
     try {
       // print("Register user");
       print(telephone);
-      var res = await http.post(Uri.parse(ApiUrl.authsignup),
+      var tel = "+" + telephone.toString();
+          var res = await http.post(Uri.parse(ApiUrl.authsignup),
+
 
           body: {
 
@@ -75,15 +95,17 @@ class NetworkApiService {
             "firstname": fname,
             "lastname": lname,
             "email": email,
+            "username":username,
             "password": password,
-            "telephone": "+855965689895",
+            "telephone": tel,
+            "gender": gender,
             "username": username
           }
       );
       print(res.statusCode);
-      // print(res.body.toString());
+      print(res.body.toString());
       if (res.statusCode == 201) {
-        // return json.decode(res.body);
+        return json.decode(res.body);
         print(res.body);
       }
       else {
@@ -94,6 +116,37 @@ class NetworkApiService {
     }
   }
 
+  Future<dynamic> UserEditing(fname, lname, String? telephone, String? username,String gender,imgid,uid,url) async {
+    try {
+      // print("Register user");
+      print(telephone);
+      var tel = telephone.toString();
+      print(tel);
+      var res = await http.put(Uri.parse(url),
+
+
+          body: {
+            "username": "${username}",
+            "firstname": "${fname}",
+            "lastname": "${lname}",
+            "telephone": "${tel}",
+            "gender": "${gender}",
+            "imgid": "${imgid}"
+          }
+      );
+      print(res.statusCode);
+      print(res.body.toString());
+      if (res.statusCode == 201) {
+        return json.decode(res.body);
+        print(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
   Future<dynamic> GetAllproduct(url, search) async {
     try {
       print(search);
@@ -112,7 +165,35 @@ class NetworkApiService {
       print("No internet during communication");
     }
   }
+  Future<dynamic> Sortproduct(url, sort,rank,{search}) async {
+    try {
+      print(url);
+      print(sort);
+      print("${url}/sort?${sort}=${rank}");
+      if(search == null) {
+        search = "";
+      }
+    var mainurl;
 
+        mainurl = "${url}/sort?search=${search}&${sort}=${rank}";
+
+      print(mainurl);
+
+      var res = await http.get(Uri.parse(mainurl),
+
+      );
+      print(res.statusCode);
+      // print(res.body.toString());
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
   Future<dynamic> Searchproduct(url, search) async {
     try {
       var res = await http.get(Uri.parse('${url}?search=${search}'),
@@ -152,7 +233,7 @@ class NetworkApiService {
         // }
       );
       // print(res.statusCode);
-      // print(res.body.toString());
+      print(res.body.toString());
       if (res.statusCode == 200) {
         return json.decode(res.body);
         print(res.body);
@@ -199,6 +280,7 @@ class NetworkApiService {
 
   Future<dynamic> GetAllCategory(url) async {
     try {
+
       var res = await http.get(Uri.parse(url),
 
       );
@@ -214,7 +296,23 @@ class NetworkApiService {
       print("No internet during communication");
     }
   }
+  Future<dynamic> GetProductCategory(url) async {
+    try {
+      var res = await http.get(Uri.parse(url),
 
+      );
+      print(res.statusCode);
+      // print(res.body.toString());
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
   Future<dynamic> GetOrderSummary(url,oid) async {
     try {
       print(url);

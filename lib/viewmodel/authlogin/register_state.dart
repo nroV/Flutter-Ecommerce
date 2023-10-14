@@ -15,13 +15,13 @@ class RegisterInitial extends RegisterState {
 class Registerloading extends RegisterState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props =>[ ];
 
 }
 class RegisterCompleted extends RegisterState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 }
 class RegisterError extends RegisterState {
@@ -32,7 +32,7 @@ class RegisterError extends RegisterState {
 
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props =>[message];
 
 }
 

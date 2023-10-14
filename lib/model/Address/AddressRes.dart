@@ -3,8 +3,10 @@ class AddressModelResponse {
   CustomerId? customerId;
   String? street;
   String? city;
-  double? latitude;
-  double? longitude;
+  String? latitude;
+  String? longitude;
+  String? description;
+  String? country;
 
   AddressModelResponse(
       {this.id,
@@ -12,7 +14,9 @@ class AddressModelResponse {
         this.street,
         this.city,
         this.latitude,
-        this.longitude});
+        this.longitude,
+        this.description,
+        this.country});
 
   AddressModelResponse.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -23,6 +27,8 @@ class AddressModelResponse {
     city = json['city'];
     latitude = json['latitude'];
     longitude = json['longitude'];
+    description = json['description'];
+    country = json['country'];
   }
 
   Map<String, dynamic> toJson() {
@@ -35,6 +41,8 @@ class AddressModelResponse {
     data['city'] = this.city;
     data['latitude'] = this.latitude;
     data['longitude'] = this.longitude;
+    data['description'] = this.description;
+    data['country'] = this.country;
     return data;
   }
 }
@@ -43,43 +51,34 @@ class CustomerId {
   int? id;
   String? firstname;
   String? lastname;
-  String? username;
   String? email;
-  String? password;
   String? telephone;
-  bool? isowner;
-  String? lastLogin;
-  bool? isActivated;
   String? gender;
-  int? imgid;
+  Null? imgid;
+  String? password;
+  String? username;
 
   CustomerId(
       {this.id,
         this.firstname,
         this.lastname,
-        this.username,
         this.email,
-        this.password,
         this.telephone,
-        this.isowner,
-        this.lastLogin,
-        this.isActivated,
         this.gender,
-        this.imgid});
+        this.imgid,
+        this.password,
+        this.username});
 
   CustomerId.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     firstname = json['firstname'];
     lastname = json['lastname'];
-    username = json['username'];
     email = json['email'];
-    password = json['password'];
     telephone = json['telephone'];
-    isowner = json['isowner'];
-    lastLogin = json['last_login'];
-    isActivated = json['is_activated'];
     gender = json['gender'];
     imgid = json['imgid'];
+    password = json['password'];
+    username = json['username'];
   }
 
   Map<String, dynamic> toJson() {
@@ -87,15 +86,12 @@ class CustomerId {
     data['id'] = this.id;
     data['firstname'] = this.firstname;
     data['lastname'] = this.lastname;
-    data['username'] = this.username;
     data['email'] = this.email;
-    data['password'] = this.password;
     data['telephone'] = this.telephone;
-    data['isowner'] = this.isowner;
-    data['last_login'] = this.lastLogin;
-    data['is_activated'] = this.isActivated;
     data['gender'] = this.gender;
     data['imgid'] = this.imgid;
+    data['password'] = this.password;
+    data['username'] = this.username;
     return data;
   }
 }

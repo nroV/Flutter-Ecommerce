@@ -22,8 +22,10 @@ class Checkout extends StatefulWidget {
 
   var discount;
   var uid;
+  var imgid;
+  var sizeid;
   var selectedIndexAddress = 0;
-  Checkout ({Key? key,this.cartitem,this.subtotal,this.discount,this.qtytotal,this.uid}) : super(key: key);
+  Checkout ({Key? key,this.cartitem,this.subtotal,this.discount,this.qtytotal,this.uid,this.imgid,this.sizeid}) : super(key: key);
 
   @override
   State<Checkout> createState() => _CheckoutState();
@@ -41,9 +43,11 @@ class _CheckoutState extends State<Checkout> {
     super.initState();
     print("Checkout userid");
     print(widget.uid);
+
     // BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget!.uid));
   }
   Widget build(BuildContext context) {
+    BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget.uid));
     // TODO: implement build
     var cart = widget.cartitem;
     return Scaffold(
@@ -64,7 +68,8 @@ class _CheckoutState extends State<Checkout> {
       body: BlocConsumer<OrderBloc, OrderState>(
   listener: (context, state) {
     // TODO: implement listener
-    print("State is updated");
+    print("State google is updated");
+    print(state);
   },
   builder: (context, state) {
     if(state is OrderLoading) {
@@ -95,9 +100,10 @@ class _CheckoutState extends State<Checkout> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Shop Owner",style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
+                Text("Free Shipping",style: TextStyle(
+                  fontSize: 12.8,
+                  fontWeight: FontWeight.w500,
+                  color: Color(AppColorConfig.success)
                 ),),
                 SizedBox(height: 20,),
                 //TODO list product
@@ -157,35 +163,68 @@ class _CheckoutState extends State<Checkout> {
                           fontSize: 16,
                         ),),
                         InkWell(
-                          onTap: () {
+                          onTap: () async {
+                            var location = await Location().getLocation();
+                            print("User current location");
+                            print(location.longitude);
+                            print(location.latitude);
 
+
+                            address = await Navigator.push(
+                                context, MaterialPageRoute(builder: (context) {
+                              return GoogleMapScreen(positionlong: location.longitude,
+                                positionlat: location.latitude,
+                              );
+                            },));
+
+                            setState(() {
+                              print("Got Address back");
+                              print(address);
+                            });
                           },
-                          child: InkWell(
-                              onTap: () async {
-                                var location = await Location().getLocation();
-                                print("User current location");
-                                print(location.longitude);
-                                print(location.latitude);
 
+                          child: Row(
+                            children: [
+                              Icon(Icons.add_circle_rounded),
+                              SizedBox(width: 7,),
+                              Text("Add new Address ", style: TextStyle(
 
-                                address = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                    return GoogleMapScreen(positionlong:     location.longitude,
-                                        positionlat:    location.latitude,
-                                        );
+                                fontSize: 12.8,
 
-                                },));
-
-                                setState(() {
-                                  print("Got Address back");
-                                  print(address);
-                                });
-
-
-                              },
-                              child: Text('Add New',style: TextStyle(
-                                fontSize: 11
-                              ),)),
-                        )
+                              ),),
+                            ],
+                          ),
+                        ),
+                        // InkWell(
+                        //   onTap: () {
+                        //
+                        //   },
+                        //   child: InkWell(
+                        //       onTap: () async {
+                        //         var location = await Location().getLocation();
+                        //         print("User current location");
+                        //         print(location.longitude);
+                        //         print(location.latitude);
+                        //
+                        //
+                        //         address = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        //             return GoogleMapScreen(positionlong:     location.longitude,
+                        //                 positionlat:    location.latitude,
+                        //                 );
+                        //
+                        //         },));
+                        //
+                        //         setState(() {
+                        //           print("Got Address back");
+                        //           print(address);
+                        //         });
+                        //
+                        //
+                        //       },
+                        //       child: Text('Add New',style: TextStyle(
+                        //         fontSize: 11
+                        //       ),)),
+                        // )
                       ],
                     ),
                     Divider(),
@@ -223,13 +262,14 @@ class _CheckoutState extends State<Checkout> {
         // ),
               Container(
                 width: double.maxFinite,
-                height: 170,
+                height: 180,
 
                 child: BlocConsumer<AddressBloc, AddressState>(
                   listener: (context, state) {
                     // TODO: implement listener
                   },
                   builder: (context, state) {
+
                     if(state is AddressLoading) {
                       return Center(
                         child: CircularProgressIndicator(
@@ -246,18 +286,27 @@ class _CheckoutState extends State<Checkout> {
                       );
                     }
                     if(state is AddressDone) {
-                      return ListView.builder(
+                      print("Address Done");
+                      print(  state.add?.results?.length );
+                      return     state.add?.results?.length  == 0?
+
+
+                      Center(
+                        child: Text("You have no address yet"
+                          ,style: TextStyle(
+                              color: Colors.grey,
+                            fontSize: 12.8
+                          ),),
+                      )  :
+                     ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: state.add?.results?.length ?? 0,
+                        itemCount: state.add?.results?.length ,
 
                         itemBuilder: (context, index) {
                           addressid =   state.add?.results?[0].id;
                           return
 
-                            state.add?.results?.length  == null ?
 
-
-                            Center(child: Text("You have no address yet"),) :
                             Container(
                               width: 200,
 
@@ -505,64 +554,68 @@ class _CheckoutState extends State<Checkout> {
       );
   },
 ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar:      Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
 
-      floatingActionButton:Row(
+          children: [
+            Expanded(
+              child: FloatingActionButton.extended(
+                  backgroundColor: Color(0xff508A7B),
 
-        children: [
-          Expanded(
-            child: FloatingActionButton.extended(
-                backgroundColor: Color(0xff508A7B),
+                  elevation: 0,
+                  isExtended: true,
+                  extendedPadding: EdgeInsets.all(0),
 
-                elevation: 0,
-                isExtended: true,
-                extendedPadding: EdgeInsets.all(0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)
+                  ),
+                  onPressed: () {
+                    //TODO submit order
+                    //TODO do some event
 
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(0)
-                ),
-                onPressed: () {
-                  //TODO submit order
-                  //TODO do some event
+                    List<Productss>? item =[];
 
-                  List<Productss>? item =[];
-
-                  for(int index=0;index<cart!.length;index++) {
-                                  item.add(Productss(
-                                    id: cart![index].productid,
-                                    quantity:  cart![index].qty,
-                                    colorselection: cart![index].colorid,
-                                    imageproduct:  cart![index].imgid,
-                                  ));
-                  }
-                  print("Item in cart");
-                  print(item.length);
-                //TODO orderrequest
-                  print(item);
-                  print(widget.uid);
-
-                  OrderRequestV2 order = OrderRequestV2(
-
-                    customer:widget.uid,
-
-                    method: "Cash",
-                    products:item
-
-                );
-
-                  BlocProvider.of<OrderBloc>(context,listen: false).add(PostOrderEvent( addressid:addressid ,orderRequestV2: order));
+                    for(int index=0;index<cart!.length;index++) {
+                      item.add(Productss(
+                        id: cart![index].productid,
+                        quantity:  cart![index].qty,
+                        colorselection: cart![index].colorid,
+                        size:  cart![index].sizeid,
 
 
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  //   return Success();
-                  // },));
+                      ));
+                    }
+                    print("Item in cart");
+                    print(item.length);
+                    //TODO orderrequest
+                    print(item);
+                    print(widget.uid);
 
-                }, label:Text('Place Order',style: TextStyle(
-                fontSize: 12.8
-            ),)),
-          ),
-        ],
-      )
+                    OrderRequestV2 order = OrderRequestV2(
+
+                        customer:widget.uid,
+
+                        method: "Cash",
+                        products:item
+
+                    );
+
+                    BlocProvider.of<OrderBloc>(context,listen: false).add(PostOrderEvent( addressid:addressid ,orderRequestV2: order));
+
+
+                    // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    //   return Success();
+                    // },));
+
+                  }, label:Text('Place Order',style: TextStyle(
+                  fontSize: 12.8
+              ),)),
+            ),
+          ],
+        ),
+      ),
+
 
 
     );

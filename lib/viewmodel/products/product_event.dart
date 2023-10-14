@@ -10,9 +10,20 @@ class FetchProduct extends ProductEvent {
 }
 
 class SortProduct extends ProductEvent {
+var sortname ;
+var rank;
+var title;
 
+SortProduct( {this.sortname, this.rank ,this.title});
 }
 
+class SortProductSearch extends ProductEvent {
+  var sortname ;
+  var rank;
+  var title;
+
+  SortProductSearch( {this.sortname, this.rank ,this.title});
+}
 class DiscountProduct extends ProductEvent {
 
 }

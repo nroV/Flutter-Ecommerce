@@ -582,90 +582,46 @@ var dropdownvalue =    'XS';
                         SizedBox(height: 20,),
                         Container(
                           width: double.maxFinite,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
 
-                          child: Row(
-
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Discount ',),
-
-                                    SizedBox(height: 10,),
-                                    Container(
-                                      width: double.maxFinite,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(6),
-
-                                      ),
-                                      child: DropdownButton(
-                                        elevation: 0,
-                                        padding: EdgeInsets.only(left: 10,right: 10,top: 0,bottom: 0),
-                                        underline: SizedBox(),
+                          ),
+                          child: DropdownButton(
+                            elevation: 0,
+                            padding: EdgeInsets.only(left: 10,right: 10,top: 0,bottom: 0),
+                            underline: SizedBox(),
 
 
-                                        // Initial Value
-                                        value:itemdiscount  ,
+                            // Initial Value
+                            value:itemdiscount  ,
 
 
-                                        // Down Arrow Icon
-                                        icon: const Icon(Icons.keyboard_arrow_down),
-                                        alignment: Alignment.center,
-                                        isExpanded: true,
-                                        style: TextStyle(
-                                            fontSize: 12.8,color: Colors.black
-                                        ),
+                            // Down Arrow Icon
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            alignment: Alignment.center,
+                            isExpanded: true,
+                            style: TextStyle(
+                                fontSize: 12.8,color: Colors.black
+                            ),
 
-                                        // Array list of items
-                                        items:itemsdis.map((int items) {
-                                          return DropdownMenuItem(
-                                            value: items,
-                                            child: Text(items.toString()),
-                                          );
-                                        }).toList(),
-                                        onChanged: (dynamic value) {
-                                            setState(() {
-                                              itemdiscount = value!;
+                            // Array list of items
+                            items:itemsdis.map((int items) {
+                              return DropdownMenuItem(
+                                value: items,
+                                child: Text(items.toString()),
+                              );
+                            }).toList(),
+                            onChanged: (dynamic value) {
+                              setState(() {
+                                itemdiscount = value!;
 
-                                            });
-                                      },
-                                        // After selecting the desired option,it will
-                                        // change button value to selected value
+                              });
+                            },
+                            // After selecting the desired option,it will
+                            // change button value to selected value
 
 
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              SizedBox(width: 20,),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Discount Price',),
-
-                                    SizedBox(height: 10,),
-                                    Container(
-                                      alignment: Alignment.centerLeft,
-                                      padding: EdgeInsets.only(left: 20),
-                                      width: double.maxFinite,
-                                      height:48,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(6),
-
-                                      ),
-                                      child: Text('\$ 10.99'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                            ],
                           ),
                         ),
 

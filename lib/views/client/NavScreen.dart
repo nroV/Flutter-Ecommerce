@@ -1,5 +1,6 @@
 
 import 'package:ecommerce/res/constant/appcolor.dart';
+import 'package:ecommerce/views/authentication/LoginUI.dart';
 import 'package:ecommerce/views/client/Home.dart';
 import 'package:ecommerce/views/client/product/CreateProduct.dart';
 import 'package:ecommerce/views/client/specialdeal.dart';
@@ -7,6 +8,7 @@ import 'package:ecommerce/views/order/Cart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import '../../viewmodel/products/address_bloc.dart';
+import '../authentication/LoginScreen.dart';
 import '../order/OrderHistory.dart';
 import 'MyOrder.dart';
 import 'profile/ProfileScreen.dart';
@@ -15,7 +17,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyNavScreen extends StatefulWidget {
   var login;
- MyNavScreen({Key? key,this.login}) : super(key: key);
+  var uid;
+  var token;
+ MyNavScreen({Key? key,this.login,this.uid,this.token}) : super(key: key);
 
   @override
   State<MyNavScreen> createState() => _MyNavScreenState();
@@ -51,6 +55,8 @@ class _MyNavScreenState extends State<MyNavScreen> {
     Icons.person
   ];
   var index = 0;
+  var token ;
+  var uid;
   var islogin = false;
   @override
   void initState() {
@@ -70,11 +76,67 @@ class _MyNavScreenState extends State<MyNavScreen> {
     print("print user id ");
     SharedPreferences? prefs = await SharedPreferences.getInstance();
 
-    prefs.getInt("userid");
+    uid = prefs.getInt("userid");
     prefs.getBool("islogin");
+
+    token =   prefs.getString("token");
+    print( prefs.getString("token"));
     islogin =   prefs.getBool("islogin") ?? false;
-    print(   prefs!.getInt("userid"));
+    print(  prefs!.getInt("userid"));
+
+
+
     BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid:  prefs!.getInt("userid")));
+  }
+  void PopUpUnauthorize(BuildContext context) {
+
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text("Login or Register",style: TextStyle(
+            fontSize: 18,
+            color: Color(AppColorConfig.negativecolor)
+        ),),
+        content: Text("Require to login first before you can make an order",style: TextStyle(
+            fontSize: 12.8,
+            fontWeight: FontWeight.w400,
+
+            color: Colors.black
+        ),),
+        elevation: 0,
+        actions: [
+          ElevatedButton(
+
+              onPressed: () {
+
+                // Navigator.pop(context);
+
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return loginScreen();
+                },));
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor:Color(AppColorConfig.negativecolor),
+                  elevation: 0,
+                  padding: EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black.withOpacity(0.14)),
+                      borderRadius: BorderRadius.circular(3)
+                  )
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                  SizedBox(width: 10,),
+                  Text("Login",style: TextStyle(
+                    fontSize: 12.8,
+
+                  ),)
+                ],
+              ))
+        ],
+      );
+    },);
   }
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -151,10 +213,26 @@ class _MyNavScreenState extends State<MyNavScreen> {
           haptic: true, // haptic feedback
           backgroundColor: Colors.black,
           onTabChange: (value) {
-                setState(() {
-                  index = value;
-                  print(index);
-                });
+
+
+                if(value == 3 || value ==  2 ) {
+                  if(token == null){
+                    PopUpUnauthorize(context);
+                  }
+                  else{
+                    setState(() {
+                      index = value;
+                      print(index);
+                    });
+                  }
+                }
+                else{
+                  setState(() {
+                    index = value;
+                    print(index);
+                  });
+                }
+
           },
 
 

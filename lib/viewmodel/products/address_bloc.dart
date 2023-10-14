@@ -18,9 +18,50 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
       emit(AddressLoading());
       // TODO: implement event handler
       try{
-        print("Send post event");
+        print("Send post adddress event");
         var response = await addressRepository.PostAddress(event.add, event.userid);
-        // print(response);
+
+        emit(AddressDone( ));
+
+
+
+      }catch(error) {
+        print(error.toString());
+        emit(AddressError());
+      }
+
+    });
+
+
+    on<FetchAddress>((event, emit) async {
+      emit(AddressLoading());
+      // TODO: implement event handler
+      try{
+        print("Send post event");
+        var response = await addressRepository.FetchAddress(event.userid);
+        print(response);
+        emit(AddressDone(add:response ));
+
+
+      }catch(error) {
+        print(error.toString());
+        emit(AddressError());
+      }
+
+    });
+  }
+}
+class AddressBlocV2 extends Bloc<AddressEvent, AddressState> {
+  AddressRepository addressRepository = AddressRepository();
+  AddressBlocV2() : super(AddressInitial()) {
+    on<PostAddress>((event, emit) async {
+      emit(AddressLoading());
+      // TODO: implement event handler
+      try{
+        print("Send post adddress event");
+        var response = await addressRepository.PostAddress(event.add, event.userid);
+
+        emit(AddressDone( ));
 
 
 

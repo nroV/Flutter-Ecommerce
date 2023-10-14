@@ -1,6 +1,7 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/order/order_bloc.dart';
 import 'package:ecommerce/views/order/Tracking.dart';
+import 'package:ecommerce/views/widget/other/EmptyWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,8 @@ class _OrderHistoryState extends State<OrderHistory> {
   }
   Widget build(BuildContext context) {
     return Scaffold(
+
+      backgroundColor: Colors.white,
       appBar: AppBar(
 
           title: Text("Order History", style: TextStyle(
@@ -34,9 +37,10 @@ class _OrderHistoryState extends State<OrderHistory> {
               color: Colors.black
           ),
 
-          backgroundColor: Colors.white.withOpacity(0.34),
+          backgroundColor: Colors.white,
           elevation: 0),
       body: SafeArea(
+
         child: BlocConsumer<OrderBloc, OrderState>(
           listener: (context, state) {
             // TODO: implement listener
@@ -49,9 +53,13 @@ class _OrderHistoryState extends State<OrderHistory> {
 
             }
             if(state is OrderUserComplete){
-              return SizedBox.expand(
+              return
+                state.orderDetail?.results?.length! != 0   ?
+          SizedBox.expand(
                 child: ListView.builder(
                   itemCount: state.orderDetail?.results?.length ?? 0,
+
+
 
                   itemBuilder: (context, index) {
                     var order =  state.orderDetail?.results?[index];
@@ -65,7 +73,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                           },));
                       },
                       child: Card(
-                          elevation: 0,
+                          elevation:1,
 
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +159,17 @@ class _OrderHistoryState extends State<OrderHistory> {
                       ),
                     );
                   },),
+              ) :
+
+      EmptyCard(
+                maintitle: 'No History Yet',
+
+                subtitle: 'You haven\'t make any order yet' ,
+                img: 'assets/logo/.png',
+                btntitle: 'Explore Our Product',
+
               );
+              ;
             }
             if(state is OrderUserError){
               return Center(
