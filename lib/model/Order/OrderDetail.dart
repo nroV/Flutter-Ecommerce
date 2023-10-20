@@ -123,6 +123,7 @@ class CustomerId {
   String? gender;
   Null? imgid;
   String? password;
+  String? username;
 
   CustomerId(
       {this.id,
@@ -132,7 +133,8 @@ class CustomerId {
         this.telephone,
         this.gender,
         this.imgid,
-        this.password});
+        this.password,
+        this.username});
 
   CustomerId.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -143,6 +145,7 @@ class CustomerId {
     gender = json['gender'];
     imgid = json['imgid'];
     password = json['password'];
+    username = json['username'];
   }
 
   Map<String, dynamic> toJson() {
@@ -155,6 +158,7 @@ class CustomerId {
     data['gender'] = this.gender;
     data['imgid'] = this.imgid;
     data['password'] = this.password;
+    data['username'] = this.username;
     return data;
   }
 }
@@ -163,10 +167,15 @@ class Products {
   Product? product;
   int? quantity;
   Colorid? colorselection;
-  Null? imageproduct;
+  Imgid? imageproduct;
+  Size? size;
 
   Products(
-      {this.product, this.quantity, this.colorselection, this.imageproduct});
+      {this.product,
+        this.quantity,
+        this.colorselection,
+        this.imageproduct,
+        this.size});
 
   Products.fromJson(Map<String, dynamic> json) {
     product =
@@ -175,7 +184,10 @@ class Products {
     colorselection = json['colorselection'] != null
         ? new Colorid.fromJson(json['colorselection'])
         : null;
-    imageproduct = json['imageproduct'];
+    imageproduct = json['imageproduct'] != null
+        ? new Imgid.fromJson(json['imageproduct'])
+        : null;
+    size = json['size'] != null ? new Size.fromJson(json['size']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -187,7 +199,12 @@ class Products {
     if (this.colorselection != null) {
       data['colorselection'] = this.colorselection!.toJson();
     }
-    data['imageproduct'] = this.imageproduct;
+    if (this.imageproduct != null) {
+      data['imageproduct'] = this.imageproduct!.toJson();
+    }
+    if (this.size != null) {
+      data['size'] = this.size!.toJson();
+    }
     return data;
   }
 }

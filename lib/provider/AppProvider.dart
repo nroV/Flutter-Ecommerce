@@ -1,4 +1,5 @@
 
+import 'package:ecommerce/viewmodel/Review/review_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,11 +8,15 @@ import '../viewmodel/authlogin/login_bloc.dart';
 import '../viewmodel/authlogin/register_bloc.dart';
 import '../viewmodel/cart/cart_bloc.dart';
 import '../viewmodel/category/category_bloc.dart';
+import '../viewmodel/image_bloc.dart';
 import '../viewmodel/order/order_bloc.dart';
 import '../viewmodel/products/address_bloc.dart';
 import '../viewmodel/products/product_bloc.dart';
 class AppProvider {
   static get allblocprovider =>[
+    BlocProvider<ImageBloc>(
+      create: (BuildContext context) => ImageBloc(),
+    ),
     BlocProvider<LoginBloc>(
       create: (BuildContext context) => LoginBloc(),
     ),
@@ -72,6 +77,9 @@ class AppProvider {
     ),
     BlocProvider<UserBloc>(
       create: (BuildContext context) => UserBloc(),
+    ),
+    BlocProvider<ReviewBloc>(
+      create: (BuildContext context) => ReviewBloc(),
     ),
 
   ];

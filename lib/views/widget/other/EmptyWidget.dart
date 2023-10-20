@@ -4,6 +4,9 @@ import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../client/utilities/SearchPage.dart';
+import '../../client/utilities/searchscreen.dart';
+
 
 
 
@@ -35,7 +38,7 @@ class EmptyCard extends StatelessWidget {
                 Image.asset('${img}'
                   ,fit: BoxFit.contain,
                   width: 300,
-                  height: 300,
+                  height: 240,
                 ),
                 SizedBox(height: 40,),
                 Text("${maintitle}",style: Theme.of(context)
@@ -60,6 +63,16 @@ class EmptyCard extends StatelessWidget {
                 ),
 
                 onPressed: () {
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+                    return  SearchScreen(
+                      sortby: 6,
+                      focus: false,
+                      searchtitle: "",
+
+
+                    );
+                  },),(route) => true,);
+
 
                 }, child: Text("${btntitle}",style: TextStyle(
                 fontSize: 15.8

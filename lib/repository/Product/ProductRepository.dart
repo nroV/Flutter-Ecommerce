@@ -88,6 +88,41 @@ class ProductRepository {
       rethrow ;
     }
   }
+
+
+  Future<dynamic> QueryProductFilter(search,{cid,maxprice,minprice,sort,rank}) async {
+
+    try{
+
+
+      print("Filter Product In Repository");
+      var res = await apiService.FilterProduct(ApiUrl.producturl,search,
+
+          cid: cid,
+
+      maxprice: maxprice,
+        minprice: minprice,
+        sort: sort,
+        rank: rank
+
+      );
+      return ProductModel.fromJson(res);
+
+
+
+
+
+      // return TokenModel.fromJson(res);
+
+
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
+
   Future<dynamic> FetchProductDiscount() async {
 
     try{

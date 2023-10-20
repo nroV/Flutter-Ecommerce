@@ -57,11 +57,13 @@ class _SearchPageState extends State<SearchPage> {
 
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
 
         iconTheme: IconThemeData(
             color: Colors.black
         ),
+        titleSpacing: 0,
         title: Container(
           alignment: Alignment.center,
           height: 40,
@@ -74,9 +76,11 @@ class _SearchPageState extends State<SearchPage> {
                 fontSize: 13
             ),
             controller: txtsearch,
+            cursorColor: Colors.grey,
+
 
             onSubmitted: (value) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
                 return  SearchScreen(
                   sortby: 6,
                   focus: false,
@@ -84,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
 
 
                 );
-              },));
+              },),(route) => true,);
 
 
               print("Search event send");

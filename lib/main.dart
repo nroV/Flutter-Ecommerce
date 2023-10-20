@@ -58,15 +58,16 @@ class _MyAppState extends State<MyApp> {
     ),
     headlineSmall: TextStyle(
       fontSize: 12,
-      color: Colors.grey
+      color: Color(AppColorConfig.success)
     ),
 
     labelSmall: TextStyle(
       fontSize: 12.8,
       color: Colors.grey
     ),
+
     labelLarge: TextStyle(
-      fontSize: 20,
+      fontSize: 16,
 
     ),
     labelMedium: TextStyle(
@@ -142,6 +143,8 @@ class _MyAppState extends State<MyApp> {
  print("User id: ${  prefs!.getInt("userid")}");
    prefs!.getString('token');
    print( prefs!.getString('token'));
+   // prefs!.remove("token");
+   // prefs!.remove("userid");
   }
 }
 

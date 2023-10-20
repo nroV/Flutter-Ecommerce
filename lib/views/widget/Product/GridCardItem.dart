@@ -156,7 +156,7 @@ var listsize = 0.0;
                                             children: [
                                               Icon(Icons.star, size: 20,
                                                 color: Colors.amberAccent,),
-                                              Text("${product.avgRating}", style: TextStyle(
+                                              Text("${product.avgRating!.roundToDouble()}", style: TextStyle(
 
                                               ),)
                                             ],

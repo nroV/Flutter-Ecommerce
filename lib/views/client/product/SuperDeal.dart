@@ -54,7 +54,8 @@ class _SuperDealListState extends State<SuperDealList> {
                     Navigator.push(context, MaterialPageRoute(builder: (context) {
                       return  SearchScreen(
                           sortby:2,
-                          focus:false
+                          focus:false,
+                        searchtitle: '',
                       );
                     },));
                   },

@@ -1,11 +1,13 @@
 
 import 'package:ecommerce/model/Product/CartModel.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
+import 'package:ecommerce/viewmodel/Review/review_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../model/Category/ProductCategory.dart';
 import '../../../model/Product/ProductModel.dart';
 import '../../../viewmodel/cart/cart_bloc.dart';
+import '../../../viewmodel/category/category_bloc.dart';
 import '../../order/Cart.dart';
 import '../../order/Checkout.dart';
 import '../Home.dart';
@@ -13,13 +15,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../NavScreen.dart';
+import '../Review/Review.dart';
+
 class ProductDetailScreen extends StatefulWidget {
 Results? product;
 
 Product? productv2;
 
+var bothproduct;
 
- ProductDetailScreen({Key? key,this.product,this.productv2}) : super(key: key);
+
+ ProductDetailScreen({Key? key,this.product,this.productv2,this.bothproduct}) : super(key: key);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -40,6 +46,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
 
     checktoken();
+
+
   }
   onChangeimage(Context,index){
     print(index);
@@ -101,11 +109,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if(widget.product == null) {
         print("product v2;");
        allproduct2 = widget.productv2;
+        context.read<CategoryBlocProduct>().add(FetchCategoryProduct(categoryid: allproduct2!.category?.id));
       }
-      else{
+      if(widget.productv2 == null){
         print("product v1;");
        allproduct = widget.product;
+        context.read<CategoryBlocProduct>().add(FetchCategoryProduct(categoryid: allproduct!.category?.id));
       }
+      // else {
+      //   allproduct = widget.bothproduct;
+      //   context.read<CategoryBlocProduct>().add(FetchCategoryProduct(categoryid: allproduct!.category?.id));
+      // }
+
       return
         allproduct !=null ?
 
@@ -121,6 +136,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               SliverAppBar(
 
                 elevation: 0,
+                leading: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: CircleAvatar(
+                      radius: 13,
+                       backgroundColor: Colors.white,
+
+                      child: Icon(Icons.arrow_back,size: 23,color: Colors.black,
+
+
+                      ),
+                    ),
+                  ),
+                ),
 
                 expandedHeight: 400,
                 backgroundColor: Colors.white10,
@@ -203,7 +233,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                             children: [
                               Icon(Icons.star,color: Colors.orange,size: 19,),
-                              Text("${allproduct!.avgRating}",
+                              Text("${allproduct!.avgRating!.roundToDouble()}",
                                 style: Theme.of(context).textTheme.headlineSmall,
                               )
 
@@ -275,41 +305,216 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       //TODO review section here
                   ProductReviewPart(product:allproduct),
 
-                      // Container(
-                      //   width: double.maxFinite,
-                      //   height: 360,
-                      //   child: Column(
-                      //     children: [
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //         children: [
-                      //           Text("Vendor Product",style:
-                      //           Theme.of(context).textTheme.labelLarge,),
-                      //           InkWell(
-                      //             onTap: () {
-                      //
-                      //             },
-                      //             child: Text("See All",style:
-                      //             Theme.of(context).textTheme.headlineSmall,),
-                      //           ),
-                      //         ],
-                      //       ),
-                      //       SizedBox(height: 20,),
-                      //
-                      //       Container(
-                      //         height: 300,
-                      //
-                      //         child: ListView.builder(
-                      //           scrollDirection: Axis.horizontal,
-                      //           itemBuilder: (context, index) {
-                      //
-                      //             return   CardHoriScroll();
-                      //           },),
-                      //       )
-                      //
-                      //     ],
-                      //   ),
-                      // ),
+//                       Container(
+//                         width: double.maxFinite,
+//                         height: 360,
+//                         child: Column(
+//                           children: [
+//                             Row(
+//                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                               children: [
+//                                 Text("Related Product",style:
+//                                 Theme.of(context).textTheme.labelLarge,),
+//
+//                               ],
+//                             ),
+//                             SizedBox(height: 20,),
+//
+//                             Container(
+//                               height: 200,
+//
+//                               child: BlocConsumer<CategoryBlocProduct, CategoryState>(
+//   listener: (context, state) {
+//     // TODO: implement listener
+//   },
+//   builder: (context, state) {
+//     if(state is CategoryByidLoading){
+//       return Center(
+//         child: CircularProgressIndicator(),
+//       );
+//     }
+//     if(state is CategoryByidError){
+//       return Center(
+//         child: Text("Error has occur"),
+//       );
+//     }
+//     if(state is CategoryByidCompleted) {
+//       return ListView.builder(
+//         scrollDirection: Axis.horizontal,
+//         itemCount: state.product?.product?.length ?? 0,
+//         itemBuilder: (context, index) {
+//
+//           return Container(
+//
+//             width: 160,
+//             height:70,
+//
+//             child: Card(
+//               elevation: 0,
+//               margin: EdgeInsets.only(right: 20),
+//
+//               child: InkWell(
+//                 onTap: () {
+//                   Navigator.push(context,MaterialPageRoute(builder: (context) {
+//                     return ProductDetailScreen(
+//
+//                       productv2:   state.product!.product![index],
+//
+//
+//
+//
+//
+//
+//                     )
+//                     ;
+//                   },));
+//                 },
+//                 child: Padding(
+//                   padding: const EdgeInsets.only(bottom: 10),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     mainAxisAlignment: MainAxisAlignment.spaceAround,
+//                     children: [
+//
+//                       Container(
+//                         height: 120,
+//                         child: Stack(
+//                           children: [
+//                             Image.network('${state.product!.imgid!.images} ',
+//
+//
+//                               width: double.maxFinite,
+//                               fit: BoxFit.cover,
+//
+//                               // height: 280,
+//
+//
+//
+//
+//                             ),
+//                             Positioned(
+//                               top: 5,
+//                               right: 0,
+//                               child: Container(
+//                                 margin: EdgeInsets.only(right: 10),
+//                                 child: Row(
+//                                   children: [
+//                                     Icon(Icons.star,size: 20,color: Colors.amberAccent,),
+//                                     Text("${state.product!.product![index].avgRating}",style: TextStyle(
+//
+//                                     ),)
+//                                   ],
+//                                 ),
+//                               ),
+//                             ),
+//                             if(state.product!.product![index].discount !=0 )
+//                               Positioned(
+//                                 left: 0,
+//                                 top: 0,
+//                                 child: Container(
+//
+//
+//
+//
+//
+//                                     decoration: BoxDecoration(
+//                                         color  :    Color(AppColorConfig.negativelight),
+//                                         border: Border.all(color:  Color(AppColorConfig.negativecolor),
+//                                             width: 1
+//                                         )
+//                                     ),
+//                                     padding: EdgeInsets.all(4),
+//                                     width: 70,
+//
+//
+//
+//
+//                                     child: Text("${state.product!.product![index].discount} % ",style: TextStyle(
+//
+//                                       color: Color(AppColorConfig.negativecolor),
+//                                       // backgroundColor:    Color(AppColorConfig.negativelight)
+//                                     ),)),
+//                               ),
+//
+//                           ],
+//
+//
+//                         ),
+//                       ),
+//                       SizedBox(height: 5,),
+//                       Text(" ${state.product!.product![index].sellRating} sold",style: TextStyle(
+//                           fontWeight: FontWeight.w500,
+//                           fontSize: 12.7,
+//                           color: Color(AppColorConfig.success)
+//
+//                       ),),
+//                       Padding(
+//                         padding: const EdgeInsets.only(left: 8,top: 9),
+//                         child: Text("${state.product!.product![index].productname}",style: TextStyle(
+//                             fontSize: 14.8,
+//                             fontWeight: FontWeight.w400
+//                         ),),
+//                       ),
+//
+//                       Container(
+//                         width: double.maxFinite,
+//                         padding: const EdgeInsets.only(left: 8),
+//                         child: Row(
+//                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                           children: [
+//                             Text("\$ ${state.product!.product![index].price}",style: TextStyle(
+//                                 fontWeight: FontWeight.w500,
+//                                 fontSize: 20
+//
+//                             ),),
+//
+//
+//
+//                             Container(
+//                               alignment: Alignment.center,
+//                               margin: EdgeInsets.only(right: 10),
+//
+//                               decoration: BoxDecoration(
+//
+//                                 shape: BoxShape.circle,
+//
+//                               ),
+//                               child: CircleAvatar(
+//                                 backgroundColor:      Color(AppColorConfig.success),
+//                                 radius: 12,
+//
+//
+//                                 child: Image.asset('assets/logo/shopping-cart.png',fit: BoxFit.cover,
+//                                   width: 14,
+//                                   height: 14,
+//                                 ),
+//                               ),
+//                             ),
+//
+//                           ],
+//                         ),
+//                       ),
+//
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           );
+//         },);
+//     }
+//
+//     return Center(
+//       child: CircularProgressIndicator(),
+//     );
+//
+//   },
+// ),
+//                             )
+//
+//                           ],
+//                         ),
+//                       ),
 
 
 
@@ -333,7 +538,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     // TODO: implement listener
     print("Added to cart");
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added to cart')));
+    ScaffoldMessenger.of(context).showSnackBar(
+
+        SnackBar(
+          width: 240,
+
+
+          content: Container(
+            height: 50,
+          padding: EdgeInsets.all(15),
+          alignment: Alignment.center,
+
+          //color: Colors.white,
+          decoration: BoxDecoration(color: Colors.black, border: Border.all(width: 0, color: Colors.black),
+              borderRadius: BorderRadius.circular(15)),
+          margin: EdgeInsets.all(10),
+          child: Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: Row(
+              children: [
+                SizedBox(width: 20,),
+                Icon(Icons.shopping_cart,color: Colors.white,size: 20,),
+                SizedBox(width: 10,),
+                Text('Added to Cart',style: TextStyle(
+                  color: Colors.white
+                ),),
+              ],
+            ),
+          ),
+        ), backgroundColor: Colors.transparent,
+
+
+
+          elevation: 0, behavior: SnackBarBehavior.floating,)
+    );
+
 
   },
   builder: (context, state) {
@@ -350,7 +589,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
       Expanded(
       child: ElevatedButton(onPressed: () {
-  
+
         showModalBottomSheet(
             context: context,
             isScrollControlled: true,
@@ -527,6 +766,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     // width: double.maxFinite,
 
                   ),
+                  leading: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: CircleAvatar(
+                        radius: 13,
+                        backgroundColor: Colors.white,
+
+                        child: Icon(Icons.arrow_back,size: 23,color: Colors.black,
+
+
+                        ),
+                      ),
+                    ),
+                  ),
                   actions: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -596,7 +850,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                               children: [
                                 Icon(Icons.star,color: Colors.orange,size: 19,),
-                                Text("${allproduct2!.avgRating}",
+                                Text("${allproduct2!.avgRating!.roundToDouble()}",
                                   style: Theme.of(context).textTheme.headlineSmall,
                                 )
 
@@ -670,41 +924,67 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         //TODO review section here
                         ProductReviewPart(productv2:allproduct2),
 
-                        // Container(
-                        //   width: double.maxFinite,
-                        //   height: 360,
-                        //   child: Column(
-                        //     children: [
-                        //       Row(
-                        //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //         children: [
-                        //           Text("Vendor Product",style:
-                        //           Theme.of(context).textTheme.labelLarge,),
-                        //           InkWell(
-                        //             onTap: () {
-                        //
-                        //             },
-                        //             child: Text("See All",style:
-                        //             Theme.of(context).textTheme.headlineSmall,),
-                        //           ),
-                        //         ],
-                        //       ),
-                        //       SizedBox(height: 20,),
-                        //
-                        //       Container(
-                        //         height: 300,
-                        //
-                        //         child: ListView.builder(
-                        //           scrollDirection: Axis.horizontal,
-                        //           itemBuilder: (context, index) {
-                        //
-                        //             return   CardHoriScroll();
-                        //           },),
-                        //       )
-                        //
-                        //     ],
-                        //   ),
-                        // ),
+                        Container(
+                          width: double.maxFinite,
+                          height: 360,
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Related Product",style:
+                                  Theme.of(context).textTheme.labelLarge,),
+                                  InkWell(
+                                    onTap: () {
+
+                                    },
+                                    child: Text("See All",style:
+                                    Theme.of(context).textTheme.headlineSmall,),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20,),
+
+                              Container(
+                                height: 300,
+
+                                child: BlocConsumer<CategoryBlocProduct, CategoryState>(
+                                  listener: (context, state) {
+                                    // TODO: implement listener
+                                  },
+                                  builder: (context, state) {
+                                    if(state is CategoryByidLoading){
+                                      return Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                    if(state is CategoryByidError){
+                                      return Center(
+                                        child: Text("Error has occur"),
+                                      );
+                                    }
+                                    if(state is CategoryByidCompleted) {
+                                      return ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemBuilder: (context, index) {
+
+                                          return   CardHoriScroll();
+                                        },);
+                                    }
+
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+
+                                  },
+                                ),
+                              )
+
+                            ],
+                          ),
+                        ),
+
+
 
 
 
@@ -1072,22 +1352,22 @@ var attri;
         SizedBox(height: 20,),
         if(widget.iscart !=null)
           ElevatedButton(onPressed: () {
-            print("ON Press");
-
-
-
-            print(attri.size);
-            print(widget.product.id);
-            print(widget.price);
-            print(widget.product!.productname);
-
-            print( attri.size![sizeindex].id);
-            print(attri.colorid![imgindexx].imgid?.images);
-            print( attri.size![sizeindex].id);
-            print( attri.size![sizeindex].size);
-            print( attri);
-            print( widget.price);
-            print( attri.colorid![imgindexx].id);
+            // print("ON Press");
+            //
+            //
+            //
+            // print(attri.size);
+            // print(widget.product.id);
+            // print(widget.price);
+            // print(widget.product!.productname);
+            //
+            // print( attri.size![sizeindex].id);
+            // print(attri.colorid![imgindexx].imgid?.images);
+            // print( attri.size![sizeindex].id);
+            // print( attri.size![sizeindex].size);
+            // print( attri);
+            // print( widget.price);
+            // print( attri.colorid![imgindexx].id);
             if(widget.attributesv2 == null) {
               context.read<CartBloc>().add(
                   CartToAdd(
@@ -1263,259 +1543,4 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
   }
 }
 
-class ProductReviewPart extends StatefulWidget {
-  var reviewrating;
-  Results? product;
-  Product? productv2;
-   ProductReviewPart({
-    super.key, this.product,
-     this.productv2
-  });
-
-  @override
-  State<ProductReviewPart> createState() => _ProductReviewPartState();
-}
-
-class _ProductReviewPartState extends State<ProductReviewPart> {
-  var product;
-  @override
-
-  Widget build(BuildContext context) {
-    if(widget.product == null) {
-      product = widget.productv2;
-    }
-    else{
-      product = widget.product;
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-
-
-              children: [
-                Text("Review",style: Theme.of(context).textTheme.displayMedium,),
-                Text(" (45 reviewers)",style: TextStyle(
-                    fontSize: 12.6
-                ),)
-              ],
-            ),
-            Icon(Icons.arrow_drop_up)
-          ],
-        ),
-        Divider(),
-        SizedBox(height: 25,),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Text("${product!.avgRating!.roundToDouble()}",style: TextStyle(
-                    fontSize: 40
-                ),),
-                Text("out of 5",style: TextStyle(
-                    fontWeight: FontWeight.w400
-                ),),
-              ],
-            ),
-            Row(
-              children: [
-                Icon(Icons.star,color: Colors.orange,),
-                Icon(Icons.star,color: Colors.orange,),
-                Icon(Icons.star,color: Colors.orange,),
-                Icon(Icons.star,color: Colors.orange,),
-                Icon(Icons.star),
-              ],
-            ),
-
-
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-
-            Text("45 reviews on this product",style: TextStyle(
-                fontWeight: FontWeight.w400,
-              fontSize: 12.8,
-              color: Colors.grey
-            ),),
-            Row(
-              children: [
-
-                Text("Write a review",style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12.8,
-                    color: Colors.grey
-                ),),
-                InkWell(
-                  child: Icon(Icons.mode_edit_rounded,color: Colors.grey,size: 17,)  ,
-                ),
-              ],
-            )
-          ],
-        ),
-        SizedBox(height: 25,),
-        Card(
-          elevation: 0,
-          margin: EdgeInsets.only(bottom: 10),
-          color: Color(0xffEFF0F2),
-          child: Padding(
-            padding:  EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  leading:  CircleAvatar(
-    radius: 20,
-    backgroundImage: NetworkImage('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tJTIwcGVvcGxlfGVufDB8fDB8fHww&w=1000&q=80'),
-    ),
-                  title : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Sok piseth',style: TextStyle(
-                        fontSize: 12.8
-                      ),),
-                      Row(
-                        children: [
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                        ],
-                      ),
-                    ],
-                  ),
-
-                   trailing:    Text("5m ago",style: TextStyle(
-                       fontWeight: FontWeight.w400,
-                       fontSize: 10.8,
-                       color: Colors.grey
-                   ),),
-                ),
-                Text('I love it.  Awesome customer service!! Helped me out with adding an additional item to my order. Thanks again!',
-
-                style: TextStyle(
-                  fontSize: 10.8,
-                  color: Color(0xff666666),
-                  fontWeight: FontWeight.w400
-                ),
-                )
-              ],
-            ),
-          ),
-        ),
-        Card(
-          elevation: 0,
-          margin: EdgeInsets.only(bottom: 10),
-          color: Color(0xffEFF0F2),
-          child: Padding(
-            padding:  EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  leading:  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tJTIwcGVvcGxlfGVufDB8fDB8fHww&w=1000&q=80'),
-                  ),
-                  title : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Sok piseth',style: TextStyle(
-                          fontSize: 12.8
-                      ),),
-                      Row(
-                        children: [
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                        ],
-                      ),
-                    ],
-                  ),
-
-                  trailing:    Text("5m ago",style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 10.8,
-                      color: Colors.grey
-                  ),),
-                ),
-                Text('I love it.  Awesome customer service!! Helped me out with adding an additional item to my order. Thanks again!',
-
-                  style: TextStyle(
-                      fontSize: 10.8,
-                      color: Color(0xff666666),
-                      fontWeight: FontWeight.w400
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        Card(
-          elevation: 0,
-          margin: EdgeInsets.only(bottom: 10),
-          color: Color(0xffEFF0F2),
-          child: Padding(
-            padding:  EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  leading:  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tJTIwcGVvcGxlfGVufDB8fDB8fHww&w=1000&q=80'),
-                  ),
-                  title : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Sok piseth',style: TextStyle(
-                          fontSize: 12.8
-                      ),),
-                      Row(
-                        children: [
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                          Icon(Icons.star,size: 17,color: Color(0xff508A7B),),
-                        ],
-                      ),
-                    ],
-                  ),
-
-                  trailing:    Text("5m ago",style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 10.8,
-                      color: Colors.grey
-                  ),),
-                ),
-                Text('I love it.  Awesome customer service!! Helped me out with adding an additional item to my order. Thanks again!',
-
-                  style: TextStyle(
-                      fontSize: 10.8,
-                      color: Color(0xff666666),
-                      fontWeight: FontWeight.w400
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-
-        SizedBox(height: 25,),
-      ],
-    );
-  }
-}
 

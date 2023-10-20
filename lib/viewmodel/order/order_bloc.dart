@@ -87,6 +87,26 @@ class OrderBlocUser extends Bloc<OrderEvent, OrderState> {
         emit(OrderDetailError());
       }
     });
+    on<PostOrderEvent>((event, emit) async {
+      // TODO: implement event handler
 
+      emit(OrderLoading());
+
+      try{
+        print("Event Order Send");
+        print(event.addressid);
+        var res = await orderRepository.PostOrderUser(event.addressid,event.orderRequestV2);
+        // print(res.toString());
+        print(res);
+        emit(OrderSuccessCompleted(orderReponse: res));
+        print("state change");
+        // emit(OrderSuccess(res));
+
+      }catch(error) {
+        print(error);
+        emit(OrderError());
+      }
+    });
   }
+
 }

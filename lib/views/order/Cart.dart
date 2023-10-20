@@ -277,7 +277,7 @@ int? userid;
                         fontSize: 15.8,
                         color: Colors.black
                     ),),
-                    Text('\$ ${total ?? 0}', style: TextStyle(
+                    Text('\$ ${total.toStringAsFixed(2)?? 0}', style: TextStyle(
                         fontSize: 15.8,
                         color: Colors.black,
                         fontWeight: FontWeight.w500
@@ -297,7 +297,7 @@ int? userid;
 
               discount: 0,
                 qtytotal: qtytotal,
-                subtotal: total,
+                subtotal: double.parse(total.toStringAsFixed(2)),
                 uid: userid,
 
 

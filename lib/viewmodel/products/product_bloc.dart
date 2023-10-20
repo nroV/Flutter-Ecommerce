@@ -36,7 +36,7 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
     on<SortProduct>((event, emit) => SortingProductV2(event,emit) ,);
     on<SortProductSearch>((event, emit) => SortingProductSearchV2(event,emit) ,);
     on<DiscountProduct>((event, emit) => DiscountProductSort(event,emit) ,);
-
+    on<ProductFilter>((event, emit) => ProductFilering(event,emit) ,);
   }
 
   SortingProductV2(SortProduct event, Emitter<ProductState> emit) async {
@@ -95,6 +95,39 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
       print(error.toString());
       emit(ProductSortError());
     }
+
+  }
+
+  ProductFilering(ProductFilter event, Emitter<ProductState> emit) async {
+    emit(ProductSortLoading());
+    try{
+
+      print("Search Filter even is ${event.search}");
+
+
+      var response = await productRepository.QueryProductFilter(
+        event.search,
+
+        minprice: event.min,
+        maxprice: event.max,
+        cid: event.category,
+        sort: event.sortby,
+        rank: event.rank
+
+      );
+
+
+      print("Product Filter Event Send to");
+      print(response);
+
+
+      emit((ProductSortCompleted(product:response)));
+
+    }catch(error) {
+      print(error.toString());
+      emit((ProductSortError()));
+    }
+
 
   }
 

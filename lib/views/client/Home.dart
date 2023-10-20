@@ -23,6 +23,7 @@ import '../../model/Product/ProductModel.dart';
 import '../widget/Product/CustomCard.dart';
 import '../widget/Product/GridCardItem.dart';
 import 'ProductAllScreen.dart';
+import 'Review/ReviewPopUp.dart';
 import 'category/categoryscroll.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class MyHomeScreen extends StatefulWidget {
@@ -38,6 +39,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
 
 var islogin = false;
 var token ;
+
+  var txtdesc = TextEditingController();
 
   @override
   void initState() {
@@ -262,9 +265,9 @@ var token ;
 
 
                     //TODO list Special here
-                Container(
+                 Container(
                       width: double.maxFinite,
-                      height: 600,
+                      height: 630,
                       child: Column(
                         children: [
                           Row(
@@ -374,6 +377,8 @@ var token ;
     },);
   }
 
+
+
   closeform(BuildContext context) {
     Navigator.pop(context);
   }
@@ -443,7 +448,7 @@ class _CardHoriScrollState extends State<CardHoriScroll> {
                           child: Row(
                             children: [
                               Icon(Icons.star,size: 20,color: Colors.amberAccent,),
-                              Text("${widget.product!.avgRating}",style: TextStyle(
+                              Text("${widget.product!.avgRating!.roundToDouble()}",style: TextStyle(
 
                               ),)
                             ],
@@ -467,7 +472,7 @@ class _CardHoriScrollState extends State<CardHoriScroll> {
                                   )
                               ),
                               padding: EdgeInsets.all(4),
-                              width: 70,
+                              width: 43,
 
 
 

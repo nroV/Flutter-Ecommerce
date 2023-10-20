@@ -94,7 +94,14 @@ class UserRepository {
     try{
       var url = "${ApiUrl.useredit}${uid}";
       print(url);
-      var res = await apiService.UserEditing(fname, lname, telephone, username, gender,imgid,uid,url!);
+
+      print(imgid);
+      var res;
+
+
+        res = await apiService.UserEditing(fname, lname, telephone, username, gender,imgid,uid,url!);
+
+
       print(res);
       return UserResponse.fromJson(res);
 

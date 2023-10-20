@@ -44,6 +44,7 @@ class _ProductAllPageState extends State<ProductAllPage> {
 
       return Scaffold(
         appBar: AppBar(
+          titleSpacing: 0,
           title: Container(
             alignment: Alignment.center,
             height: 40,
@@ -53,6 +54,8 @@ class _ProductAllPageState extends State<ProductAllPage> {
 
                   fontSize: 13
               ),
+              cursorColor: Colors.grey,
+
               readOnly: true,
 
 
@@ -82,12 +85,14 @@ class _ProductAllPageState extends State<ProductAllPage> {
                   (route) => true,
                 );
               },
+
               decoration: InputDecoration(
                   // filled: true,
                   //
                   // fillColor: Color(AppColorConfig.bgfill),
                   hintText: 'Search By brand or product name...etc',
                   contentPadding: EdgeInsets.only(right: 24),
+
 
                   floatingLabelStyle: TextStyle(
                       color: Colors.black
@@ -356,7 +361,7 @@ class _ProductAllPageState extends State<ProductAllPage> {
                             child: Row(
                               children: [
                                 Icon(Icons.star,size: 20,color: Colors.amberAccent,),
-                                Text("${product!.avgRating }",style: TextStyle(
+                                Text("${product!.avgRating!.roundToDouble() }",style: TextStyle(
 
                                 ),)
                               ],

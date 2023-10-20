@@ -124,7 +124,7 @@ class _CustomCardListState extends State<CustomCardList> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("\$ ${widget.product!.price! - ( widget.product!.price! * (double.parse(widget.product!.discount!.toString() )/100)) }",style: TextStyle(
+                              Text("\$ ${widget.product!.price! - ( widget.product!.price! * (double.parse(widget.product!.discount!.toString() )/100)).truncateToDouble() }",style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 20
 
@@ -170,7 +170,7 @@ class _CustomCardListState extends State<CustomCardList> {
                               child: Row(
                                 children: [
                                   Icon(Icons.star,size: 20,color: Colors.amberAccent,),
-                                  Text("4.5",style: TextStyle(
+                                  Text("${widget.product!.avgRating!.roundToDouble()}",style: TextStyle(
 
                                   ),)
                                 ],

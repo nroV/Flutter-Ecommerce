@@ -88,6 +88,57 @@ class _MyNavScreenState extends State<MyNavScreen> {
 
     BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid:  prefs!.getInt("userid")));
   }
+
+  void ReviewAlert(BuildContext context) {
+
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text("Login or Register",style: TextStyle(
+            fontSize: 18,
+            color: Color(AppColorConfig.negativecolor)
+        ),),
+        content: Text("Require to login first before you can make an order",style: TextStyle(
+            fontSize: 12.8,
+            fontWeight: FontWeight.w400,
+
+            color: Colors.black
+        ),),
+        elevation: 0,
+        actions: [
+          ElevatedButton(
+
+              onPressed: () {
+
+                // Navigator.pop(context);
+
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return loginScreen();
+                },));
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor:Color(AppColorConfig.negativecolor),
+                  elevation: 0,
+                  padding: EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black.withOpacity(0.14)),
+                      borderRadius: BorderRadius.circular(3)
+                  )
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                  SizedBox(width: 10,),
+                  Text("Login",style: TextStyle(
+                    fontSize: 12.8,
+
+                  ),)
+                ],
+              ))
+        ],
+      );
+    },);
+  }
   void PopUpUnauthorize(BuildContext context) {
 
     showDialog(context: context, builder: (context) {

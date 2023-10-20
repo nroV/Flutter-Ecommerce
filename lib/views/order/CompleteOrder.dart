@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../res/appurl/appurl.dart';
+import '../client/Review/ReviewPopUp.dart';
 class CompletedOrder extends StatefulWidget {
 
   const CompletedOrder({Key? key}) : super(key: key);
@@ -15,8 +16,15 @@ class CompletedOrder extends StatefulWidget {
   @override
   State<CompletedOrder> createState() => _CompletedOrderState();
 }
+void ReviewAlert(BuildContext context) {
 
+  showDialog(context: context, builder: (context) {
+    return AlertReviewPop();
+  },);
+}
 class _CompletedOrderState extends State<CompletedOrder> {
+  int subqty = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,9 +54,9 @@ class _CompletedOrderState extends State<CompletedOrder> {
   builder: (context, state) {
     if(state is OrderDetailSuccess) {
 
-      var cartlen = state.orderDetail?.products?.length ?? 0;
+      var cartlen = state.orderDetail?.products!.length ?? 0;
       var urlimg = ApiUrl.main;
-      print(state?.orderDetail?.products?.length);
+
       print(cartlen);
       return Column(
         children: [
@@ -58,7 +66,7 @@ class _CompletedOrderState extends State<CompletedOrder> {
             itemCount: cartlen,
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              var cart =  state.orderDetail?.products?[index];
+              var cart =  state.orderDetail?.products;
               return Container(
 
                 margin: EdgeInsets.only(bottom: 10),
@@ -72,23 +80,23 @@ class _CompletedOrderState extends State<CompletedOrder> {
 
 
                   contentPadding: EdgeInsets.all(0),
-                  leading: Image.network('${urlimg}${cart!.colorselection?.imgid?.images}'
+                  leading: Image.network('${urlimg}${cart![index].colorselection?.imgid?.images}'
 
                     ,fit: BoxFit.cover,
                     width: 100,
                     height:double.maxFinite,
                   ),
 
-                  title: Text('${cart!.product!.productname!}',style: TextStyle(
+                  title: Text('${cart![index].product!.productname!}',style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500
                   ),),
-                  subtitle: Text('\$ ${cart!.product!.price!}',style: TextStyle(
+                  subtitle: Text('\$ ${cart![index].product!.price!}',style: TextStyle(
                       fontSize: 16.8,
                       fontWeight: FontWeight.w500,
                       color: Color(0xff508A7B)
                   ),),
-                  trailing: Text('Qty: ${cart!.quantity!}',style: TextStyle(
+                  trailing: Text('Qty: ${cart![index].quantity!}',style: TextStyle(
                       fontSize: 12.8,
 
                       fontWeight: FontWeight.w400
@@ -145,7 +153,8 @@ class _CompletedOrderState extends State<CompletedOrder> {
                           color: Colors.grey,
                           fontSize: 12.8
                       ),),
-                      Text('x2'),
+                      for(int i =0;i<state.orderDetail!.products!.length;i++)
+                      Text('x ${ ( subqty += state.orderDetail!.products![i].quantity!.toInt()  ) }'),
                     ],
                   ),
                 ),
@@ -240,11 +249,11 @@ class _CompletedOrderState extends State<CompletedOrder> {
                   ),
                   onPressed: () {
                     BlocProvider.of<CartBloc>(context,listen: false).add(CartClear());
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
                       return MyNavScreen();
-                    },));
+                    },),(route) => false  );
 
-                  }, label:Text('Return',style: TextStyle(
+                  }, label:Text('Continue Shopping',style: TextStyle(
                   fontSize: 12.8
               ),)),
             ),

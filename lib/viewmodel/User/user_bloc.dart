@@ -27,7 +27,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     });
     on<EditUser>((event, emit) async {
       // TODO: implement event handler
-      print("Event Edit");
+      print("Event Edi "+event.imgid);
+        var idimg ;
+
       emit(UserPatchLoading());
       try {
         var res = await userRepository.UserEditing(

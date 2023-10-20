@@ -48,14 +48,15 @@ class _PopularSectionState extends State<PopularSection> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Popular ",style:
+                Text("Most Popular ",style:
                 Theme.of(context).textTheme.labelLarge,),
                 InkWell(
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) {
                       return  SearchScreen(
                           sortby:1,
-                          focus:false
+                          focus:false,
+                        searchtitle: "",
                       );
                     },));
                   },

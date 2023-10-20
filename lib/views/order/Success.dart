@@ -73,10 +73,10 @@ class _SuccessState extends State<Success> {
             onPressed: () {
 
               BlocProvider.of<OrderBloc>(context,listen: false).add(GetOrderDetail(orderid: widget.order?.id));
-              Navigator.push(
+              Navigator.pushAndRemoveUntil(
                   context, MaterialPageRoute(builder: (context) {
                 return CompletedOrder();
-              },));
+              },),(route) => false,);
             },
             label: Text('Continue', style: TextStyle(
                 fontSize: 12.8

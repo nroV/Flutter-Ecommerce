@@ -36,7 +36,7 @@ class _BestSellingSectionState extends State<BestSellingSection> {
   Widget build(BuildContext context) {
     context.read<ProductBlocBestSell>().add(SortProduct(rank: "DESC",sortname: "best_selling"));
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.only(bottom: 15,top: 15),
       child: SizedBox(
 
         width: double.maxFinite,
@@ -47,14 +47,15 @@ class _BestSellingSectionState extends State<BestSellingSection> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Best Sale",style:
+                Text("Top Sale",style:
                 Theme.of(context).textTheme.labelLarge,),
                 InkWell(
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) {
                       return  SearchScreen(
                         sortby:0,
-                        focus:false
+                        focus:false,
+                        searchtitle: "",
                       );
                     },));
                   },

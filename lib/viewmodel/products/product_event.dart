@@ -8,6 +8,16 @@ abstract class ProductEvent
 class FetchProduct extends ProductEvent {
 
 }
+class ProductFilter extends ProductEvent {
+  var search;
+  var min;
+  var max;
+  var category;
+  var sortby;
+  var rank;
+
+  ProductFilter( {this.min, this.max, this.category, this.sortby,this.search,this.rank});
+}
 
 class SortProduct extends ProductEvent {
 var sortname ;

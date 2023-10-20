@@ -15,6 +15,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../model/Order/OrderDetail.dart';
+import '../../model/Order/OrderRequest.dart';
+import '../client/Review/ReviewPopUp.dart';
+import 'Success.dart';
+
 
 class TrackingScreen extends StatefulWidget {
   var appbar;
@@ -25,11 +30,16 @@ class TrackingScreen extends StatefulWidget {
   @override
   State<TrackingScreen> createState() => _TrackingScreenState();
 }
+void ReviewAlert(BuildContext context,OrderList orderList) {
 
+  showDialog(context: context, builder: (context) {
+    return AlertReviewPop(orderList: orderList,);
+  },);
+}
 class _TrackingScreenState extends State<TrackingScreen> {
   int? totalqty = 0;
 
-
+  var order;
 
   @override
   void initState() {
@@ -38,6 +48,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     BlocProvider.of<OrderBlocUser>(context,listen: false).add(GetOrderDetail(orderid: widget.orderid));
   }
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -58,9 +69,41 @@ class _TrackingScreenState extends State<TrackingScreen> {
         child: BlocConsumer<OrderBlocUser, OrderState>(
   listener: (context, state) {
     // TODO: implement listener
+    if(state is OrderLoading) {
+            Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    if(state is OrderSuccessCompleted) {
+      print("Success");
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
+      });
+      //TODO use this whenever u want to push neww screen after state updated
+      // Navigator.push(context, MaterialPageRoute(
+      //   builder: (context) {
+      //   return Success();
+      // },));
+    }
+
+
+    if(state is OrderDetailSuccess) {
+      print("THe order");
+      print(  state?.orderDetail?.status!.toLowerCase());
+     if(     state?.orderDetail?.status!.toLowerCase() == "completed" ){
+       print("THe order again");
+       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+         ReviewAlert(context,  state!.orderDetail!);
+       });
+
+     }
+
+
+    }
   },
   builder: (context, state) {
     if(state is OrderDetailSuccess) {
+
       return SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(12.0),
@@ -238,9 +281,9 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 physics: AlwaysScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  var order= state.orderDetail?.products![index];
+                   order= state.orderDetail?.products![index];
 
-                  totalqty = totalqty! + order!.quantity!;
+                  totalqty = (totalqty! + order!.quantity!) as int?;
                   return Container(
 
                     margin: EdgeInsets.only(bottom: 10),
@@ -373,33 +416,127 @@ class _TrackingScreenState extends State<TrackingScreen> {
   },
 ),
       ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      //
-      // floatingActionButton:Row(
-      //
-      //   children: [
-      //     Expanded(
-      //       child: FloatingActionButton.extended(
-      //           backgroundColor: Colors.black,
-      //
-      //           elevation: 0,
-      //           isExtended: true,
-      //           extendedPadding: EdgeInsets.all(0),
-      //
-      //           shape: RoundedRectangleBorder(
-      //               borderRadius: BorderRadius.circular(0)
-      //           ),
-      //           onPressed: () {
-      //             Navigator.push(context, MaterialPageRoute(builder: (context) {
-      //               return MyNavScreen();
-      //             },));
-      //
-      //           }, label:Text('Return',style: TextStyle(
-      //           fontSize: 12.8
-      //       ),)),
-      //     ),
-      //   ],
-      // )
+      bottomNavigationBar:      BlocConsumer<OrderBlocUser, OrderState>(
+  listener: (context, state) {
+    print(state);
+    print("The state is ${state}");
+    // TODO: implement listener
+    // if(state is OrderLoading) {
+    //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //     Center(
+    //       child: CircularProgressIndicator(),
+    //     );
+    //   });
+    //
+    // }
+    // if(state is OrderSuccessCompleted) {
+    //   print("Success");
+    //
+    //     Navigator.pushReplacement(context,
+    //
+    //         MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
+    //
+    //   //TODO use this whenever u want to push neww screen after state updated
+    //   // Navigator.push(context, MaterialPageRoute(
+    //   //   builder: (context) {
+    //   //   return Success();
+    //   // },));
+    // }
+  },
+  builder: (context, state) {
+    if(state is OrderSuccessCompleted) {
+      print("Success");
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
+      });
+      //TODO use this whenever u want to push neww screen after state updated
+      // Navigator.push(context, MaterialPageRoute(
+      //   builder: (context) {
+      //   return Success();
+      // },));
+    }
+    if(state is OrderDetailSuccess) {
+      return Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+
+          children: [
+            Expanded(
+              child: FloatingActionButton.extended(
+                  backgroundColor: Color(AppColorConfig.success),
+
+                  elevation: 0,
+                  isExtended: true,
+                  extendedPadding: EdgeInsets.all(0),
+
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)
+                  ),
+                  onPressed: () async {
+                    //TODO submit order
+                    //TODO do some event
+                    //TODO submit order
+                    //TODO do some event
+
+                    List<Productss>? item =[];
+
+                    for(int index=0;index<state!.orderDetail!.products!.length;index++) {
+                      item.add(Productss(
+                        id: state!.orderDetail!.products![index].product?.id,
+                        quantity:  state!.orderDetail!.products![index].quantity,
+                        colorselection: state!.orderDetail!.products![index].colorselection!.id,
+                        size:  state!.orderDetail!.products![index].size?.id,
+
+
+                      ));
+                    }
+                    print("Item in cart");
+                    print(item.length);
+                    //TODO orderrequest
+                    print(item);
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+
+                    OrderRequestV2 order = OrderRequestV2(
+
+                        customer:prefs.getInt("userid"),
+
+                        method: "Cash",
+                        products:item
+
+                    );
+
+                    BlocProvider.of<OrderBlocUser>(context,listen: false).add(PostOrderEvent( addressid:
+
+                    state!.orderDetail!.address?.id
+                        ,orderRequestV2: order));
+
+
+
+                  }, label:Row(
+                children: [
+                  Icon(Icons.restart_alt),
+                  Text('Reorder',style: TextStyle(
+                      fontSize: 14.8
+                  ),),
+                ],
+              )),
+            ),
+          ],
+        ),
+      );
+    }
+
+    else{
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+  },
+),
+
     );
   }
 }

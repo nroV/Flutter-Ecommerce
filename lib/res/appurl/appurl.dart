@@ -13,9 +13,14 @@ class ApiUrl {
   static var useredit = "${main}auth/update/";
   static var addressurlpost = "${main}address/user/";
   static var addressuser = "${main}address/customer/";
-
+  static var reviewurl = "${main}review/product/";
+  static var reviewpro = "${main}review/pro/";
   static var orderurl = "${main}order/product/";
   static var ordergetorder = "${main}order/";
+
+  static var filterproduct ="${main}/product?min_price=0&max_price=0&category=1";
+  static var imagepost = "${main}image";
+
 
 
   static var orderuserurl = '${main}order/user/';
