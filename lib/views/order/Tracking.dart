@@ -56,6 +56,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
         title: Text('${widget.appbar ?? 'Tracking'}', style: TextStyle(
             color: Colors.white
         ),),
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+            
+            
+            child: Icon(Icons.arrow_back_ios_sharp,color: Colors.white,)),
         centerTitle: true,
         iconTheme: IconThemeData(
             color: Colors.black

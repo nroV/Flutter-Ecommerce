@@ -29,23 +29,33 @@ class _NewArrivalSectionState extends State<NewArrivalSection> {
 
     // TODO: implement initState
     super.initState();
-    BlocProvider.of<ProductBloc>(context).add(FetchProduct());
+
+    BlocProvider.of<ProductBlocSorting>(context).add (SortProduct());
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    print("Home screen ended");
+
+    // BlocProvider.of<ProductBlocSorting>(context).close();
+
+    super.dispose();
   }
   Widget build(BuildContext context) {
     return Expanded(
 
-        child: BlocConsumer<ProductBloc, ProductState>(
+        child: BlocConsumer<ProductBlocSorting, ProductState>(
           listener: (context, state) {
             // TODO: implement listener
           },
           builder: (context, state) {
 
-            if(state is ProductLoading) {
+            if(state is ProductSortLoading) {
               return Center(
                 child: CircularProgressIndicator(),
               );
             }
-            if(state is  ProductCompleted){
+            if(state is  ProductSortCompleted){
               var productlen = state.product!.results!.length;
               var allproduct = state.product!.results;
               int len =  productlen;
@@ -58,7 +68,7 @@ class _NewArrivalSectionState extends State<NewArrivalSection> {
                   return CustomCardList(product:allproduct![index],len: len,);
                 },);
             }
-            if(state is  ProductError){
+            if(state is  ProductSortError){
               return Center(
                 child: Text("Error has been occur"),
               );

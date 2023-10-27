@@ -5,6 +5,10 @@ abstract class AddressEvent {
 
 
 }
+class DeleteAddress extends AddressEvent {
+  var id;
+  DeleteAddress({this.id});
+}
 class FetchAddress extends AddressEvent {
   var userid;
 
@@ -13,7 +17,15 @@ class FetchAddress extends AddressEvent {
 class PostAddress extends AddressEvent {
   AddressBody? add;
   var userid;
-
-PostAddress({this.add,this.userid});
+  var addressid;
+var desc;
+PostAddress({this.add,this.userid,this.addressid,this.desc});
 }
 
+class UpdateAddress extends AddressEvent {
+  AddressBody? add;
+  var userid;
+  var addressid;
+  var desc;
+  UpdateAddress({this.add,this.userid,this.addressid,this.desc});
+}

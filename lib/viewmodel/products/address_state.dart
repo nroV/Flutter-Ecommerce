@@ -14,7 +14,18 @@ class AddressLoading extends AddressState {
 
 }
 
+class AddressPostLoading extends AddressState {
 
+}
+class AddressPostDone extends AddressState {
+  AddressModelResponse? addressModelResponse;
+  AddDeleteResponse? addDeleteResponse;
+  AddressPostDone({this.addressModelResponse,this.addDeleteResponse});
+
+}
+class AddressPostError extends AddressState {
+
+}
 class AddressError extends AddressState {
 
 

@@ -65,6 +65,16 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         emit(OrderUserError());
       }
     });
+    on<OrderStripe>((event, emit) {
+      // TODO: implement event handler
+      emit(OrderStripePending());
+
+
+
+
+
+
+    });
   }
 }
 

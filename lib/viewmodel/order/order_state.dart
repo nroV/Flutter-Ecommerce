@@ -9,7 +9,9 @@ class OrderInitial extends OrderState {
 class OrderLoading extends OrderState {
 
 }
+class OrderStripePending extends OrderState {
 
+}
 class OrderSuccessError extends OrderState {
 
 }

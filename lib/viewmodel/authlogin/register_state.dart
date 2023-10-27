@@ -35,5 +35,34 @@ class RegisterError extends RegisterState {
   List<Object?> get props =>[message];
 
 }
+class RegisterAuthLoading extends RegisterState {
+
+
+  RegisterAuthLoading();
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
+
+class RegisterAuthComplete extends RegisterState {
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+
+
+
+}
+
+class RegisterAuthError extends RegisterState {
+  var message;
+
+  RegisterAuthError(this.message);
+  @override
+  // TODO: implement props
+  List<Object?> get props => [message];
+
+}
 
 

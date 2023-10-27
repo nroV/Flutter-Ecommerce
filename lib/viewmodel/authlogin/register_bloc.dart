@@ -27,6 +27,22 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       }
       // TODO: implement event handler
     });
+
+    on<RegisterAuth>((event, emit) async {
+      print("Event on register send");
+      emit(RegisterAuthLoading());
+      try{
+        print(event.password);
+        // fname,lname,String? email,String? password,telephone,username
+        var responsebody = await user.SocialAuthRegister(email: event.email,telephone: event.telephone,password: event.password,username: event.fullname);
+        print(responsebody);
+        emit(RegisterAuthComplete());
+      }catch(error) {
+        print(error.toString());
+        emit(RegisterAuthError(error.toString()));
+      }
+      // TODO: implement event handler
+    });
     // on<OnVerify>((event, emit) async {
     //   print("Event on register send");
     //   emit(Registerloading());

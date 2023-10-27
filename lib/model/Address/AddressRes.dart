@@ -54,7 +54,7 @@ class CustomerId {
   String? email;
   String? telephone;
   String? gender;
-  Null? imgid;
+  Imgid? imgid;
   String? password;
   String? username;
 
@@ -76,7 +76,7 @@ class CustomerId {
     email = json['email'];
     telephone = json['telephone'];
     gender = json['gender'];
-    imgid = json['imgid'];
+    imgid = json['imgid'] != null ? new Imgid.fromJson(json['imgid']) : null;
     password = json['password'];
     username = json['username'];
   }
@@ -89,9 +89,30 @@ class CustomerId {
     data['email'] = this.email;
     data['telephone'] = this.telephone;
     data['gender'] = this.gender;
-    data['imgid'] = this.imgid;
+    if (this.imgid != null) {
+      data['imgid'] = this.imgid!.toJson();
+    }
     data['password'] = this.password;
     data['username'] = this.username;
+    return data;
+  }
+}
+
+class Imgid {
+  int? id;
+  String? images;
+
+  Imgid({this.id, this.images});
+
+  Imgid.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    images = json['images'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['images'] = this.images;
     return data;
   }
 }

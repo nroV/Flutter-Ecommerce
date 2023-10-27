@@ -13,9 +13,32 @@ ProductRepository productRepository = ProductRepository();
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   ProductBloc() : super(ProductInitial()) {
+
     on<FetchProduct>((event, emit) => FetchingProduct(event,emit) ,);
     on<SortProduct>((event, emit) => SortingProduct(event,emit) ,);
+    on<ClearAllState>((event, emit) => ClearProduct(event,emit) ,);
 
+  }
+
+  ClearProduct(ClearAllState event, Emitter<ProductState> emit) async {
+    ProductCompleted().product?.results?.clear();
+    emit(ProductInitial());
+    emit(ProductLoading());
+
+    //
+    // try{
+    //
+    //   var response = await productRepository.FetchProduct(page: 1);
+    //   print("Product bloc here");
+    //   print(response);
+    //
+    //
+    //   emit(ProductCompleted(product:response));
+    //
+    // }catch(error) {
+    //   print(error.toString());
+    //   emit(ProductError());
+    // }
 
   }
 
@@ -48,7 +71,7 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
     event.title = "";
   }
 
-      var response = await productRepository.SortProduct(event.sortname,event.rank,search: event.title);
+      var response = await productRepository.SortProduct(event.sortname,event.rank,search: event.title,page: event.page );
 
 
       print("Product Sorting Event Send to");
@@ -84,7 +107,7 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
   SortingProductSearchV2(SortProductSearch event, Emitter<ProductState> emit) async {
     emit(ProductSortLoading());
     try{
-      var response = await productRepository.QueryProduct(event.title);
+      var response = await productRepository.QueryProduct(event.title,page: event.page);
       print("Product query event send");
       print(response);
 
@@ -360,9 +383,11 @@ FetchingProduct(FetchProduct event, Emitter<ProductState> emit) async {
 
   // TODO: implement event handler
   emit(ProductLoading());
+  print(event.page);
 
   try{
-    var response = await productRepository.FetchProduct();
+
+    var response = await productRepository.FetchProduct(page: event.page);
     print("Product bloc here");
     print(response);
 

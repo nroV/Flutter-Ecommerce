@@ -42,6 +42,8 @@ class _SearchPageState extends State<SearchPage> {
     "filter",
 
   ];
+  final focusNode = FocusNode();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -71,6 +73,7 @@ class _SearchPageState extends State<SearchPage> {
 
           child: TextField(
             autofocus: widget.focus,
+            focusNode:focusNode ,
             style: TextStyle(
 
                 fontSize: 13
@@ -91,10 +94,13 @@ class _SearchPageState extends State<SearchPage> {
               },),(route) => true,);
 
 
-              print("Search event send");
+
               // BlocProvider.of<ProductSearchBloc>(context,listen: false).add(QueryProduct(txtsearch.text));
 
               print(txtsearch.text);
+
+              FocusScope.of(context).unfocus();
+
             },
 
             onTap: () {
@@ -123,6 +129,13 @@ class _SearchPageState extends State<SearchPage> {
         elevation: 0,
         backgroundColor: Colors.white.withOpacity(0.14),
         centerTitle: true,
+
+        // leading: InkWell(
+        //     onTap: () {
+        //
+        //     },
+        //
+        //     child: Icon(Icons.navigate_before)),
 
         actions: [
 

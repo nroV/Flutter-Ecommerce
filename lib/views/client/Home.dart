@@ -2,6 +2,7 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/cart/cart_bloc.dart';
 import 'package:ecommerce/viewmodel/products/product_bloc.dart';
+import 'package:ecommerce/viewmodel/products/product_fav_bloc.dart';
 import 'package:ecommerce/views/client/category/category.dart';
 import 'package:ecommerce/views/client/product/NewArrival.dart';
 import 'package:ecommerce/views/client/product/BestSelling.dart';
@@ -50,6 +51,7 @@ var token ;
   }
   Widget build(BuildContext context) {
     // TODO: implement build
+    print("State rebuild");
     return Scaffold(
       appBar:AppBar(
         toolbarHeight: MediaQuery.of(context).size.width*0.20,
@@ -154,7 +156,13 @@ var token ;
           )
         ],
       ),
-      body: SafeArea(
+      body: BlocConsumer<ProductFavBloc, ProductFavState>(
+  listener: (context, state) {
+    // TODO: implement listener
+  },
+  builder: (context, state) {
+    if(state is ProductFavSuccess) {
+      return SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
@@ -236,8 +244,8 @@ var token ;
 
                                         builder: (context) {
 
-                                    return CategorySreen();
-                                  },));
+                                          return CategorySreen();
+                                        },));
                                 },
                                 child: Text("See All",style:
                                 Theme.of(context).textTheme.headlineSmall,),
@@ -265,9 +273,9 @@ var token ;
 
 
                     //TODO list Special here
-                 Container(
+                    Container(
                       width: double.maxFinite,
-                      height: 630,
+                      height: 540,
                       child: Column(
                         children: [
                           Row(
@@ -300,7 +308,7 @@ var token ;
                     //TODO section popular
                     SuperDealList(),
                     //TODO section all
-                    GridCardItem(),
+                    // GridCardItem(),
 
 
 
@@ -314,7 +322,174 @@ var token ;
           },
 
         ),
-      ),
+      );
+    }
+    else{
+      return SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(12.8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                  children: [
+                    //TODO search bar
+
+                    // Container(
+                    //   height: 50,
+                    //
+                    //   width: double.maxFinite,
+                    //   margin: EdgeInsets.only(bottom: 5),
+                    //   child: TextField(
+                    //
+                    //     style: TextStyle(
+                    //         fontSize: 13
+                    //     ),
+                    //
+                    //     onTap: () {
+                    //
+                    //         Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    //           return  SearchScreen();
+                    //         },));
+                    //
+                    //     },
+                    //
+                    //     onSubmitted: (value) {
+                    //       setState(() {
+                    //
+                    //       });
+                    //     },
+                    //     readOnly: true,
+                    //     decoration: InputDecoration(
+                    //       contentPadding: EdgeInsets.all(0),
+                    //         filled: true,
+                    //         hintText:'What are you looking for?',
+                    //         prefixIcon: Icon(Icons.search_sharp,color: Colors.black,size: 22,),
+                    //
+                    //
+                    //         fillColor: Color(AppColorConfig.bgfill),
+                    //
+                    //         floatingLabelStyle: TextStyle(
+                    //             color: Colors.black
+                    //         ),
+                    //         border: OutlineInputBorder(
+                    //             borderSide: BorderSide.none,
+                    //             borderRadius: BorderRadius.circular(10)
+                    //         )
+                    //     ),
+                    //
+                    //   ),
+                    // ),
+                    //TODO caategory part
+                    CustomCarousel(),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      child: Column(
+                        children: [
+                          //TODO bar search here
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Categories",style:
+                              Theme.of(context).textTheme.labelLarge,),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(context,
+
+                                      MaterialPageRoute(
+                                        fullscreenDialog: true,
+                                        // maintainState: true,
+                                        allowSnapshotting: false,
+
+
+                                        builder: (context) {
+
+                                          return CategorySreen();
+                                        },));
+                                },
+                                child: Text("See All",style:
+                                Theme.of(context).textTheme.headlineSmall,),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20,),
+
+
+
+                          //TODO cate tempalte card
+
+                          Container(
+                              width: double.maxFinite,
+                              height:150,
+
+                              child: CardCategoryScroll())
+
+                        ],
+                      ),
+                    ),
+                    //TODO carousel part
+
+
+
+
+                    //TODO list Special here
+                    Container(
+                      width: double.maxFinite,
+                      height: 540,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("New Arrival",style:
+                              Theme.of(context).textTheme.labelLarge,),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                    return  ProductAllPage(apptitle: 'New Arrival',);
+                                  },));
+                                },
+                                child: Text("See All",style:
+                                Theme.of(context).textTheme.headlineSmall,),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20,),
+
+                          NewArrivalSection()
+                        ],
+                      ),
+                    ),
+
+                    //TODO section ratiing
+                    BestSellingSection(),
+                    //TODO section popular
+                    PopularSection(),
+                    //TODO section popular
+                    SuperDealList(),
+                    //TODO section all
+                    // GridCardItem(),
+
+
+
+
+
+
+                  ],
+                ),
+              ),
+            );
+          },
+
+        ),
+      );
+    }
+
+  },
+),
 
     );
   }
@@ -406,145 +581,147 @@ class _CardHoriScrollState extends State<CardHoriScroll> {
 
       width: 160,
       height:70,
+      margin: EdgeInsets.only(right: 7),
+      decoration: BoxDecoration(
+          border: Border.all(
+              color: Colors.grey.withOpacity(0.24)
+          )
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context,MaterialPageRoute(builder: (context) {
+              return ProductDetailScreen(product: widget.product,);
+          },));
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
 
-      child: Card(
-        elevation: 0,
-        margin: EdgeInsets.only(right: 20),
-
-        child: InkWell(
-          onTap: () {
-            Navigator.push(context,MaterialPageRoute(builder: (context) {
-                return ProductDetailScreen(product: widget.product,);
-            },));
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-
-                Container(
-                  height: 120,
-                  child: Stack(
-                    children: [
-                      Image.network('${widget.product!.imgid![0].images} ',
-
-
-                        width: double.maxFinite,
-                        fit: BoxFit.cover,
-
-                        // height: 280,
+              Container(
+                height: 125,
+                child: Stack(
+                  children: [
+                    Image.network('${widget.product!.imgid![0].images} ',
 
 
+                      width: double.maxFinite,
+                      fit: BoxFit.cover,
 
-
-                      ),
-                      Positioned(
-                        top: 5,
-                        right: 0,
-                        child: Container(
-                          margin: EdgeInsets.only(right: 10),
-                          child: Row(
-                            children: [
-                              Icon(Icons.star,size: 20,color: Colors.amberAccent,),
-                              Text("${widget.product!.avgRating!.roundToDouble()}",style: TextStyle(
-
-                              ),)
-                            ],
-                          ),
-                        ),
-                      ),
-                      if(widget.product!.discount !=0 )
-                        Positioned(
-                         left: 0,
-                          top: 0,
-                          child: Container(
+                      // height: 280,
 
 
 
 
-
-                              decoration: BoxDecoration(
-                                  color  :    Color(AppColorConfig.negativelight),
-                                  border: Border.all(color:  Color(AppColorConfig.negativecolor),
-                                      width: 1
-                                  )
-                              ),
-                              padding: EdgeInsets.all(4),
-                              width: 43,
-
-
-
-
-                              child: Text("${widget.product!.discount} % ",style: TextStyle(
-
-                                color: Color(AppColorConfig.negativecolor),
-                                // backgroundColor:    Color(AppColorConfig.negativelight)
-                              ),)),
-                        ),
-
-                    ],
-
-
-                  ),
-                ),
-                SizedBox(height: 5,),
-                Text(" ${widget.product!.sellRating} sold",style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12.7,
-                  color: Color(AppColorConfig.success)
-
-                ),),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8,top: 9),
-                  child: Text("${widget.product!.productname}",style: TextStyle(
-                      fontSize: 14.8,
-                      fontWeight: FontWeight.w400
-                  ),),
-                ),
-
-                Container(
-                  width: double.maxFinite,
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("\$ ${widget.product!.price}",style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20
-
-                      ),),
-
-
-
-                      Container(
-                        alignment: Alignment.center,
+                    ),
+                    Positioned(
+                      top: 5,
+                      right: 0,
+                      child: Container(
                         margin: EdgeInsets.only(right: 10),
+                        child: Row(
+                          children: [
+                            Icon(Icons.star,size: 20,color: Colors.amberAccent,),
+                            Text("${widget.product!.avgRating!.roundToDouble()}",style: TextStyle(
 
-                        decoration: BoxDecoration(
-
-                          shape: BoxShape.circle,
-
-                        ),
-                        child: CircleAvatar(
-                          backgroundColor:      Color(AppColorConfig.success),
-                          radius: 12,
-
-
-                          child: Image.asset('assets/logo/shopping-cart.png',fit: BoxFit.cover,
-                            width: 14,
-                            height: 14,
-                          ),
+                            ),)
+                          ],
                         ),
                       ),
+                    ),
+                    if(widget.product!.discount !=0 )
+                      Positioned(
+                       left: 0,
+                        top: 0,
+                        child:
 
-                    ],
-                  ),
+                        Container(
+
+
+
+
+
+                            decoration: BoxDecoration(
+                                color  :    Color(AppColorConfig.negativelight),
+                                border: Border.all(color:  Color(AppColorConfig.negativecolor),
+                                    width: 1
+                                )
+                            ),
+                            padding: EdgeInsets.all(4),
+                            width: 43,
+
+
+
+
+                            child: Text("${widget.product!.discount} % ",style: TextStyle(
+
+                              color: Color(AppColorConfig.negativecolor),
+                              // backgroundColor:    Color(AppColorConfig.negativelight)
+                            ),)),
+                      ),
+
+                  ],
+
+
                 ),
+              ),
+              SizedBox(height: 5,),
+              Text(" ${widget.product!.sellRating} sold",style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12.7,
+                color: Color(AppColorConfig.success)
 
-              ],
-            ),
+              ),),
+              Padding(
+                padding: const EdgeInsets.only(left: 8,top: 9),
+                child: Text("${widget.product!.productname}",style: TextStyle(
+                    fontSize: 14.8,
+                    fontWeight: FontWeight.w400
+                ),),
+              ),
+
+              Container(
+                width: double.maxFinite,
+                padding: const EdgeInsets.only(left: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("\$ ${widget.product!.price}",style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20
+
+                    ),),
+
+
+
+                    // Container(
+                    //   alignment: Alignment.center,
+                    //   margin: EdgeInsets.only(right: 10),
+                    //
+                    //   decoration: BoxDecoration(
+                    //
+                    //     shape: BoxShape.circle,
+                    //
+                    //   ),
+                    //   child: CircleAvatar(
+                    //     backgroundColor:      Color(AppColorConfig.success),
+                    //     radius: 12,
+                    //
+                    //
+                    //     child: Image.asset('assets/logo/shopping-cart.png',fit: BoxFit.cover,
+                    //       width: 14,
+                    //       height: 14,
+                    //     ),
+                    //   ),
+                    // ),
+
+                  ],
+                ),
+              ),
+
+            ],
           ),
         ),
       ),

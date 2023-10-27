@@ -93,7 +93,7 @@ class _CardCategoryScrollState extends State<CardCategoryScroll> {
     }
     else{
       return Center(
-        child: Text("Error during fetching"),
+        child: CircularProgressIndicator(),
       );
     }
 

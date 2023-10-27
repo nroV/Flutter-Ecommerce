@@ -5,7 +5,7 @@ import 'package:location/location.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../order/GoogleMap/GoogleMapScreen.dart';
-
+import 'package:lottie/lottie.dart';
 
 class AddressProductScr extends StatefulWidget {
   var userid;
@@ -21,8 +21,10 @@ class _AddressProductScrState extends State<AddressProductScr> {
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
     print(widget.userid);
+
 
   }
   Widget build(BuildContext context) {
@@ -90,7 +92,11 @@ class _AddressProductScrState extends State<AddressProductScr> {
               Expanded(child:
               BlocConsumer<AddressBloc, AddressState>(
                 listener: (context, state) {
+                  print(state);
                   // TODO: implement listener
+                  if(state is AddressPostDone) {
+                   context.read<AddressBloc>().add(FetchAddress(userid: widget.userid));
+                  }
                 },
                 builder: (context, state) {
                   if(state is AddressLoading) {
@@ -109,14 +115,23 @@ class _AddressProductScrState extends State<AddressProductScr> {
                     );
                   }
                   if(state is AddressDone) {
-                    return ListView.builder(
+                    print(    state.add?.results?.length);
+
+
+
+                    return
+                      state.add?.results?.length == 0 ?
+                      Center(
+                        child: Lottie.asset('assets/logo/Animation - 1698223136592.json')
+
+                        ,) :
+
+                      ListView.builder(
                       itemCount: state.add?.results?.length ?? 0,
 
                       itemBuilder: (context, index) {
                         return
 
-                          state.add?.results?.length  == null ?
-                              Center(child: Text("You have no address yet"),) :
                           Container(
                           width: double.maxFinite,
                           margin: EdgeInsets.only(bottom: 10),
@@ -137,40 +152,60 @@ class _AddressProductScrState extends State<AddressProductScr> {
                                   ),),
 
                                   SizedBox(height: 10,),
+                                  Row(
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
 
-                                  InkWell(
-                                    onTap: () {
-
-                                    },
-                                    child: InkWell(
-                                        onTap: () async {
-                                          var location = await Location()
-                                              .getLocation();
-                                          print("User current location");
-                                          print(location.longitude);
-                                          print(location.latitude);
-
-
-                                          address = await Navigator.push(context,
-                                              MaterialPageRoute(
-                                                builder: (context) {
-                                                  return GoogleMapScreen(
-                                                    positionlong: location
-                                                        .longitude,
-                                                    positionlat: location
-                                                        .latitude,
-                                                  );
-                                                },));
-
-                                          setState(() {
-                                            print("Got Address back");
-                                            print(address);
-                                          });
                                         },
-                                        child: Text('Edit', style: TextStyle(
-                                            fontSize: 12.8
-                                        ),)),
+                                        child: InkWell(
+                                            onTap: () async {
+                                              var location = await Location()
+                                                  .getLocation();
+                                              print("User current location");
+                                              print(location.longitude);
+                                              print(location.latitude);
+
+
+                                              address = await Navigator.push(context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) {
+                                                      return GoogleMapScreen(
+                                                        positionlong: location
+                                                            .longitude,
+                                                        positionlat: location
+                                                            .latitude,
+                                                        isupdate: true,
+                                                        addid:state.add?.results![index].id ,
+                                                        label:state.add?.results![index].description ,
+
+                                                      );
+                                                    },));
+
+                                              setState(() {
+                                                print("Got Address back");
+                                                print(address);
+                                              });
+                                            },
+                                         child: Icon(Icons.edit,color: Color(AppColorConfig.success),)),
+                                      ),
+                                      SizedBox(width: 10,),
+                                      InkWell(
+                                        onTap: () {
+                                          print(state.add?.results![index].id);
+                                          context.read<AddressBloc>()
+                                              .add(DeleteAddress(id: state.add?.results![index].id));
+
+                                        },
+                                        child: InkWell(
+
+                                            child: Icon(Icons.delete,color: Colors.red.shade700,)),
+                                      ),
+                                    ],
                                   )
+
+
+
                                 ],
                               ),
 

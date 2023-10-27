@@ -87,12 +87,13 @@ int? userid;
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                           side: BorderSide(
-                              color: Colors.black.withOpacity(0.2)
+                              color: Colors.grey.withOpacity(0.35)
                           )
                       ),
                       child: ListTile(
                         isThreeLine: true,
                         style: ListTileStyle.drawer,
+                        contentPadding: EdgeInsets.all(14),
 
                         leading: Image.network(
                             '${cart.imgurl}'),
@@ -100,7 +101,9 @@ int? userid;
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
 
-                            Text('${cart.producttitle}'),
+                            Text('${cart.producttitle}',style: TextStyle(
+                              fontSize: 16
+                            ),),
                             InkWell(
                               onTap: () {
                                 BlocProvider.of<CartBloc>(
@@ -124,7 +127,10 @@ int? userid;
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('\$ ${cart.price}'),
+                            Text('\$ ${cart.price}',style: TextStyle(
+                              fontSize: 15.9,
+                              color: Color(AppColorConfig.success)
+                            ),),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
@@ -133,10 +139,10 @@ int? userid;
                                 Row(
                                   children: [
                                     Text('Size: ${cart.sizetext} ', style: TextStyle(
-                                        fontSize: 10.8
+                                        fontSize: 12.8
                                     ),),
                                     Text('Color: ${cart.colorid} ', style: TextStyle(
-                                        fontSize: 10.8
+                                        fontSize: 12.8
                                     ),),
                                   ],
                                 ),

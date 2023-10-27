@@ -1,11 +1,15 @@
 class OrderListUser {
   int? count;
+  Null? next;
+  Null? previous;
   List<Results>? results;
 
-  OrderListUser({this.count, this.results});
+  OrderListUser({this.count, this.next, this.previous, this.results});
 
   OrderListUser.fromJson(Map<String, dynamic> json) {
     count = json['count'];
+    next = json['next'];
+    previous = json['previous'];
     if (json['results'] != null) {
       results = <Results>[];
       json['results'].forEach((v) {
@@ -17,6 +21,8 @@ class OrderListUser {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['count'] = this.count;
+    data['next'] = this.next;
+    data['previous'] = this.previous;
     if (this.results != null) {
       data['results'] = this.results!.map((v) => v.toJson()).toList();
     }
@@ -147,7 +153,7 @@ class CustomerId {
   String? email;
   String? telephone;
   String? gender;
-  Null? imgid;
+  Imgid? imgid;
   String? password;
   String? username;
 
@@ -169,7 +175,7 @@ class CustomerId {
     email = json['email'];
     telephone = json['telephone'];
     gender = json['gender'];
-    imgid = json['imgid'];
+    imgid = json['imgid'] != null ? new Imgid.fromJson(json['imgid']) : null;
     password = json['password'];
     username = json['username'];
   }
@@ -182,9 +188,30 @@ class CustomerId {
     data['email'] = this.email;
     data['telephone'] = this.telephone;
     data['gender'] = this.gender;
-    data['imgid'] = this.imgid;
+    if (this.imgid != null) {
+      data['imgid'] = this.imgid!.toJson();
+    }
     data['password'] = this.password;
     data['username'] = this.username;
+    return data;
+  }
+}
+
+class Imgid {
+  int? id;
+  String? images;
+
+  Imgid({this.id, this.images});
+
+  Imgid.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    images = json['images'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['images'] = this.images;
     return data;
   }
 }
@@ -193,7 +220,7 @@ class Products {
   Product? product;
   int? quantity;
   Colorid? colorselection;
-  Imgid? imageproduct;
+  Null? imageproduct;
   Size? size;
 
   Products(
@@ -210,9 +237,7 @@ class Products {
     colorselection = json['colorselection'] != null
         ? new Colorid.fromJson(json['colorselection'])
         : null;
-    imageproduct = json['imageproduct'] != null
-        ? new Imgid.fromJson(json['imageproduct'])
-        : null;
+    imageproduct = json['imageproduct'];
     size = json['size'] != null ? new Size.fromJson(json['size']) : null;
   }
 
@@ -225,9 +250,7 @@ class Products {
     if (this.colorselection != null) {
       data['colorselection'] = this.colorselection!.toJson();
     }
-    if (this.imageproduct != null) {
-      data['imageproduct'] = this.imageproduct!.toJson();
-    }
+    data['imageproduct'] = this.imageproduct;
     if (this.size != null) {
       data['size'] = this.size!.toJson();
     }
@@ -333,25 +356,6 @@ class Category {
     if (this.imgid != null) {
       data['imgid'] = this.imgid!.toJson();
     }
-    return data;
-  }
-}
-
-class Imgid {
-  int? id;
-  String? images;
-
-  Imgid({this.id, this.images});
-
-  Imgid.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    images = json['images'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['images'] = this.images;
     return data;
   }
 }

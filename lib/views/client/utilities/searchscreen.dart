@@ -3,6 +3,7 @@ import 'package:ecommerce/views/client/utilities/SearchPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../model/Address/AddressModel.dart';
 import '../../../res/constant/appcolor.dart';
 import '../../../viewmodel/category/category_bloc.dart';
 import '../../../viewmodel/products/product_bloc.dart';
@@ -18,6 +19,7 @@ class SearchScreen extends StatefulWidget {
   var focus;
 
   var searchtitle;
+  final focusNode = FocusNode();
 
   SearchScreen({Key? key, this.sortby, this.focus, this.searchtitle})
       : super(key: key);
@@ -28,8 +30,13 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   var txtsearch = TextEditingController();
-  var selectedcategory;
 
+  var selectedcategory;
+  var listsize = 0.0;
+
+  var initpage = 1;
+  var totalpage;
+// var listofproduct =[];
   var listfilter = [
     "Best Selling",
     "Popular",
@@ -48,36 +55,162 @@ class _SearchScreenState extends State<SearchScreen> {
     "price",
     "filter",
   ];
-
+  int index =0;
+  late ScrollController _controller;
   var txtmax = TextEditingController();
   var txtmin = TextEditingController();
+  // late ProductBlocSorting blocsorting ;
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
+    print("Search title is ");
+    print(widget.searchtitle);
+    // blocsorting = ProductBlocSorting();
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+
+
+
     txtsearch.text = widget.searchtitle;
 
     selectedcategory = widget.sortby;
     print(widget.searchtitle);
-
-    if (widget.sortby == 2) {
+    if(widget.sortby == 2) {
       print("In sort ");
-      context.read<ProductBlocSorting>().add(DiscountProduct());
-    } else {
+      context.read<ProductBlocSorting>().add(DiscountProduct(
+        page: 1
+
+      ));
+    }
+    else{
       print("Seraching is real");
       print(widget.searchtitle);
-      if (widget.searchtitle != null) {
+      if(widget.searchtitle !=null) {
         context.read<ProductBlocSorting>().add(SortProductSearch(
-            sortname: "id", rank: "DESC", title: widget.searchtitle));
+            sortname:"id" ,
+            rank: "DESC",
+            title: widget.searchtitle,
+            page: 1
+        ));
         return;
       }
       print("Sort by something");
 
       context.read<ProductBlocSorting>().add(SortProduct(
-          sortname: sortparam[widget.sortby], rank: "DESC", title: null));
+          sortname:sortparam[widget.sortby] ,
+          rank: "DESC",
+          title: null,
+          page: 1
+      ));
+
+
     }
+
+    super.initState();
   }
 
+  void dispose() {
+    // TODO: implement dispose
+
+
+    initpage = 1;
+
+
+    super.dispose();
+  }
+  void _scrollListener() {
+
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      //todO pagination here
+      print("Bottom");
+
+      initpage ++;
+      print(initpage);
+      if(initpage > 2) {
+        initpage --;
+
+        return;
+      }
+      // else{
+      //   print(initpage);
+      //
+      //   context.read<ProductBlocSorting>().add(SortProduct(
+      //       sortname:sortparam[widget.sortby] ,
+      //       rank: "DESC",
+      //       title: txtsearch.text,
+      //       page: initpage
+      //   ));
+      //   // context.read<ProductBlocSorting>()
+      //   //     .add(SortProduct(
+      //   //     title: null,
+      //   //     sortname: sortparam[index],
+      //   //     rank: "DESC",
+      //   //     page: initpage
+      //   //
+      //   //
+      //   //
+      //   // ));
+      // }
+      // if (widget.searchtitle == null) {
+      //   context.read<ProductBlocSorting>()
+      //       .add(SortProduct(
+      //       title: null,
+      //       sortname: sortparam[index],
+      //       rank: "DESC",
+      //       page: initpage
+      //
+      //   ));
+      // } else {
+      //   print(widget.searchtitle);
+      //   print("Search push on click here");
+      //   context.read<ProductBlocSorting>()
+      //       .add(SortProduct(
+      //       title: widget.searchtitle,
+      //       sortname: sortparam[index] == "-name"
+      //           ? "name"
+      //           : sortparam[index],
+      //       rank: sortparam[index] == "name"
+      //           ? "ASC"
+      //           : "desc",
+      //       page: initpage
+      //   ));
+      // }
+      // print(sortparam[index] );
+      // if (widget.searchtitle == "") {
+      //   context.read<ProductBlocSorting>()
+      //       .add(SortProduct(
+      //       title: null,
+      //       sortname: sortparam[index],
+      //       rank: "desc",
+      //       page: initpage
+      //
+      //   ));
+      // } else {
+      //   print(widget.searchtitle);
+      //   print("Search push on click here");
+      //   context.read<ProductBlocSorting>()
+      //       .add(SortProduct(
+      //       title: widget.searchtitle,
+      //       sortname: sortparam[index] == "-name"
+      //           ? "name"
+      //           : sortparam[index],
+      //       rank: sortparam[index] == "name"
+      //           ? "asc"
+      //           : "desc",
+      //       page: initpage
+      //   ));
+      // }
+
+
+
+    }
+    if (_controller.offset <= _controller.position.minScrollExtent &&
+        !_controller.position.outOfRange) {
+
+      print("Top");
+
+    }
+  }
   Widget build(BuildContext context) {
     // TODO: implement build
     // BlocProvider.of<ProductSearchBloc>(context,listen: false).add(QueryProduct(""));
@@ -165,7 +298,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         body: SafeArea(
             child: Padding(
-                padding: const EdgeInsets.only(left: 18, right: 18),
+                padding: const EdgeInsets.only(left: 0, right: 0),
                 child: Column(
                   children: [
                     Container(
@@ -179,40 +312,45 @@ class _SearchScreenState extends State<SearchScreen> {
                           itemBuilder: (context, index) {
                             return InkWell(
                               onTap: () {
+                                listsize = 0.0;
+                                initpage = 1;
+                                // listofproduct.clear();
                                 if (index == 2) {
                                   print("run");
-                                  context
-                                      .read<ProductBlocSorting>()
-                                      .add(DiscountProduct());
+
+                                  context.read<ProductBlocSorting>()
+                                      .add(DiscountProduct(page: 1));
                                 } else {
                                   if (txtsearch.text == null) {
-                                    context
-                                        .read<ProductBlocSorting>()
+                                    context.read<ProductBlocSorting>()
                                         .add(SortProduct(
-                                          title: null,
-                                          sortname: sortparam[index],
-                                          rank: "DESC",
-                                        ));
+                                        title: null,
+                                        sortname: sortparam[index],
+                                        rank: "DESC",
+                                        page: 1
+
+                                    ));
                                   } else {
                                     print(widget.searchtitle);
                                     print("Search push on click here");
-                                    context
-                                        .read<ProductBlocSorting>()
+                                    context.read<ProductBlocSorting>()
                                         .add(SortProduct(
-                                          title: widget.searchtitle,
-                                          sortname: sortparam[index] == "-name"
-                                              ? "name"
-                                              : sortparam[index],
-                                          rank: sortparam[index] == "name"
-                                              ? "ASC"
-                                              : "desc",
-                                        ));
+                                        title: widget.searchtitle,
+                                        sortname: sortparam[index] == "-name"
+                                            ? "name"
+                                            : sortparam[index],
+                                        rank: sortparam[index] == "name"
+                                            ? "ASC"
+                                            : "desc",
+                                        page: 1
+                                    ));
                                   }
                                   print("even sent here");
                                 }
 
                                 setState(() {
                                   selectedcategory = index;
+                                  index == index;
                                 });
                               },
                               child: Container(
@@ -255,6 +393,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     BlocConsumer<ProductBlocSorting, ProductState>(
                       listener: (context, state) {
                         // TODO: implement listener
+                        print("Current State is ${state}");
                       },
                       builder: (context, state) {
                         if (state is ProductSortError) {
@@ -269,9 +408,14 @@ class _SearchScreenState extends State<SearchScreen> {
                         }
                         if (state is ProductSortCompleted) {
                           var productlen = state.product!.results!.length;
-                          print(productlen);
+                          var ls =  state.product!.results;
 
-                          return productlen <= 0
+                          print(productlen);
+                          //
+                          // listofproduct.addAll(state.product!.results!);
+                          // listofproduct.toSet().toList();
+
+                          return ls!.length <= 0
                               ? Center(
                                   child: Column(
                                     children: [
@@ -291,31 +435,48 @@ class _SearchScreenState extends State<SearchScreen> {
                                   ),
                                 )
                               : Expanded(
-                                  child: GridView.builder(
-                                    itemCount: productlen ?? 0,
-                                    scrollDirection: Axis.vertical,
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 2,
-                                            crossAxisSpacing: 5,
-                                            mainAxisExtent: 280,
-                                            childAspectRatio: 19 / 12,
-                                            mainAxisSpacing: 5),
-                                    itemBuilder: (context, index) {
-                                      var product =
-                                          state.product!.results![index];
-                                      return Container(
-                                        height: 430,
-                                        child: Card(
-                                          elevation: 0,
+
+                                  child: RefreshIndicator(
+                                    onRefresh: () {
+                                      print("Refresh");
+
+                                      initpage = 1;
+
+
+                                      // BlocProvider.of<ProductBloc>(context).add(FetchProduct(page: 1));
+
+                                      return TickerFuture.complete();
+                                    },
+                                    child: GridView.builder(
+
+                                      itemCount: ls ?.length ?? 0,
+                                      scrollDirection: Axis.vertical,
+                                      controller: _controller,
+
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 2,
+                                              crossAxisSpacing: 3,
+                                              mainAxisExtent: 280,
+                                              childAspectRatio: 19 / 12,
+                                              mainAxisSpacing: 3),
+                                      itemBuilder: (context, index) {
+                                        var product =
+                                        ls![index];
+                                        return Container(
+                                          height: 430,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.grey.withOpacity(0.35)
+                                            )
+                                          ),
                                           child: InkWell(
                                             onTap: () {
                                               Navigator.push(context,
                                                   MaterialPageRoute(
                                                 builder: (context) {
                                                   return ProductDetailScreen(
-                                                    product: state.product
-                                                        ?.results![index],
+                                                    product:ls![index],
                                                     productv2: null,
                                                   );
                                                 },
@@ -332,7 +493,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                                   children: [
                                                     Image.network(
                                                       '${product!.imgid![0].images} ',
-                                                      fit: BoxFit.contain,
+                                                      fit: BoxFit.cover,
                                                       width: double.maxFinite,
                                                       height: 180,
                                                     ),
@@ -467,9 +628,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                               ],
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
+                                        );
+                                      },
+                                    ),
                                   ),
                                 );
                         } else {

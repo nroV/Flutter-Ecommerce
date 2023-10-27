@@ -1,3 +1,4 @@
+import 'package:ecommerce/model/Product/ProductModel.dart';
 import 'package:ecommerce/viewmodel/products/product_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../client/product/Product.dart';
 
 class GridCardItem extends StatefulWidget {
-
-  GridCardItem();
+  var iscroll ;
+  var iswishlist ;
+  GridCardItem({this.iscroll,this.iswishlist});
 
 
   @override
@@ -21,57 +23,157 @@ class GridCardItem extends StatefulWidget {
 
 class _GridCardItemState extends State<GridCardItem> {
   var itemsize = 130;
-
+  late ScrollController _controller;
 
 var listsize = 0.0;
+var initpage = 1;
+var init = false;
+var totalpage;
+  List<Results> listofproduct =[];
+  late ProductBloc filtersBloc;
+
   @override
   void initState() {
-    // TODO: implement initState
-    // productbloc.add( FetchProduct());
 
+    filtersBloc = BlocProvider.of<ProductBloc>(context);
+    filtersBloc.add(ClearAllState());
+    listsize = 0.0;
+    init = true;
+    print("Clear everthing");
+    initpage = 1;
+    print("Discover init");
+    listofproduct.clear();
+    // TODO: implement initState
+
+
+    // productbloc.add( FetchProduct());
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
 
     super.initState();
 
   }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    print("Stop close");
+    listsize = 0.0;
+    //
+    // print("Clear everthing");
+    initpage = 1;
 
+    listofproduct.clear();
+    // print(listofproduct.length);
+    // BlocProvider.of<ProductBloc>(context).close();
+    filtersBloc.add(ClearAllState());
+    super.dispose();
+  }
+  void _scrollListener() {
+
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      //todO pagination here
+        print("Bottom");
+
+          initpage ++;
+          print(initpage);
+        if(initpage > totalpage) {
+            initpage--;
+          return;
+        }
+        else{
+          filtersBloc.add(FetchProduct(page: initpage ));
+        }
+
+
+
+    }
+    if (_controller.offset <= _controller.position.minScrollExtent &&
+        !_controller.position.outOfRange) {
+
+        print("Top");
+
+    }
+  }
   Widget build(BuildContext context) {
-    BlocProvider.of<ProductBloc>(context).add(FetchProduct());
-    return BlocConsumer<ProductBloc,ProductState>(
+    print("Discover rebuild");
+    filtersBloc.add(FetchProduct(page: initpage));
+
+    return
+      widget.iswishlist == true ?
+          Center(child: Text("Wish List"),) :
+
+      BlocConsumer<ProductBloc,ProductState>(
       listener: (context, state) {
         // TODO: implement listener
+        print(state);
       },
       builder: (context, state) {
-
+        //
         if(state is ProductLoading) {
           return Center(
             child: CircularProgressIndicator(),
           );
         }
         if(state is ProductCompleted) {
+          print(listofproduct.length);
+          if(init == true) {
+            print("Clear product in list ");
+            listofproduct.clear();
+            init = false;
+          }
+          // listofproduct.clear();
+          totalpage = state.product?.totalPages ?? 0;
+          print("Total Page ${totalpage}");
 
           var productlen = state.product!.results!.length;
+
           var allproduct = state.product!.results;
+          // print(allproduct?.length);
+
+
           double len = productlen.toDouble();
 
           listsize = (len /2 ).floorToDouble() ;
-          print(listsize);
+
+
+
+          listofproduct.addAll(state.product!.results!);
+
+
+
+
+          print(" product length is ${state.product!.results!.length}" );
+          // if(listofproduct.length >state.product!.results! ){
+          //
+          // }
+
+
+
+          print("Current product length is ${listofproduct.length}" );
+
           return Container(
             width: double.maxFinite,
             padding: EdgeInsets.all(0),
-            height:
+            // height:
+            //
+            //
+            //
+            // productlen.isOdd ?  360 * (len -   listsize  ) :
+            //
+            // 360 * (len -   listsize  )
+            //     ??  0,
+            // //algrothims infinite scroll
 
 
-
-            productlen.isOdd ?  360 * (len -   listsize  ) :
-
-            360 * (len -   listsize  )
-                ??  0,
-            //algrothims infinite scroll
-
-
-            margin: EdgeInsets.only(top: 20),
+            margin:
+         widget.iscroll == null ?
+            EdgeInsets.only(top: 20) :
+         EdgeInsets.only(top: 0)
+            ,
             child: Column(
               children: [
+                if(widget.iscroll == null)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -91,37 +193,60 @@ var listsize = 0.0;
                     // ),
                   ],
                 ),
+                if(widget.iscroll == null)
                 SizedBox(height: 20,),
                 Expanded(
 
-                  child: GridView.builder(
-
-                    physics: NeverScrollableScrollPhysics(),
-
-
-                    itemCount: productlen ?? 0,
-                    scrollDirection: Axis.vertical,
-
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 5,
-                        mainAxisExtent: 290,
+                  child: RefreshIndicator(
+                    onRefresh: () {
+                    print("Refresh");
+                    listofproduct.clear();
+                    initpage = 1;
 
 
-                        childAspectRatio: 19 / 12,
+                    BlocProvider.of<ProductBloc>(context).add(FetchProduct(page: 1));
+
+                return TickerFuture.complete();
+                    },
+                    color: Colors.black,
+                    child: GridView.builder(
+
+                      controller: _controller,
+
+                      physics:
+                          widget.iscroll == true ?
+                        AlwaysScrollableScrollPhysics() :
+
+                        NeverScrollableScrollPhysics(),
 
 
-                        mainAxisSpacing: 5
+                      itemCount: listofproduct.length,
+                      scrollDirection: Axis.vertical,
 
-                    ),
-                    itemBuilder: (context, index) {
-                      var product =  allproduct![index];
-                      return Container(
-                        height: 430,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 5,
+                          mainAxisExtent: 290,
 
-                        child: Card(
-                          elevation: 0,
 
+                          childAspectRatio: 19 / 12,
+
+
+                          mainAxisSpacing:5
+
+                      ),
+                      itemBuilder: (context, index) {
+
+
+
+                        var product =  listofproduct![index];
+                        return Container(
+                          height: 430,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Colors.grey.withOpacity(0.35)
+                            )
+                          ),
 
                           child: InkWell(
                             onTap: () {
@@ -130,7 +255,7 @@ var listsize = 0.0;
                               },));
                             },
                             child: Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.only(bottom: 0),
                               child: Column(
 
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,7 +265,7 @@ var listsize = 0.0;
                                   Stack(
                                     children: [
 
-                                      Image.network('${product!.imgid![0].images} ',fit: BoxFit.contain,
+                                      Image.network('${product!.imgid![0].images} ',fit: BoxFit.cover,
                                         width: double.maxFinite,
                                         height: 180,
 
@@ -261,10 +386,10 @@ var listsize = 0.0;
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
 
+                    ),
                   ),
                 ),
 
@@ -275,7 +400,7 @@ var listsize = 0.0;
         }
         else{
           return Center(
-            child: Text("Error has been occur"),
+            child: CircularProgressIndicator(),
           );
         }
 

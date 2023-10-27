@@ -19,6 +19,15 @@ String generateGoogleMapPreview(double longtitute,double latitute,double zoom) {
  
   """;
 }
+
+
+static String? staticmapurl ({double? latitute,double? longtitute}){
+  print(latitute);
+  print(longtitute);
+  final std = "https://maps.googleapis.com/maps/api/staticmap?center=&${latitute},${longtitute}zoom=13&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C${latitute},${longtitute}&key=AIzaSyCh-zW5BLV8oll7nn7ZzBfniWKI0iEDAuM";
+  print(std);
+  return std;
+}
 // Map<String,dynamic>
 Future<List<double?>> currentUserLocation () async {
    var location = await Location().getLocation();

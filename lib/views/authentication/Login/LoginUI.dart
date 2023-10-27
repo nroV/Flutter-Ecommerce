@@ -4,7 +4,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../widget/auth/customlogin.dart';
+import '../../widget/auth/customlogin.dart';
 
 class LoginUI extends StatefulWidget {
   var errormessage;

@@ -4,7 +4,7 @@ import 'package:ecommerce/views/client/NavScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../client/Home.dart';
+import '../../client/Home.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VerifyScreen extends StatefulWidget {

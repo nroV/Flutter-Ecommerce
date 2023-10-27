@@ -1,19 +1,23 @@
 
 import 'package:ecommerce/res/constant/appcolor.dart';
-import 'package:ecommerce/views/authentication/LoginUI.dart';
+import 'package:ecommerce/views/authentication/Login/LoginUI.dart';
 import 'package:ecommerce/views/client/Home.dart';
 import 'package:ecommerce/views/client/product/CreateProduct.dart';
+import 'package:ecommerce/views/client/product/DiscoverScreen.dart';
 import 'package:ecommerce/views/client/specialdeal.dart';
 import 'package:ecommerce/views/order/Cart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import '../../viewmodel/products/address_bloc.dart';
-import '../authentication/LoginScreen.dart';
+import '../authentication/Login/LoginScreen.dart';
 import '../order/OrderHistory.dart';
 import 'MyOrder.dart';
 import 'profile/ProfileScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:line_icons/line_icons.dart';
+import 'package:line_icons/line_icon.dart';
 
 class MyNavScreen extends StatefulWidget {
   var login;
@@ -28,6 +32,7 @@ class MyNavScreen extends StatefulWidget {
 class _MyNavScreenState extends State<MyNavScreen> {
   var screenlist =[
     MyHomeScreen(),
+    DiscoverScreen(),
     CartScreen(),
     OrderHistory(),
     MyProfileScreen()
@@ -36,11 +41,13 @@ class _MyNavScreenState extends State<MyNavScreen> {
   ];
   var title =[
     "Home",
-    "Special deal",
+    "Discover",
+    "Cart",
     "Order",
     'Profile'
   ];
   var icon = [
+    'assets/logo/home.png',
    'assets/logo/home.png',
     'assets/logo/paperclip-2.png',
     'assets/logo/shopping-bag.png',
@@ -49,10 +56,13 @@ class _MyNavScreenState extends State<MyNavScreen> {
   ];
 
   var iconlogo = [
-    Icons.home,
-      Icons.shopping_cart,
-    Icons.favorite_border,
-    Icons.person
+
+      LineIcons.home,
+       LineIcons.shoppingBag,
+    LineIcons.shoppingCart,
+    LineIcons.history,
+
+    LineIcons.user
   ];
   var index = 0;
   var token ;
@@ -71,6 +81,7 @@ class _MyNavScreenState extends State<MyNavScreen> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     CheckAuthorize();
+    print(iconlogo.length);
   }
   void CheckAuthorize() async {
     print("print user id ");
@@ -266,7 +277,7 @@ class _MyNavScreenState extends State<MyNavScreen> {
           onTabChange: (value) {
 
 
-                if(value == 3 || value ==  2 ) {
+                if(value == 4 || value ==  3 ) {
                   if(token == null){
                     PopUpUnauthorize(context);
                   }
@@ -283,6 +294,10 @@ class _MyNavScreenState extends State<MyNavScreen> {
                     print(index);
                   });
                 }
+
+                setState(() {
+
+                });
 
           },
 
@@ -312,10 +327,10 @@ class _MyNavScreenState extends State<MyNavScreen> {
           //   GButton(icon: Icons.home,text: 'Home',),
           //   GButton(icon: Icons.home,text: 'Home',)
           // ],
-          tabs: List.generate(screenlist.length, (index) {
+          tabs: List.generate(iconlogo.length, (index) {
 
         return       GButton(
-          icon:iconlogo[index],
+             icon: iconlogo[index],
 
 
 

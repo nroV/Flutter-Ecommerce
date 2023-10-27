@@ -2,12 +2,14 @@
 import 'package:ecommerce/model/Product/CartModel.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/Review/review_bloc.dart';
+import 'package:ecommerce/viewmodel/products/product_fav_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../model/Category/ProductCategory.dart';
 import '../../../model/Product/ProductModel.dart';
 import '../../../viewmodel/cart/cart_bloc.dart';
 import '../../../viewmodel/category/category_bloc.dart';
+import '../../../viewmodel/products/product_bloc.dart';
 import '../../order/Cart.dart';
 import '../../order/Checkout.dart';
 import '../Home.dart';
@@ -16,16 +18,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../NavScreen.dart';
 import '../Review/Review.dart';
+import 'MyProduct.dart';
 
 class ProductDetailScreen extends StatefulWidget {
+
+
 Results? product;
-
 Product? productv2;
-
+MyProductDetail? productss;
 var bothproduct;
 
 
- ProductDetailScreen({Key? key,this.product,this.productv2,this.bothproduct}) : super(key: key);
+ ProductDetailScreen({Key? key,this.product,this.productv2,this.bothproduct,this.productss}) : super(key: key);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -34,11 +38,14 @@ var bothproduct;
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   var imgindexx =0;
   var selectedindex = 0;
-
   var islogin = false;
   var token ;
-  Results? allproduct;
+  var isfav ;
+  var click = false;
+  var allproduct;
   Product? allproduct2;
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -70,6 +77,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
             color: Colors.black
         ),),
+
         elevation: 0,
         actions: [
           ElevatedButton(
@@ -105,17 +113,32 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
     Widget build(BuildContext context) {
       // TODO: implement build
+      print("Render again");
+
 
       if(widget.product == null) {
         print("product v2;");
        allproduct2 = widget.productv2;
         context.read<CategoryBlocProduct>().add(FetchCategoryProduct(categoryid: allproduct2!.category?.id));
+        // isfav =      allproduct2?.isfavorite;
       }
+
       if(widget.productv2 == null){
         print("product v1;");
        allproduct = widget.product;
         context.read<CategoryBlocProduct>().add(FetchCategoryProduct(categoryid: allproduct!.category?.id));
+       if(click == false)
+        isfav =  allproduct!.isfavorite!;
       }
+      // if(widget.productss !=null) {
+      //   allproduct = widget!.productss;
+      //
+      //
+      //
+      // }
+      print(widget!.productss);
+      print("Product fav is");
+      print(isfav);
       // else {
       //   allproduct = widget.bothproduct;
       //   context.read<CategoryBlocProduct>().add(FetchCategoryProduct(categoryid: allproduct!.category?.id));
@@ -130,16 +153,36 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         body:
 
 
-        SafeArea(
+        BlocListener<ProductFavBloc, ProductFavState>(
+  listener: (context, state) {
+    print(state);
+    // TODO: implement listener
+    if(state is ProductFavSuccess) {
+      // BlocProvider.of<ProductDiscountBloc>(context).add(DiscountProduct(page: 1));
+      //       context.read<ProductBlocBestRating>().add(SortProduct(rank: "DESC",sortname: "popular",page: 1));
+      //       BlocProvider.of<ProductDiscountBloc>(context).add(DiscountProduct(page: 1));
+      //
+      //       BlocProvider.of<ProductBlocSorting>(context).add (SortProduct(page: 1));
+      //       context.read<ProductBlocBestSell>().add(SortProduct(rank: "DESC",sortname: "best_selling",page: 1));
+      // context.read<ProductBloc>().add(ClearAllState());
+      //       context.read<ProductBloc>().add(FetchProduct(page: 1));
+
+    }
+  },
+  child: SafeArea(
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
+
 
                 elevation: 0,
                 leading: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      Navigator.pop(context);
+
+                    },
                     child: CircleAvatar(
                       radius: 13,
                        backgroundColor: Colors.white,
@@ -165,11 +208,43 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 ),
                 actions: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.favorite,color: Color(0xffFF6E6E),),
+                  InkWell(
+                    onTap: () async {
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                      setState(() {
+                        if ( isfav == false){
+                          context.read<ProductFavBloc>().add(AddFavorite(prefs.getInt("userid"), allproduct?.id));
+                        }
+                        if(isfav == true){
+                          context.read<ProductFavBloc>().add(RemoveFavorite(prefs.getInt("userid"), allproduct?.id));
+                        }
+                        click = true;
+                        if(  isfav== true) {
+                          isfav = false;
+                        }
+                        else{
+                          isfav= true;
+                        }
+
+                      });
+
+
+
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child:
+                        isfav == true ?
+
+
+                           Icon(Icons.favorite,color: Color(0xffFF6E6E),) :
+
+                            Icon(Icons.favorite_border_outlined,color: Color(0xffFF6E6E),)
+                        ,
+                      ),
                     ),
                   )
                 ],
@@ -284,10 +359,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         attributes: allproduct?.attribution,
                         images: allproduct?.imgid,
                         function: onChangeimage,
-
-
-
-
                         stock:allproduct?.stockqty,
 
 
@@ -533,6 +604,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
           ),
         ),
+),
       bottomNavigationBar:   BlocConsumer<CartBloc, AllCart>(
   listener: (context, state) {
     // TODO: implement listener
@@ -684,10 +756,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
       Expanded(
       child: ElevatedButton(
-
-          onPressed: () {
-
-
+       onPressed: () {
 
       },
       style: ElevatedButton.styleFrom(
@@ -1188,7 +1257,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
 class DetailSizeColor extends StatefulWidget {
   AttributionCategory? attributesv2;
-  Attribution? attributes;
+  var attributes;
   var product;
   var price;
   // List<Imgid>? images;
@@ -1457,7 +1526,7 @@ var attri;
 
 class ProductDetailSection extends StatefulWidget {
   var desc;
-  Attribution? attribution;
+  var attribution;
   AttributionCategory? attributionv2;
  ProductDetailSection({
     super.key,

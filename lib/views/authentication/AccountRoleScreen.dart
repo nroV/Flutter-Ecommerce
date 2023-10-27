@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 
 import '../widget/auth/customregister.dart';
 import '../widget/other/templatescreen.dart';
-import 'CredentialScreen.dart';
-import 'PhoneNumberScreen.dart';
+
+import 'Register/PhoneNumberScreen.dart';
 
 
 class AccountRoleScreen extends StatefulWidget {

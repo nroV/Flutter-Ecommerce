@@ -22,3 +22,13 @@ OnRegister(
       this.fname, this.lname, this.email, this.pass, this.tele, this.username,this.gender);
 }
 
+
+class RegisterAuth extends RegisterEvent {
+  var fullname;
+  var telephone;
+  var email;
+  var password;
+
+  RegisterAuth({ this.fullname, this.telephone, this.email, this.password });
+}
+

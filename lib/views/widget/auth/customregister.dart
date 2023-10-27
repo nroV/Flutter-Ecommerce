@@ -2,7 +2,7 @@
 
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/res/constant/stripesecretkey.dart';
-import 'package:ecommerce/views/authentication/PhoneNumberScreen.dart';
+import 'package:ecommerce/views/authentication/Register/PhoneNumberScreen.dart';
 import 'package:ecommerce/views/client/NavScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +13,9 @@ import 'dart:convert';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
 import '../../../model/Ulti/Genders.dart';
+import '../../../service/auth_service.dart';
 import '../../authentication/AccountRoleScreen.dart';
-import '../../authentication/LoginScreen.dart';
+import '../../authentication/Login/LoginScreen.dart';
 import '../../client/Home.dart';
 class RegisterForm extends StatefulWidget {
  RegisterForm({Key? key}) : super(key: key);
@@ -30,8 +31,15 @@ class _RegisterFormState extends State<RegisterForm> {
   var fname = TextEditingController();
   var lname = TextEditingController();
   var username = TextEditingController();
+  var formfnamekey = GlobalKey<FormState>();
+  var formlnamekey = GlobalKey<FormState>();
+  var formusernamekey = GlobalKey<FormState>();
   var genderlist = [Genders.Male.name,Genders.Female.name,Genders.Other.name];
   var gender =Genders.Male.name;
+  var isfnameerror = true;
+  var islnameerror = true;
+  var isusernameerror = true;
+  AuthService auth = AuthService();
   @override
   void initState() {
     // TODO: implement initState
@@ -63,7 +71,26 @@ class _RegisterFormState extends State<RegisterForm> {
                   child: ElevatedButton(
                     onPressed: () async {
 
+                     var user = await auth.signInWithGoogle() as Map<String,String?>;
 
+                     print(user["email"]);
+                     print(user["id"]);
+                     print(user["displayname"]);
+
+
+                      if(user!=null) {
+                        //TODO push to telephone number
+                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          return  PhoneNumberScreen(
+                            email: user["email"],
+                            username: user["displayname"],
+                            id: user["id"],
+
+                            isowner: false,
+
+                          );
+                        },));
+                      }
 
                     },
                     style: ElevatedButton.styleFrom(
@@ -167,113 +194,217 @@ class _RegisterFormState extends State<RegisterForm> {
           ),
 
           Container(
-            height: 45,
+
             margin: EdgeInsets.only(top: 25),
-            child: TextField(
-              style: TextStyle(
-                  fontSize: 13
-              ),cursorColor: Colors.grey,
-              controller: fname,
-              onSubmitted: (value) {
-                setState(() {
-                  fname.text = value;
-                });
-              },
+            child: Form(
+              key: formfnamekey,
+              child: TextFormField(
+                style: TextStyle(
+                    fontSize: 13
+                ),cursorColor: Colors.grey,
+                controller: fname,
+                validator: (value) {
+                  if(value!.length == 0 || value.isEmpty) {
+                    return "Firstname cannot leave it blank";
+                  }
+                  // else if(value!.length == 0 || value.isEmpty) {
+                  //   return "Firstname cannot leave it blank";
+                  // }
+                  else {
+                    return null;
+                  }
+                },
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onChanged: (value) {
+                  if(value!.length == 0 || value.isEmpty) {
+                    isfnameerror = true;
+                  }
+                  // else if(value!.length == 0 || value.isEmpty) {
+                  //   return "Firstname cannot leave it blank";
+                  // }
+                  else {
+                    isfnameerror = false;
 
-              onTap: () {
-                setState(() {
-                  istap =false;
-                });
-              },
-              decoration: InputDecoration(
-                  filled: true,
+                  }
+                },
+                onFieldSubmitted: (value) {
+                  setState(() {
+                    if(formfnamekey.currentState!.validate()) {
+                      formfnamekey.currentState!.save();
+                    }
+                    fname.text = value;
+                  });
+                },
 
-                  fillColor: Color(AppColorConfig.bgfill),
-                  label: Text("Firstname"),
-                  floatingLabelStyle: TextStyle(
-                      color: Colors.black
-                  ),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(10)
-                  )
+                onTap: () {
+                  setState(() {
+                    istap =false;
+                  });
+                },
+                decoration: InputDecoration(
+                    filled: true,
+
+                    fillColor: Color(AppColorConfig.bgfill),
+                    label: Text("Firstname"),
+                    floatingLabelStyle: TextStyle(
+                        color: Colors.black
+                    ),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(10)
+                    )
+                ),
+
               ),
-
             ),
           ),
             //TODO form here
           Container(
-            height: 45,
+            // height: 45,
             margin: EdgeInsets.only(top: 25),
-            child: TextField(
-              cursorColor: Colors.grey,
-              style: TextStyle(
-                  fontSize: 13
+            child: Form(
+              key: formlnamekey,
+              child: TextFormField(
+                cursorColor: Colors.grey,
+                style: TextStyle(
+                    fontSize: 13
+                ),
+
+                onTap: () {
+                  setState(() {
+                    istap =false;
+                  });
+                },
+                controller: lname,
+                autovalidateMode:  AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if(value.toString().length == 0 ||value!.isEmpty ) {
+                    return "Lastname cannot be blank";
+                  }
+                  // else if(){
+                  //
+                  // }
+                  else{
+                    return null ;
+                  }
+                },
+                onChanged: (value) {
+                  if(value.toString().length == 0 ||value!.isEmpty ) {
+                    islnameerror = true;
+                  }
+                  // else if(){
+                  //
+                  // }
+                  else{
+                    islnameerror = false;
+
+                  }
+                },
+                onFieldSubmitted: (value) {
+                  setState(() {
+                    if(formlnamekey.currentState!.validate()) {
+                      formlnamekey.currentState!.save();
+                    }
+                    lname.text = value;
+                  });
+                },
+                decoration: InputDecoration(
+                    filled: true,
+
+                    fillColor: Color(AppColorConfig.bgfill),
+                    label: Text("lastname"),
+                    floatingLabelStyle: TextStyle(
+                        color: Colors.black
+                    ),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(10)
+                    )
+                ),
+
               ),
-
-              onTap: () {
-                setState(() {
-                  istap =false;
-                });
-              },
-              controller: lname,
-              onSubmitted: (value) {
-                setState(() {
-                  lname.text = value;
-                });
-              },
-              decoration: InputDecoration(
-                  filled: true,
-
-                  fillColor: Color(AppColorConfig.bgfill),
-                  label: Text("lastname"),
-                  floatingLabelStyle: TextStyle(
-                      color: Colors.black
-                  ),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(10)
-                  )
-              ),
-
             ),
           ),
           Container(
-            height: 45,
+
             margin: EdgeInsets.only(top: 25),
-            child: TextField(
-              cursorColor: Colors.grey,
-              style: TextStyle(
-                  fontSize: 13
+            child: Form(
+              key: formusernamekey,
+              child: TextFormField(
+                cursorColor: Colors.grey,
+                style: TextStyle(
+                    fontSize: 13
+                ),
+
+                onTap: () {
+
+                },
+                controller: username,
+                autovalidateMode:  AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  final regexp = RegExp(r'^([^0-9]*)$');
+
+                  if(value.toString().length == 0) {
+                      return "Username cannot leave it blank";
+                  }
+                  else if(value.toString().length <= 4){
+                    return "Username must be at least 4 character";
+                  }
+                  print(regexp.hasMatch(value!) );
+                  if(regexp.hasMatch(value!) == false){
+
+                    return "Username cannot be numeric only";
+                  }
+                  else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  final regexp = RegExp(r'^([^0-9]*)$');
+
+                  if(value.toString().length == 0) {
+                    isusernameerror = true;
+                  }
+                  else if(value.toString().length <= 4){
+                    isusernameerror = true;
+                  }
+                  print(regexp.hasMatch(value!) );
+                  if(regexp.hasMatch(value!) == false){
+
+                    isusernameerror = true;
+                  }
+                  else {
+                    isusernameerror = false;
+                  }
+                },
+                onFieldSubmitted: (value) {
+                  setState(() {
+                    if(formusernamekey.currentState!.validate()) {
+                      formusernamekey.currentState!.save();
+                    }
+                    username.text = value;
+                  });
+                },
+
+                decoration: InputDecoration(
+                    filled: true,
+
+
+
+
+
+                    label: Text("username"),
+                    floatingLabelStyle: TextStyle(
+                        color: Colors.black
+                    ),
+
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(10)
+                    )
+                ),
+
               ),
-
-              onTap: () {
-
-              },
-              controller: username,
-              onSubmitted: (value) {
-                setState(() {
-                  username.text = value;
-                });
-              },
-              decoration: InputDecoration(
-                  filled: true,
-
-
-
-
-
-                  label: Text("username"),
-                  floatingLabelStyle: TextStyle(
-                      color: Colors.black
-                  ),
-
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(10)
-                  )
-              ),
-
             ),
           ),
 
@@ -358,14 +489,40 @@ class _RegisterFormState extends State<RegisterForm> {
               onPressed: () {
                 //TODO login Register here
                 print(username.text);
+                var iserror = true;
+
+                if(formfnamekey.currentState!.validate()  ) {
+                  formfnamekey.currentState!.save();
+                  iserror = false;
+
+                }
+
+                if(formlnamekey.currentState!.validate()){
+                  formlnamekey.currentState!.save();
+                  iserror = false;
+                }
+
+                if(formusernamekey.currentState!.validate() ){
+                  formusernamekey.currentState!.save();
+                  iserror = false;
+                }
+
+
+                if(isusernameerror == true || islnameerror == true || isusernameerror == true){
+                        return;
+                }
+
+
+
+
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return  PhoneNumberScreen(
-                        firstname: fname.text,
-                        lastname: lname.text,
-                        username: username.text,
-                        isowner: false,
-                        gender: gender,
-                        );
+                  return  PhoneNumberScreen(
+                    firstname: fname.text,
+                    lastname: lname.text,
+                    username: username.text,
+                    isowner: false,
+                    gender: gender,
+                  );
                 },));
 
               }, child:Text("Register",

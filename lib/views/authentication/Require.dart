@@ -4,8 +4,8 @@ import 'package:ecommerce/views/client/NavScreen.dart';
 import 'package:flutter/material.dart';
 
 import '../client/Home.dart';
-import 'LoginScreen.dart';
-import 'Register.dart';
+import 'Login/LoginScreen.dart';
+import 'Register/Register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RequireLoginandSignup extends StatefulWidget {

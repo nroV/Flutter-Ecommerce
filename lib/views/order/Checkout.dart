@@ -5,10 +5,16 @@ import 'package:ecommerce/views/order/GoogleMap/GoogleMapScreen.dart';
 import 'package:ecommerce/views/order/Success.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ecommerce/res/constant/stripesecretkey.dart';
+import '../../helper/GoogleLocation.dart';
 import '../../model/Order/OrderRequest.dart';
 import '../../model/Product/CartModel.dart';
 import '../../viewmodel/order/order_bloc.dart';
+import '../testpayment.dart';
 import '../widget/Product/FloatingAction.dart';
 
 import 'package:location/location.dart';
@@ -32,8 +38,9 @@ class Checkout extends StatefulWidget {
 }
 
 class _CheckoutState extends State<Checkout> {
-
+  Map<String, dynamic>? paymentintent;
  var address;
+ var imagepreviewurl;
  var selectedIndexAddress = 0;
  var indexchose =0;
  var initpayment = 0;
@@ -42,15 +49,23 @@ class _CheckoutState extends State<Checkout> {
   @override
   void initState() {
     // TODO: implement initState
-
+    BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget.uid));
     super.initState();
     print("Checkout userid");
     print(widget.uid);
 
+
+
     // BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget!.uid));
   }
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+
+    super.didChangeDependencies();
+  }
   Widget build(BuildContext context) {
-    BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget.uid));
+
     // TODO: implement build
     var cart = widget.cartitem;
     return Scaffold(
@@ -73,6 +88,32 @@ class _CheckoutState extends State<Checkout> {
     // TODO: implement listener
     print("State google is updated");
     print(state);
+    if(state is OrderStripePending) {
+      List<Productss>? item =[];
+
+      for(int index=0;index<cart!.length;index++) {
+        item.add(Productss(
+          id: cart![index].productid,
+          quantity:  cart![index].qty,
+          colorselection: cart![index].colorid,
+          size:  cart![index].sizeid,
+
+
+        ));
+      }
+      OrderRequestV2 order = OrderRequestV2(
+
+          customer:widget.uid,
+
+          method:
+          "online" ,
+
+          products:item
+
+      );
+
+      BlocProvider.of<OrderBloc>(context,listen: false).add(PostOrderEvent( addressid:addressid ,orderRequestV2: order));
+    }
   },
   builder: (context, state) {
     if(state is OrderLoading) {
@@ -163,41 +204,41 @@ class _CheckoutState extends State<Checkout> {
                       children: [
                         Text("Delivery Address",style: TextStyle(
 
-                          fontSize: 16,
+                          fontSize: 18,
                         ),),
-                        InkWell(
-                          onTap: () async {
-                            var location = await Location().getLocation();
-                            print("User current location");
-                            print(location.longitude);
-                            print(location.latitude);
-
-
-                            address = await Navigator.push(
-                                context, MaterialPageRoute(builder: (context) {
-                              return GoogleMapScreen(positionlong: location.longitude,
-                                positionlat: location.latitude,
-                              );
-                            },));
-
-                            setState(() {
-                              print("Got Address back");
-                              print(address);
-                            });
-                          },
-
-                          child: Row(
-                            children: [
-                              Icon(Icons.add_circle_rounded),
-                              SizedBox(width: 7,),
-                              Text("Add new Address ", style: TextStyle(
-
-                                fontSize: 12.8,
-
-                              ),),
-                            ],
-                          ),
-                        ),
+                        // InkWell(
+                        //   onTap: () async {
+                        //     var location = await Location().getLocation();
+                        //     print("User current location");
+                        //     print(location.longitude);
+                        //     print(location.latitude);
+                        //
+                        //
+                        //     address = await Navigator.push(
+                        //         context, MaterialPageRoute(builder: (context) {
+                        //       return GoogleMapScreen(positionlong: location.longitude,
+                        //         positionlat: location.latitude,
+                        //       );
+                        //     },));
+                        //
+                        //     setState(() {
+                        //       print("Got Address back");
+                        //       print(address);
+                        //     });
+                        //   },
+                        //
+                        //   child: Row(
+                        //     children: [
+                        //       Icon(Icons.add_circle_rounded),
+                        //       SizedBox(width: 7,),
+                        //       Text("Add new Address ", style: TextStyle(
+                        //
+                        //         fontSize: 12.8,
+                        //
+                        //       ),),
+                        //     ],
+                        //   ),
+                        // ),
                         // InkWell(
                         //   onTap: () {
                         //
@@ -265,11 +306,19 @@ class _CheckoutState extends State<Checkout> {
         // ),
               Container(
                 width: double.maxFinite,
-                height: 180,
+                height:
+
+
+                310,
 
                 child: BlocConsumer<AddressBloc, AddressState>(
                   listener: (context, state) {
                     // TODO: implement listener
+                    print("The State of Address is ${state}");
+                    if(state is AddressPostDone) {
+                      print("THe address is done");
+                      context.read<AddressBloc>().add(FetchAddress(userid: widget.uid));
+                    }
                   },
                   builder: (context, state) {
 
@@ -291,22 +340,142 @@ class _CheckoutState extends State<Checkout> {
                     if(state is AddressDone) {
                       print("Address Done");
                       print(  state.add?.results?.length );
+                      var len =  state.add?.results?.length;
+                      print(len);
+                      var previewimages;
+                      if( state.add?.results!.length != 0 ) {
+
+                        previewimages =  LocationHelper.staticmapurl(latitute: double.parse( state.add!.results![len!-1].latitude!),longtitute:
+
+                        double.parse( state.add!.results![len!-1].longitude!)
+
+                        );
+                      }
+
                       return     state.add?.results?.length  == 0?
 
 
-                      Center(
-                        child: Text("You have no address yet"
-                          ,style: TextStyle(
-                              color: Colors.grey,
-                            fontSize: 12.8
-                          ),),
+                      Container(
+                        width: double.maxFinite,
+
+
+                        margin: EdgeInsets.only(bottom: 10,right: 10),
+
+                        padding: EdgeInsets.only(
+                            top: 0, bottom: 35, left: 0, right: 0),
+
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                          children: [
+                            Container(
+                              padding:EdgeInsets.all(10) ,
+                              child:
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  InkWell(
+
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.location_on,color: Colors.white,size: 20,),
+                                        Text("Current Location",style: TextStyle(
+                                            fontSize: 12.8
+                                            ,color: Colors.white
+                                        ),)
+                                      ],
+                                    ),
+                                    onTap: () {
+
+                                    },
+                                  ),
+                                  InkWell(
+
+
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.map
+                                            ,color: Colors.white,
+                                          size: 20,
+                                        ),
+                                        Text("Select On Map",style: TextStyle(
+                                            fontSize: 12.8
+                                            ,color: Colors.white
+                                        ),)
+                                      ],
+                                    ),
+                                    onTap: () async {
+                                      // InkWell(
+                                      //   onTap: () {
+                                      //
+                                      //   },
+                                      //   child: InkWell(
+                                      //       onTap: () async {
+                                      var location = await Location().getLocation();
+                                      print("User current location");
+                                      print(location.longitude);
+                                      print(location.latitude);
+
+
+                                      address = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                        return GoogleMapScreen(positionlong:     location.longitude,
+                                          positionlat:    location.latitude,
+                                        );
+
+                                      },));
+
+                                      setState(() {
+                                        print("Got Address back");
+                                        print(address);
+                                      });
+                                      //
+                                      //
+                                      //       },
+                                      //       child: Text('Add New',style: TextStyle(
+                                      //         fontSize: 11
+                                      //       ),)),
+                                      // )
+                                    },
+                                  )
+
+                                ],
+                              ),
+                              decoration: BoxDecoration(
+                                color: Color(AppColorConfig.success)
+                              ),
+                            ),
+                            SizedBox(height: 85,),
+                            Center(child: Text('You have no address picked yet',
+
+
+                            style: TextStyle(
+                              fontSize: 12.8
+                            ),
+                            )),
+
+
+
+                            SizedBox(height: 15,),
+
+
+
+
+                          ],
+                        ),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                                color: Colors.grey.withOpacity(0.2)
+                            )
+                        ),
                       )  :
                      ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: state.add?.results?.length ,
+                        scrollDirection: Axis.vertical,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount:  state.add?.results!.length  ?? 0  ,
 
                         itemBuilder: (context, index) {
-                          addressid =   state.add?.results?[selectedIndexAddress].id;
+                          addressid =   state.add?.results?[len!-1].id;
                           return
 
 
@@ -320,98 +489,160 @@ class _CheckoutState extends State<Checkout> {
                                 print(selectedIndexAddress);
                               },
                               child: Container(
-                                width: 200,
+                                width: double.maxFinite,
+
 
                                 margin: EdgeInsets.only(bottom: 10,right: 10),
 
                                 padding: EdgeInsets.only(
-                                    top: 35, bottom: 35, left: 15, right: 15),
+                                    top: 25, bottom: 35, left: 15, right: 15),
 
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: [
+                                          InkWell(
 
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.location_on),
+                                                Text("Current Location",style: TextStyle(
+                                                  fontSize: 12.8
+                                                ),)
+                                              ],
+                                            ),
+                                            onTap: () {
+
+                                            },
+                                          ),
+                                          InkWell(
+
+
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.map),
+                                                Text("Select On Map",style: TextStyle(
+                                                    fontSize: 12.8
+                                                ),)
+                                              ],
+                                            ),
+                                            onTap: () async {
+                                              // InkWell(
+                                              //   onTap: () {
+                                              //
+                                              //   },
+                                              //   child: InkWell(
+                                              //       onTap: () async {
+                                                      var location = await Location().getLocation();
+                                                      print("User current location");
+                                                      print(location.longitude);
+                                                      print(location.latitude);
+
+
+                                                      address = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                          return GoogleMapScreen(positionlong:     location.longitude,
+                                                              positionlat:    location.latitude,
+                                                              );
+
+                                                      },));
+
+                                                      setState(() {
+                                                        print("Got Address back");
+                                                        print(address);
+                                                      });
+                                              //
+                                              //
+                                              //       },
+                                              //       child: Text('Add New',style: TextStyle(
+                                              //         fontSize: 11
+                                              //       ),)),
+                                              // )
+                                            },
+                                          )
+
+                                        ],
+                                      ),
+
+
+                                    SizedBox(height: 15,),
+                                    if(previewimages != null )
+                                    Image.network('${previewimages}',fit: BoxFit.cover,
+
+                                      width: double.maxFinite,
+                                      height: 180,
+                                    ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
 
-                                        Text('${
-                                            selectedIndexAddress == index ?
-                                                'Selected Address' :
-                                            state.add?.results![index].description
+
+                                        // Text('${
+                                        //     selectedIndexAddress == index ?
+                                        //         'Selected Address' :
+                                        //     state.add?.results![index].description
+                                        //
+                                        //
+                                        // }', style: TextStyle(
+                                        //     fontSize: 16,
+                                        //     fontWeight: FontWeight.w500
+                                        // ),),
 
 
-                                        }', style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500
-                                        ),),
 
-
-
-                                        InkWell(
-                                          onTap: () {
-
-                                          },
-                                          child: InkWell(
-                                              onTap: () async {
-                                                var location = await Location()
-                                                    .getLocation();
-                                                print("User current location");
-                                                print(location.longitude);
-                                                print(location.latitude);
-
-
-                                                address = await Navigator.push(context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) {
-                                                        return GoogleMapScreen(
-                                                          positionlong: location
-                                                              .longitude,
-                                                          positionlat: location
-                                                              .latitude,
-                                                        );
-                                                      },));
-
-                                                setState(() {
-                                                  print("Got Address back");
-                                                  print(address);
-                                                });
-                                              },
-                                              child: Text('Edit', style: TextStyle(
-                                                  fontSize: 10.8,
-                                                color: Color(AppColorConfig.success)
-                                              ),)),
-                                        )
+                                        // InkWell(
+                                        //   onTap: () {
+                                        //
+                                        //   },
+                                        //   child: InkWell(
+                                        //       onTap: () async {
+                                        //         var location = await Location()
+                                        //             .getLocation();
+                                        //         print("User current location");
+                                        //         print(location.longitude);
+                                        //         print(location.latitude);
+                                        //
+                                        //
+                                        //         address = await Navigator.push(context,
+                                        //             MaterialPageRoute(
+                                        //               builder: (context) {
+                                        //                 return GoogleMapScreen(
+                                        //                   positionlong: location
+                                        //                       .longitude,
+                                        //                   positionlat: location
+                                        //                       .latitude,
+                                        //                 );
+                                        //               },));
+                                        //
+                                        //         setState(() {
+                                        //           print("Got Address back");
+                                        //           print(address);
+                                        //         });
+                                        //       },
+                                        //       child: Text('Edit', style: TextStyle(
+                                        //           fontSize: 10.8,
+                                        //         color: Color(AppColorConfig.success)
+                                        //       ),)),
+                                        // )
                                       ],
                                     ),
 
                                     SizedBox(height: 10,),
 
-                                    Text('${state.add?.results![index].street}', style: TextStyle(
-                                        fontSize: 11.8,
-                                        color: Colors.grey
+                                    Text('${state.add?.results![len!-1].street}', style: TextStyle(
+                                        fontSize: 14.8,
+                                        color: Colors.black
                                     ),)
 
 
                                   ],
                                 ),
                                 decoration: BoxDecoration(
+                                  color: Colors.white,
                                   border: Border.all(
-                                    color:
-
-
-                                    selectedIndexAddress == index ?
-                                    Color(AppColorConfig.success) :
-                                    Colors.white
-                                  ),
-
-
-                                    color:
-
-                                    selectedIndexAddress == index ?
-                                        Colors.white :
-
-                                    Color(0xffF5F5F5)
+                                    color: Colors.grey.withOpacity(0.2)
+                                  )
                                 ),
                               ),
                             );
@@ -682,21 +913,53 @@ class _CheckoutState extends State<Checkout> {
                     print(item.length);
                     //TODO orderrequest
                     print(item);
+
                     print(widget.uid);
+                    print(initpayment);
 
-                    OrderRequestV2 order = OrderRequestV2(
+                    if(initpayment == 1) {
+                      print("What is our init state");
+                      double total = 0;
+                      var qtytotal = 0;
+                      cart!?.forEach((element) {
+                        total += (element!.price * element.qty);
+                        qtytotal += element!.qty!;
 
-                        customer:widget.uid,
+                      });
+                      makePayment(currency:"USD",totalamount:total.ceil().toString()).then((value) {
+                        print("Success");
 
-                        method:
-                        initpayment == 0?
-                        "Cash" :
-                        "online",
-                        products:item
 
-                    );
 
-                    BlocProvider.of<OrderBloc>(context,listen: false).add(PostOrderEvent( addressid:addressid ,orderRequestV2: order));
+                      }).catchError((err) {
+                        print(err);
+
+                      });
+
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        //   return TestScreen(currency: 'USD',total: total.ceil(),);
+                        // },));
+
+                    }
+                    //
+
+                    else{
+                      OrderRequestV2 order = OrderRequestV2(
+
+                          customer:widget.uid,
+
+                          method:
+                          initpayment == 0?
+                          "Cash" :
+                          "online",
+                          products:item
+
+                      );
+
+                      BlocProvider.of<OrderBloc>(context,listen: false).add(PostOrderEvent( addressid:addressid ,orderRequestV2: order));
+                    }
+
+
 
 
                     // Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -714,6 +977,89 @@ class _CheckoutState extends State<Checkout> {
 
 
     );
+  }
+
+
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': calculateAmount(amount),
+        'currency': currency,
+        'payment_method_types[]': 'card'
+      };
+      var res = await http.
+      post(Uri.parse('https://api.stripe.com/v1/payment_intents'),
+          headers: {
+            'Authorization': 'Bearer ${SecretKey.key}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: body
+      );
+      print("Payment body: ${res.body.toString()}");
+      return json.decode(res.body);
+    } catch (error) {
+      print('  createPaymentIntentresponse error');
+      print(error.toString());
+    }
+  }
+
+  String calculateAmount(String amount) {
+    return ((int.parse(amount)) * 100).toString();
+  }
+
+  Future<void> makePayment({totalamount,currency}) async {
+    print("payment");
+    try {
+      paymentintent = await createPaymentIntent(totalamount.toString(), 'USD');
+      await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+              paymentIntentClientSecret: paymentintent!['client_secret'],
+              style: ThemeMode.light,
+              merchantDisplayName: 'Adnan')).then((value) {
+
+      });
+      // applePay: const PaymentSheetApplePay(merchantCountryCode: '+92'),
+      // googlePay: const PaymentSheetGooglePay(merchantCountryCode: )
+      //after successfully paid
+      displayPaymentSheet();
+    } catch (err) {
+      print('send response error');
+      print(err.toString());
+    }
+  }
+
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet(
+
+      ).then((value) {
+
+        showDialog(context: context, builder: (context) {
+          return AlertDialog(
+            title: Text('Payment Successfully'),
+          );
+        },);
+        paymentintent = null;
+        context.read<OrderBloc>().add(OrderStripe());
+        Navigator.pop(context);
+      }).onError((error, stackTrace) {
+        print("error is --- ${error}");
+      });
+    } on StripeException catch (e) {
+      print("Stripe error catching ${e}");
+      await Stripe.instance.presentPaymentSheet(
+
+      ).then((value) {
+        showDialog(context: context, builder: (context) {
+          return AlertDialog(
+            title: Text('Error has been occur'),
+          );
+        },);
+        paymentintent = null;
+      }).onError((error, stackTrace) {
+        print("error is --- ${error}");
+      });
+    }
   }
 }
 

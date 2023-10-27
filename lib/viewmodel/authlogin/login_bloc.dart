@@ -46,5 +46,38 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
 
     });
+    on<LoginSocialAuth>((event, emit) async {
+      // TODO: implement event handler
+
+
+      var email = event.email;
+
+      print(email );
+      emit(LoginLoading());
+      try{
+        TokenModel responsebody = await userRepository.GoogleAuthUser(event.email);
+        print(responsebody.access);
+        print(responsebody.refresh);
+
+        if(responsebody.access == null ) {
+          print("Unauthorize");
+          emit(LoginUnAuthorize());
+
+        }
+        else{
+          emit(LoginCompleted(token: responsebody ));
+        }
+
+
+
+      }catch(error) {
+        emit(LoginError(error));
+      }
+
+
+
+
+
+    });
   }
 }

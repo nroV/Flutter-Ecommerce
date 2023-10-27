@@ -1,17 +1,17 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/authlogin/register_bloc.dart';
-import 'package:ecommerce/views/authentication/VerifyScreen.dart';
+import 'package:ecommerce/views/authentication/Register/VerifyScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/authlogin/login_bloc.dart';
 import 'package:flutter/material.dart';
 
-import '../client/Home.dart';
-import '../widget/auth/customlogin.dart';
+import '../../client/Home.dart';
+import '../../widget/auth/customlogin.dart';
 import 'dart:math';
 
 import 'package:ecommerce/viewmodel/authlogin/login_bloc.dart';
-import 'package:ecommerce/views/authentication/Register.dart';
+import 'package:ecommerce/views/authentication/Register/Register.dart';
 import 'package:ecommerce/views/client/Home.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -21,8 +21,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../widget/auth/customlogin.dart';
-import '../widget/auth/customregister.dart';
+import '../../widget/auth/customlogin.dart';
+import '../../widget/auth/customregister.dart';
 import 'package:bloc/bloc.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -30,9 +30,13 @@ class RegisterScreen extends StatefulWidget {
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
+
+
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build

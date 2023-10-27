@@ -1,4 +1,5 @@
 import 'package:ecommerce/data/network/networkservice.dart';
+import 'package:ecommerce/model/Product/ProductFavModel.dart';
 import 'package:ecommerce/model/Users/MessageRegister.dart';
 import 'package:ecommerce/model/Users/TokenModel.dart';
 import 'package:ecommerce/res/appurl/appurl.dart';
@@ -8,23 +9,16 @@ import '../../model/Product/ProductModel.dart';
 class ProductRepository {
   var url =ApiUrl.producturl;
   NetworkApiService apiService = new NetworkApiService();
-  Future<dynamic> FetchProduct() async {
+  Future<dynamic> FetchProduct({page}) async {
 
     try{
 
 
 
         print("New Arrival");
-        var res = await apiService.GetAllproduct(ApiUrl.producturl,"");
+        print(page);
+        var res = await apiService.GetAllproduct(ApiUrl.producturl,"",page: page);
         return ProductModel.fromJson(res);
-
-
-
-
-
-      // return TokenModel.fromJson(res);
-
-
 
 
     }catch(e) {
@@ -32,7 +26,22 @@ class ProductRepository {
       rethrow ;
     }
   }
-  Future<dynamic> SortProduct(sort,rank,{search}) async {
+  Future<dynamic> FavFetchProduct(uid) async {
+
+    try{
+
+
+
+      var res = await apiService.FetchFavorite(uid);
+      return ProductFavModel.fromJson(res);
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
+  Future<dynamic> SortProduct(sort,rank,{search,page}) async {
 
     try{
 
@@ -43,8 +52,9 @@ class ProductRepository {
       print(sort);
       print(rank);
       print(search);
+      print(page);
 
-       res = await apiService.Sortproduct(ApiUrl.producturl,sort,rank ,search: search );
+       res = await apiService.Sortproduct(ApiUrl.producturl,sort,rank ,search: search ,page: page);
 
       // print(res);
 
@@ -65,13 +75,13 @@ class ProductRepository {
     }
   }
 
-  Future<dynamic> QueryProduct(search) async {
+  Future<dynamic> QueryProduct(search,{page}) async {
 
     try{
 
 
       print("Query Product In Repository");
-      var res = await apiService.Searchproduct(ApiUrl.producturl,search);
+      var res = await apiService.Searchproduct(ApiUrl.producturl,search,page: page);
       return ProductModel.fromJson(res);
 
 

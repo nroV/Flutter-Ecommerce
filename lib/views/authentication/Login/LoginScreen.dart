@@ -1,15 +1,15 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/authlogin/login_bloc.dart';
-import 'package:ecommerce/views/authentication/LoginUI.dart';
+import 'package:ecommerce/views/authentication/Login/LoginUI.dart';
 import 'package:flutter/material.dart';
 
-import '../client/Home.dart';
-import '../client/NavScreen.dart';
-import '../widget/auth/customlogin.dart';
+import '../../client/Home.dart';
+import '../../client/NavScreen.dart';
+import '../../widget/auth/customlogin.dart';
 import 'dart:math';
 
 import 'package:ecommerce/viewmodel/authlogin/login_bloc.dart';
-import 'package:ecommerce/views/authentication/Register.dart';
+import 'package:ecommerce/views/authentication/Register/Register.dart';
 import 'package:ecommerce/views/client/Home.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -38,6 +38,19 @@ class _loginScreenState extends State<loginScreen> {
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
             // TODO: implement listener
+
+            if  (state is LoginCompleted) {
+
+              // Navigator.pop(context);
+              print(state.token?.access);
+              setLoginTrue(state.token!.user!.id ?? 0,state.token?.access);
+
+              // return Text("${state.token?.refresh}");
+              // throw "done";
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+                return MyNavScreen();
+              },), (route) => false);
+            }
           },
           builder: (context, state) {
 
@@ -53,16 +66,6 @@ class _loginScreenState extends State<loginScreen> {
                 ,);
             }
 
-            if  (state is LoginCompleted) {
-
-              // Navigator.pop(context);
-              print(state.token?.access);
-              setLoginTrue(state.token!.user!.id ?? 0,state.token?.access);
-
-              // return Text("${state.token?.refresh}");
-              // throw "done";
-              return MyNavScreen();
-            }
             if(state is LoginError) {
 
 

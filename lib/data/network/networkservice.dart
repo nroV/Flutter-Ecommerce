@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:ecommerce/model/Address.dart';
 import 'package:ecommerce/res/appurl/appurl.dart';
+import 'package:ecommerce/viewmodel/products/address_bloc.dart';
+import 'package:ecommerce/viewmodel/products/product_fav_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -22,6 +24,31 @@ class NetworkApiService {
       // print(res.statusCode);
       print(res.body.toString());
       if (res.statusCode == 200) {
+        return json.decode(res.body);
+        print(res.body);
+      }
+      if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+  Future<dynamic> LoginSocialAuthUser(String? email) async {
+    try {
+      var res = await http.post(Uri.parse(ApiUrl.authlogingoogle),
+          body: {
+            "email": "${email}"
+
+          }
+      );
+      print(res.statusCode);
+      print(res.body.toString());
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
         return json.decode(res.body);
         print(res.body);
       }
@@ -115,7 +142,36 @@ class NetworkApiService {
       print("No internet during communication");
     }
   }
+  Future<dynamic> AuthRegisterGoogle(String? email,String? password,username,telephone) async {
+    try {
+      // print("Register user");
+      print(telephone);
+      var tel = "+" + telephone.toString();
+      var res = await http.post(Uri.parse(ApiUrl.authgoogleauthregister),
 
+
+          body: {
+
+
+            "email": email,
+            "username":username,
+            "password": password,
+            "telephone": tel,
+          }
+      );
+      print(res.statusCode);
+      print(res.body.toString());
+      if (res.statusCode == 201) {
+        return json.decode(res.body);
+        print(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
   Future<dynamic> UserEditing(fname, lname, String? telephone, String? username,String gender,imgid,uid,url) async {
     try {
       // print("Register user");
@@ -161,10 +217,12 @@ class NetworkApiService {
       print("No internet during communication");
     }
   }
-  Future<dynamic> GetAllproduct(url, search) async {
+  Future<dynamic> GetAllproduct(url, search,{page}) async {
+
     try {
 
-      var res = await http.get(Uri.parse("${url}"),
+  print(page);
+      var res = await http.get(Uri.parse("${url}?page=${page}"),
 
       );
       print(res.statusCode);
@@ -205,23 +263,27 @@ class NetworkApiService {
       );
       print("User id review");
       print(res.statusCode);
-      print(res.body.toString());
+      print(res.body.toString()); //
       return json.decode(responseStatusCheck(res));
     } on SocketException {
       print("No internet during communication");
     }
   }
-  Future<dynamic> Sortproduct(url, sort,rank,{search}) async {
+  Future<dynamic> Sortproduct(url, sort,rank,{search,page}) async {
     try {
       print(url);
       print(sort);
-      print("${url}/sort?${sort}=${rank}");
+      print("${url}/sort?${sort}=${rank}&page=${page}");
       if(search == null) {
         search = "";
       }
+      print("Pagination now is ${page}");
     var mainurl;
+    if(page == null) {
+      page = 1;
+    }
 
-        mainurl = "${url}/sort?search=${search}&${sort}=${rank}";
+        mainurl = "${url}/sort?search=${search}&${sort}=${rank}&page=${page}";
 
       print(mainurl);
 
@@ -262,7 +324,7 @@ class NetworkApiService {
       );
       print(res.statusCode);
       print("Filtering ");
-      print(res.body.toString());
+      // print(res.body.toString());
 
       return json.decode(responseStatusCheck(res));
 
@@ -273,9 +335,9 @@ class NetworkApiService {
   }
 
 
-  Future<dynamic> Searchproduct(url, search) async {
+  Future<dynamic> Searchproduct(url, search,{page}) async {
     try {
-      var res = await http.get(Uri.parse('${url}?search=${search}'),
+      var res = await http.get(Uri.parse('${url}?search=${search}&page=${page}'),
 
       );
       print(res.statusCode);
@@ -287,7 +349,7 @@ class NetworkApiService {
   }
 
 
-  Future<dynamic> AddressPost(String? url, AddressBody addressbody, uid) async {
+  Future<dynamic> AddressPost(String? url, AddressBody addressbody, uid,desc) async {
     try {
       print(addressbody);
 
@@ -297,7 +359,35 @@ class NetworkApiService {
           "city": addressbody.country,
           "latitude": addressbody.lat.toString(),
           "longitude": addressbody.lon.toString(),
-          "country": addressbody.country
+          "country": addressbody.country,
+          "description":"${desc}"
+        },
+        //     headers: {
+        //       'Content-type': 'application/json',
+        //       'Accept': 'application/json'
+        //       // "Authorization": "Some token"
+        //
+        // }
+      );
+      print(res.statusCode);
+      print(res.body.toString());
+      return json.decode(responseStatusCheck(res));
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+  Future<dynamic> AddressPatch(String? url, AddressBody addressbody, uid,aid,desc) async {
+    try {
+      print(addressbody);
+
+      var res = await http.put(Uri.parse('${url}/${aid}'),
+        body: {
+          "street": addressbody.street,
+          "city": addressbody.country,
+          "latitude": addressbody.lat.toString(),
+          "longitude": addressbody.lon.toString(),
+          "country": addressbody.country,
+          "description":desc
         },
         //     headers: {
         //       'Content-type': 'application/json',
@@ -307,13 +397,101 @@ class NetworkApiService {
         // }
       );
       // print(res.statusCode);
-      print(res.body.toString());
+      // print(res.body.toString());
       return json.decode(responseStatusCheck(res));
     } on SocketException {
       print("No internet during communication");
     }
   }
 
+  Future<dynamic> DeleteAddress(addid) async {
+    try {
+      print(addid);
+
+      var res = await http.delete(Uri.parse('${ApiUrl.addressurlput}/${addid}'),
+
+        //     headers: {
+        //       'Content-type': 'application/json',
+        //       'Accept': 'application/json'
+        //       // "Authorization": "Some token"
+        //
+        // }
+      );
+      // print(res.statusCode);
+      // print(res.body.toString());
+      return json.decode(responseStatusCheck(res));
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+
+  Future<dynamic> AddFavorite(pid,uid) async  {
+    try {
+
+
+      var res = await http.post(Uri.parse('${ApiUrl.addproductfavurl}/${pid}'),
+        body: {
+        'user':'${uid}'
+        }
+
+        //     headers: {
+        //       'Content-type': 'application/json',
+        //       'Accept': 'application/json'
+        //       // "Authorization": "Some token"
+        //
+        // }
+      );
+      print(res.statusCode);
+      // print(res.body.toString());
+      return json.decode(responseStatusCheck(res));
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+
+  Future<dynamic> FetchFavorite(uid) async  {
+    try {
+
+
+      var res = await http.get(Uri.parse('${ApiUrl.addproductfavurl}/${uid}'),
+
+        //     headers: {
+        //       'Content-type': 'application/json',
+        //       'Accept': 'application/json'
+        //       // "Authorization": "Some token"
+        //
+        // }
+      );
+      print(res.statusCode);
+      // print(res.body.toString());
+      return json.decode(responseStatusCheck(res));
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+  Future<dynamic> RemoveFavorite(pid,uid) async {
+    try {
+
+
+      var res = await http.post(Uri.parse('${ApiUrl.addproductfavurl}/${pid}/delete'),
+          body: {
+            'user':'${uid}'
+          }
+
+        //     headers: {
+        //       'Content-type': 'application/json',
+        //       'Accept': 'application/json'
+        //       // "Authorization": "Some token"
+        //
+        // }
+      );
+      print(res.statusCode);
+      // print(res.body.toString());
+      return json.decode(responseStatusCheck(res));
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
   Future<dynamic> AddressFetch(uid) async {
     try {
       var url = ApiUrl.addressuser;
@@ -333,7 +511,7 @@ class NetworkApiService {
       print("No internet during communication");
     }
   }
-
+//
   Future<dynamic> GetAllCategory(url) async {
     try {
 
@@ -369,7 +547,7 @@ class NetworkApiService {
 
       );
       print(res.statusCode);
-      print(res.body.toString());
+      // print(res.body.toString());
 
       return json.decode(responseStatusCheck(res));
     } on SocketException {
@@ -408,7 +586,7 @@ class NetworkApiService {
     }
     List<Map<String, dynamic>> jsonList = orderRequestV2!.products!.map((item) => item.toJson()).toList();
 
-    print(jsonList);
+    //  print(jsonList);
     request.body = json.encode({
       "method":'${orderRequestV2?.method}',
      "products": jsonList.toList(),

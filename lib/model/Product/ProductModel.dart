@@ -3,8 +3,6 @@ class ProductModel {
   int? pageSize;
   int? totalPages;
   int? currentPageNumber;
-  Null? next;
-  Null? previous;
   List<Results>? results;
 
   ProductModel(
@@ -12,8 +10,6 @@ class ProductModel {
         this.pageSize,
         this.totalPages,
         this.currentPageNumber,
-        this.next,
-        this.previous,
         this.results});
 
   ProductModel.fromJson(Map<String, dynamic> json) {
@@ -21,8 +17,6 @@ class ProductModel {
     pageSize = json['page_size'];
     totalPages = json['total_pages'];
     currentPageNumber = json['current_page_number'];
-    next = json['next'];
-    previous = json['previous'];
     if (json['results'] != null) {
       results = <Results>[];
       json['results'].forEach((v) {
@@ -37,8 +31,6 @@ class ProductModel {
     data['page_size'] = this.pageSize;
     data['total_pages'] = this.totalPages;
     data['current_page_number'] = this.currentPageNumber;
-    data['next'] = this.next;
-    data['previous'] = this.previous;
     if (this.results != null) {
       data['results'] = this.results!.map((v) => v.toJson()).toList();
     }
@@ -54,6 +46,7 @@ class Results {
   Attribution? attribution;
   String? productname;
   double? price;
+  bool? isfavorite;
   int? stockqty;
   double? avgRating;
   int? discount;
@@ -68,6 +61,7 @@ class Results {
         this.attribution,
         this.productname,
         this.price,
+        this.isfavorite,
         this.stockqty,
         this.avgRating,
         this.discount,
@@ -91,6 +85,7 @@ class Results {
         : null;
     productname = json['productname'];
     price = json['price'];
+    isfavorite = json['isfavorite'];
     stockqty = json['stockqty'];
     avgRating = json['avg_rating'];
     discount = json['discount'];
@@ -115,6 +110,7 @@ class Results {
     }
     data['productname'] = this.productname;
     data['price'] = this.price;
+    data['isfavorite'] = this.isfavorite;
     data['stockqty'] = this.stockqty;
     data['avg_rating'] = this.avgRating;
     data['discount'] = this.discount;
@@ -245,13 +241,15 @@ class Colorid {
   int? id;
   Imgid? imgid;
   String? color;
+  String? desc;
 
-  Colorid({this.id, this.imgid, this.color});
+  Colorid({this.id, this.imgid, this.color, this.desc});
 
   Colorid.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     imgid = json['imgid'] != null ? new Imgid.fromJson(json['imgid']) : null;
     color = json['color'];
+    desc = json['desc'];
   }
 
   Map<String, dynamic> toJson() {
@@ -261,6 +259,7 @@ class Colorid {
       data['imgid'] = this.imgid!.toJson();
     }
     data['color'] = this.color;
+    data['desc'] = this.desc;
     return data;
   }
 }

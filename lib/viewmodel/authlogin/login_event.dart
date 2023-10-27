@@ -12,3 +12,11 @@ class LoginUser extends LoginEvent {
 
   LoginUser(this.email, this.password);
 }
+
+
+class LoginSocialAuth extends LoginEvent {
+  var email;
+
+
+  LoginSocialAuth(this.email);
+}

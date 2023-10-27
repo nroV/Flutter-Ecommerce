@@ -33,6 +33,30 @@ class UserRepository {
      rethrow ;
     }
   }
+  Future<dynamic> GoogleAuthUser(String? email ) async {
+
+    try{
+      var res = await apiService.LoginSocialAuthUser(email) as Map<String,dynamic>;
+      print(res['data']);
+      if(res['data']!=null) {
+        print("data here ");
+      }
+
+
+
+
+
+      return TokenModel.fromJson(res);
+
+      return res;
+
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
   Future<dynamic> AuthUserSignUp(fname,lname,String? email,String? password,telephone,username,gender) async {
 
     try{
@@ -49,6 +73,24 @@ class UserRepository {
       rethrow ;
     }
   }
+  Future<dynamic> SocialAuthRegister({String? email,String? password,username,telephone}) async {
+
+    try{
+
+      var res = await apiService.AuthRegisterGoogle(email,password,username,telephone);
+      print(res);
+      return MessageRegister.fromJson(res);
+
+      return res;
+
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
+
 
   Future<dynamic> FetchUser(uid) async {
 

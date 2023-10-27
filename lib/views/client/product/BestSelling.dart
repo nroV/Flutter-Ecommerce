@@ -28,13 +28,13 @@ class _BestSellingSectionState extends State<BestSellingSection> {
   @override
   void initState() {
     // TODO: implement initState
-
+    context.read<ProductBlocBestSell>().add(SortProduct(rank: "DESC",sortname: "best_selling"));
     super.initState();
 
 
   }
   Widget build(BuildContext context) {
-    context.read<ProductBlocBestSell>().add(SortProduct(rank: "DESC",sortname: "best_selling"));
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 15,top: 15),
       child: SizedBox(

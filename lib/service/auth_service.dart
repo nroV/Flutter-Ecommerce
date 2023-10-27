@@ -5,17 +5,32 @@ class AuthService{
   //google sign in
 
 
-    signInWithGoogle() async {
+  Future<Map<String,String?>>  signInWithGoogle() async {
      final GoogleSignInAccount? googleuser = await  GoogleSignIn().signIn();
-    print(googleuser?.email);
-     print(googleuser?.id);
-     print(googleuser?.displayName);
+    // print(googleuser?.email);
+
+    //  print(googleuser);
+    //
+    //
+    //
+    //  print("Photo url is ");
+    //  print(googleuser?.photoUrl.toString());
+     // print(googleuser?.displayName);
+
+
 
       final GoogleSignInAuthentication? googleauth = await googleuser?.authentication;
      //  print(googleauth?.accessToken);
      // print(googleauth?.idToken);
-      //create credential
+     // print(googleauth?.idToken);
 
+      //create credential
+     var user = {
+       "email":googleuser?.email,
+       "displayname":googleuser?.displayName,
+       "id":googleuser?.id
+     };
+     return user;
 
   }
 }

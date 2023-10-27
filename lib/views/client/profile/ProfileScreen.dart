@@ -6,11 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../res/appurl/appurl.dart';
 import '../../Address/AddressScreen.dart';
 import '../../authentication/Require.dart';
+import '../../authentication/ResetPassword/ResetPassword.dart';
 import '../../order/Cart.dart';
 import '../../order/GoogleMap/GoogleMapScreen.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'MyWishList.dart';
 
 class MyProfileScreen extends StatefulWidget {
 
@@ -317,7 +320,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           ListTile(
                             onTap: () {
 
-
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return MyWishScreen(uid: uid,);
+                              },));
                             },
                             leading: Image.asset('assets/logo/Favorite_fill.png',
                               fit: BoxFit.cover,
@@ -337,6 +342,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           ),
                           Divider(),
                           ListTile(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return ResetPassword();
+                              },));
+                            },
                             leading: Image.asset('assets/logo/eye.png',
                               fit: BoxFit.cover,
                               width: 24,
@@ -406,7 +416,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             }
             else{
               return Center(
-                child: Text("No Internet"),
+                child: CircularProgressIndicator(),
               );
             }
 

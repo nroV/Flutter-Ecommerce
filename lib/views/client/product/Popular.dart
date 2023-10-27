@@ -28,13 +28,13 @@ class _PopularSectionState extends State<PopularSection> {
   @override
   void initState() {
     // TODO: implement initState
-
+    context.read<ProductBlocBestRating>().add(SortProduct(rank: "DESC",sortname: "popular"));
     super.initState();
 
 
   }
   Widget build(BuildContext context) {
-    context.read<ProductBlocBestRating>().add(SortProduct(rank: "DESC",sortname: "popular"));
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: SizedBox(

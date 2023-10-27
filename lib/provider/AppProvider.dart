@@ -1,5 +1,8 @@
 
 import 'package:ecommerce/viewmodel/Review/review_bloc.dart';
+import 'package:ecommerce/viewmodel/order/stripe_bloc.dart';
+import 'package:ecommerce/viewmodel/products/product_fav_bloc.dart';
+import 'package:ecommerce/viewmodel/validator/form_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,6 +17,12 @@ import '../viewmodel/products/address_bloc.dart';
 import '../viewmodel/products/product_bloc.dart';
 class AppProvider {
   static get allblocprovider =>[
+    BlocProvider<FormBloc>(
+      create: (BuildContext context) => FormBloc(),
+    ),
+    BlocProvider<StripeBloc>(
+      create: (BuildContext context) => StripeBloc(),
+    ),
     BlocProvider<ImageBloc>(
       create: (BuildContext context) => ImageBloc(),
     ),
@@ -81,6 +90,8 @@ class AppProvider {
     BlocProvider<ReviewBloc>(
       create: (BuildContext context) => ReviewBloc(),
     ),
-
+    BlocProvider<ProductFavBloc>(
+      create: (BuildContext context) => ProductFavBloc(),
+    ),
   ];
 }
