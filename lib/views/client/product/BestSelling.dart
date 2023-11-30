@@ -11,6 +11,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+import '../../widget/LoadingIcon.dart';
 import '../Home.dart';
 import '../ProductAllScreen.dart';
 
@@ -75,9 +76,11 @@ class _BestSellingSectionState extends State<BestSellingSection> {
 
                   if(state is ProductLoading) {
                     return Center(
-                      child: CircularProgressIndicator(),
+                        child:LoadingIcon()
+
                     );
                   }
+
                   if(state is ProductCompleted) {
                     var productlen = state.product!.results!.length;
                     var allproduct = state.product!.results;
@@ -87,6 +90,8 @@ class _BestSellingSectionState extends State<BestSellingSection> {
                       scrollDirection: Axis.horizontal,
                       itemCount:productlen ,
                       itemBuilder: (context, index) {
+
+
 
                         return   CardHoriScroll(product: allproduct![index],);
                       },);

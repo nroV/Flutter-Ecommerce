@@ -6,9 +6,13 @@ import 'package:ecommerce/views/client/NavScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../helper/HexColorConverter.dart';
 import '../../res/appurl/appurl.dart';
+import '../../res/constant/appcolor.dart';
+import '../client/ReportBug.dart';
 import '../client/Review/ReviewPopUp.dart';
+import '../widget/LoadingIcon.dart';
 class CompletedOrder extends StatefulWidget {
 
   const CompletedOrder({Key? key}) : super(key: key);
@@ -25,6 +29,8 @@ void ReviewAlert(BuildContext context) {
 class _CompletedOrderState extends State<CompletedOrder> {
   int subqty = 0;
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,13 +38,13 @@ class _CompletedOrderState extends State<CompletedOrder> {
       appBar:AppBar(
 
         title: Text('Order Summary',style: TextStyle(
-            color: Colors.black
+            color: Colors.white
         ),),
         centerTitle: true,
         iconTheme: IconThemeData(
-            color: Colors.black
+            color: Colors.white
         ),
-        backgroundColor: Colors.white.withOpacity(0.34),
+        backgroundColor: Colors.black,
         elevation: 0,
 
 
@@ -50,12 +56,13 @@ class _CompletedOrderState extends State<CompletedOrder> {
             child: BlocConsumer<OrderBloc, OrderState>(
   listener: (context, state) {
     // TODO: implement listener
+    print(state);
   },
   builder: (context, state) {
     if(state is OrderDetailSuccess) {
 
       var cartlen = state.orderDetail?.products!.length ?? 0;
-      var urlimg = ApiUrl.main;
+      var urlimg =  "https://django-ecomm-6e6490200ee9.herokuapp.com";
 
       print(cartlen);
       return Column(
@@ -67,6 +74,10 @@ class _CompletedOrderState extends State<CompletedOrder> {
             shrinkWrap: true,
             itemBuilder: (context, index) {
               var cart =  state.orderDetail?.products;
+              Color colorcode = HexColor(cart![index].colorselection!.code!);
+
+              for(int i =0;i<state.orderDetail!.products!.length;i++)
+                subqty += state.orderDetail!.products![i].quantity!.toInt();
               return Container(
 
                 margin: EdgeInsets.only(bottom: 10),
@@ -79,24 +90,134 @@ class _CompletedOrderState extends State<CompletedOrder> {
                   },
 
 
-                  contentPadding: EdgeInsets.all(0),
-                  leading: Image.network('${urlimg}${cart![index].colorselection?.imgid?.images}'
 
-                    ,fit: BoxFit.cover,
-                    width: 100,
-                    height:double.maxFinite,
+                  contentPadding: EdgeInsets.all(14),
+                  leading:
+
+                  // Image.network(
+                  //     '${urlimg}${cart![index].colorselection?.imgid?.images}'
+                  //
+                  //
+                  //
+                  //
+                  //
+                  // ),
+                  CachedNetworkImage(
+                    // imageUrl: "https://fakeimg.pl/300x150?text=+",
+                    imageUrl: urlimg + cart![index].colorselection!.imgid!.images!,
+                    width: 80,
+                    height: 180,
+                    fit: BoxFit.cover,
+
+                    progressIndicatorBuilder: (context, url, downloadProgress) =>
+                        Center(child:
+                        Image.network( "https://fakeimg.pl/300x150?text=+"
+                          ,fit: BoxFit.cover,)
+
+                        ),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                  ),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+
+                      Expanded(
+                        child: Text('${cart![index].product!.productname!}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+
+                          style: TextStyle(
+                          fontSize: 16,
+                            overflow: TextOverflow.ellipsis,
+                          fontWeight: FontWeight.w400,
+
+                        ),),
+                      ),
+
+
+                    ],
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 2,),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Size: ${cart[index].size?.size} ', style: TextStyle(
+                            fontSize: 12.8,
+
+                          ),),
+                          // Text('Color: ${cart[index].colorselection?.color} ', style: TextStyle(
+                          //   fontSize: 12.8,
+                          //
+                          // ),),
+                          Text('Color:  ', style: TextStyle(
+                            fontSize: 11.8,
+
+                          ),),
+                          Container(
+                            width: 12,
+                            margin: EdgeInsets.only(right: 5),
+                            height: 12,
+                            // child: Text(attri?.colorid[index].code),
+                            decoration: BoxDecoration(
+                                color:colorcode,
+                                borderRadius: BorderRadius.circular(3),
+                                border: Border.all(
+                                    color: Colors.grey.withOpacity(0.5)
+                                )
+
+                            ),
+                          ),
+                          Text('\ Total: \$ ${ (cart![index].colorselection!.price! * (cart![index].quantity!)).toStringAsFixed(2)}',
+
+                            style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w500,
+                                color: Color(AppColorConfig.success)
+                            ),),
+
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Container(
+
+
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                          children: [
+                        // element!.price - ( element!.price * (double.parse( element.discount.toString() )/100)).truncateToDouble();
+                            Text('\$ ${
+                            (cart[index].colorselection!.price! - ( cart[index].colorselection!.price! *
+                                (double.parse( cart[index].product!.discount.toString() )/100))).toStringAsFixed(2)
+                            }',style: TextStyle(
+                                fontSize: 18.9,
+                                fontWeight: FontWeight.w500,
+                                color: Color(AppColorConfig.success)
+                            ),),
+
+
+                          ],
+                        ),
+                      ),
+
+                    ],
                   ),
 
-                  title: Text('${cart![index].product!.productname!}',style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500
-                  ),),
-                  subtitle: Text('\$ ${cart![index].product!.price!}',style: TextStyle(
-                      fontSize: 16.8,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff508A7B)
-                  ),),
-                  trailing: Text('Qty: ${cart![index].quantity!}',style: TextStyle(
+                  // title:
+                  // Text('${cart![index].product!.productname!}',style: TextStyle(
+                  //     fontSize: 16,
+                  //     fontWeight: FontWeight.w500
+                  // ),),
+                  // subtitle: Text('\$ ${cart![index].product!.price!}',style: TextStyle(
+                  //     fontSize: 16.8,
+                  //     fontWeight: FontWeight.w500,
+                  //     color: Color(0xff508A7B)
+                  // ),),
+                  trailing: Text('Qty: x ${cart![index].quantity!}',style: TextStyle(
                       fontSize: 12.8,
 
                       fontWeight: FontWeight.w400
@@ -115,27 +236,32 @@ class _CompletedOrderState extends State<CompletedOrder> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Order ${state.orderDetail?.id}",style: TextStyle(
+                      Text("Order # ${state.orderDetail?.id}",style: TextStyle(
 
                           fontSize: 16,
                           fontWeight: FontWeight.w500
                       ),),
 
-                      Container(
-                        padding: EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          color: Color(0xffF5F5F5),
+                      InkWell(
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          return ReportScreen();
+                        },)),
+                        child: Container(
+                          padding: EdgeInsets.all(7),
+                          decoration: BoxDecoration(
+                            color: Color(0xffF5F5F5),
 
-                        ),
-                        child: Row(
-                          children: [
-                            Text('Need Help?'),
-                            SizedBox(width: 20,),
-                            Icon(Icons.add_ic_call_sharp,size: 15,),
-                            SizedBox(width: 10,),
-                            Icon(Icons.email,size: 15,),
-                          ],
-                        ),)
+                          ),
+                          child: Row(
+                            children: [
+                              Text('Need Help?'),
+                              SizedBox(width: 20,),
+                              Icon(Icons.add_ic_call_sharp,size: 15,),
+                              SizedBox(width: 10,),
+                              Icon(Icons.email,size: 15,),
+                            ],
+                          ),),
+                      )
 
 
 
@@ -149,12 +275,12 @@ class _CompletedOrderState extends State<CompletedOrder> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Product Qty',style: TextStyle(
+                      Text("Payment status",style: TextStyle(
                           color: Colors.grey,
                           fontSize: 12.8
                       ),),
-                      for(int i =0;i<state.orderDetail!.products!.length;i++)
-                      Text('x ${ ( subqty += state.orderDetail!.products![i].quantity!.toInt()  ) }'),
+
+                      Text(' ${state?.orderDetail?.ispaid == false  ? 'Not Paid' : 'Paid'}'),
                     ],
                   ),
                 ),
@@ -176,7 +302,7 @@ class _CompletedOrderState extends State<CompletedOrder> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Payment',style: TextStyle(
+                      Text('Payment method',style: TextStyle(
                           color: Colors.grey,
                           fontSize: 12.8
                       ),),
@@ -195,9 +321,15 @@ class _CompletedOrderState extends State<CompletedOrder> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('SubTotal',style: TextStyle(
-                          color: Colors.black
+                          color: Color(AppColorConfig.success),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500
                       ),),
-                      Text('\$ ${state?.orderDetail?.amount}'),
+                      Text('\$ ${state?.orderDetail?.amount}',style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                        color: Color(AppColorConfig.success),
+                        fontSize: 18,
+                      ),),
                     ],
                   ),
                 ),
@@ -210,23 +342,13 @@ class _CompletedOrderState extends State<CompletedOrder> {
       );
     }
     if(state is OrderDetailError){
-      return Center(
-        child:  Text('Error during server sending'),
-      );
+      return  LoadingIcon();
     }
     if(state is OrderDetailLoading){
-        return Center(
-          child:  CircularProgressIndicator(),
-        );
+      return  Center(child: LoadingIcon());
     }
-
-
-
-
     else{
-      return Center(
-        child:  CircularProgressIndicator(),
-      );
+      return  LoadingIcon();
     }
 
 
@@ -241,24 +363,31 @@ class _CompletedOrderState extends State<CompletedOrder> {
 
           children: [
             Expanded(
-              child: FloatingActionButton.extended(
-                  backgroundColor: Colors.black,
 
-                  elevation: 0,
-                  isExtended: true,
-                  extendedPadding: EdgeInsets.all(0),
+              child:
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      elevation: 0,
 
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0)
+
+                      padding: EdgeInsets.all(15),
+
+                      backgroundColor: Color(AppColorConfig.success),
+                      shape: BeveledRectangleBorder(
+                          borderRadius: BorderRadius.circular(0)
+                      )
                   ),
                   onPressed: () {
                     BlocProvider.of<CartBloc>(context,listen: false).add(CartClear());
+
+
                     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
                       return MyNavScreen();
                     },),(route) => false  );
 
-                  }, label:Text('Continue Shopping',style: TextStyle(
-                  fontSize: 12.8
+
+                  }, child: Text("Continue Shopping",style: TextStyle(
+                  fontSize: 16
               ),)),
             ),
           ],

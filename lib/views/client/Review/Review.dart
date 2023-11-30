@@ -11,11 +11,13 @@ import '../../../model/Review/ReviewModel.dart';
 import '../../../viewmodel/cart/cart_bloc.dart';
 import '../../order/Cart.dart';
 import '../../order/Checkout.dart';
+import '../../widget/LoadingIcon.dart';
 import '../Home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../NavScreen.dart';
+import '../product/MyProduct.dart';
 import 'Review.dart';
 import 'ReviewModify.dart';
 
@@ -23,12 +25,15 @@ import 'ReviewModify.dart';
 
 class ProductReviewPart extends StatefulWidget {
   var reviewrating;
-  Results? product;
+  MyProductDetail? product;
+  var star;
+
   Product? productv2;
 
   ProductReviewPart({
     super.key, this.product,
-    this.productv2
+    this.productv2,
+    this.star
   });
 
 
@@ -41,34 +46,10 @@ class _ProductReviewPartState extends State<ProductReviewPart> {
 
   var starpoint ;
   var liststar =[];
+
   @override
   void initState() {
 
-
-    // TODO: implement initState
-    super.initState();
-
-    // if(widget.product == null) {
-    //   product = widget.productv2;
-    //
-    //
-    //   for(int i =0;i<5;i++) {
-    //     liststar.add(i);
-    //   }
-    // }
-    // else{
-    //   product = widget.product;
-    //
-    //   for(int i =0;i<5;i++) {
-    //     liststar.add(i);
-    //   }
-    // }
-
-  }
-
-
-
-  Widget build(BuildContext context) {
     if(widget.product == null) {
       product = widget.productv2;
 
@@ -86,21 +67,60 @@ class _ProductReviewPartState extends State<ProductReviewPart> {
     }
     context.read<ReviewBloc>().add(ReviewFetch(pid: product.id));
     starpoint =product!.avgRating!.roundToDouble();
+    // TODO: implement initState
+    super.initState();
+
+
+  }
+
+
+
+  Widget build(BuildContext context) {
+
     print(starpoint);
     return BlocConsumer<ReviewBloc, ReviewState>(
       listener: (context, state) {
         // TODO: implement listener
+        if(state is ReviewPostCompleted) {
+          liststar.clear();
+          starpoint = 0;
+          if(widget.product == null) {
+            product = widget.productv2;
+
+
+            for(int i =0;i<5;i++) {
+              liststar.add(i);
+            }
+          }
+          else{
+            product = widget.product;
+
+            for(int i =0;i<5;i++) {
+              liststar.add(i);
+            }
+          }
+          context.read<ReviewBloc>().add(ReviewFetch(pid: product.id));
+          print(liststar.length);
+          print("State is review completed");
+        }
       },
       builder: (context, state) {
         if(state is ReviewLoading) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+          return LoadingIcon();
         }
         if(state is ReviewCompleted){
           var review = state.review;
-          var count  = state.review?.count;
+          num avgstar = 0;
+
+          var count  = state.review?.count ?? 0;
+          if(count > 0) {
+           avgstar = state.review?.results?[0].product?.avgRating ??  0;
+          }
+          starpoint = avgstar;
+
+
           print(review);
+          print(avgstar);
 
 
 
@@ -170,7 +190,7 @@ class _ProductReviewPartState extends State<ProductReviewPart> {
                 children: [
                   Row(
                     children: [
-                      Text("${product!.avgRating!.roundToDouble()}",style: TextStyle(
+                      Text(avgstar.toStringAsPrecision(3),style: TextStyle(
                           fontSize: 40
                       ),),
                       SizedBox(width: 5,),
@@ -213,6 +233,7 @@ class _ProductReviewPartState extends State<ProductReviewPart> {
                             return ReviewList(pid:product.id ,
                               pimage: product.imgid![0].images,
                               pname: product.productname,
+                              star:avgstar.toStringAsPrecision(3)
                             );
                           },));
 

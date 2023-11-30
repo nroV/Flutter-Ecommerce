@@ -23,8 +23,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(LoginLoading());
       try{
       TokenModel responsebody = await userRepository.AuthUser(email , pass);
-       print(responsebody.access);
-       print(responsebody.refresh);
+       // print(responsebody.access);
+       // print(responsebody.refresh);
 
        if(responsebody.access == null ) {
          print("Unauthorize");
@@ -48,6 +48,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     });
     on<LoginSocialAuth>((event, emit) async {
       // TODO: implement event handler
+      print("Gmail has sent");
 
 
       var email = event.email;

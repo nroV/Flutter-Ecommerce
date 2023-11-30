@@ -1,16 +1,16 @@
 class OrderRequestV2 {
   String? method;
-  List<Productss>? products;
+  List<Productss>? productss;
   int? customer;
 
-  OrderRequestV2({this.method, this.products, this.customer});
+  OrderRequestV2({this.method, this.productss, this.customer});
 
   OrderRequestV2.fromJson(Map<String, dynamic> json) {
     method = json['method'];
-    if (json['products'] != null) {
-      products = <Productss>[];
-      json['products'].forEach((v) {
-        products!.add(new Productss.fromJson(v));
+    if (json['productss'] != null) {
+      productss = <Productss>[];
+      json['productss'].forEach((v) {
+        productss!.add(new Productss.fromJson(v));
       });
     }
     customer = json['customer'];
@@ -19,8 +19,8 @@ class OrderRequestV2 {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['method'] = this.method;
-    if (this.products != null) {
-      data['products'] = this.products!.map((v) => v.toJson()).toList();
+    if (this.productss != null) {
+      data['productss'] = this.productss!.map((v) => v.toJson()).toList();
     }
     data['customer'] = this.customer;
     return data;

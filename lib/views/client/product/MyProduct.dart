@@ -1,19 +1,19 @@
 class MyProductDetail {
   int? id;
-  var category;
+  var categoryid;
   var imgid;
  var attribution;
   String? productname;
   double? price;
-  bool? isfavorite;
   int? stockqty;
   double? avgRating;
   int? discount;
   int? sellRating;
+
   String? description;
   MyProductDetail(
       {this.id,
-        this.category,
+        this.categoryid,
 
         this.imgid,
         this.attribution,

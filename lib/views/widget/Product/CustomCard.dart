@@ -2,11 +2,12 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../model/Product/ProductModel.dart';
 import '../../../res/constant/appcolor.dart';
+import '../../client/product/MyProduct.dart';
 import '../../client/product/Product.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class CustomCardList extends StatefulWidget {
   Results? product;
   var len;
@@ -25,10 +26,31 @@ class _CustomCardListState extends State<CustomCardList> {
   @override
 
   Widget build(BuildContext context) {
+    print("My images in custom card are");
+    print(widget.product!.imgid![0].images);
     return InkWell(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return ProductDetailScreen(product:widget.product,);
+      onTap: () async {
+
+        SharedPreferences prefs= await SharedPreferences.getInstance();
+        Navigator.push(context,MaterialPageRoute(builder: (context) {
+
+
+          return ProductDetailScreen(
+            userid: prefs.getInt("userid"),
+              productss: MyProductDetail(
+                  id: widget.product!.id,
+                  imgid: widget.product!.imgid,
+                  price: widget.product!.price,
+                  categoryid:widget.product!.category?.id,
+                  attribution:  widget.product!.attribution,
+                  discount:  widget.product!.discount,
+                  avgRating:  widget.product!.avgRating,
+                  description:  widget.product!.description,
+                  sellRating:  widget.product!.sellRating,
+                  productname:  widget.product!.productname,
+                  stockqty:  widget.product!.stockqty
+              ));
+
         },));
       },
       child: Container(
@@ -52,14 +74,21 @@ class _CustomCardListState extends State<CustomCardList> {
 
               Expanded(
 
-                child: Image.network('${widget.product!.imgid![0].images}',
-                  fit: BoxFit.cover,
+                child:
+                CachedNetworkImage(
+                  // imageUrl: "http://via.placeholder.com/350x150",
+                  imageUrl: widget.product!.imgid![0].images.toString(),
+                  width: double.maxFinite,
                   height: 155,
+                  fit: BoxFit.cover,
 
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(child:
+                      CircularProgressIndicator(
+                          color: Color(AppColorConfig.success),
 
-
-
-
+                          value: downloadProgress.progress)),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
 
               ),
@@ -73,6 +102,7 @@ class _CustomCardListState extends State<CustomCardList> {
                     crossAxisAlignment: CrossAxisAlignment.end,
 
                     children: [
+                      if(widget.product?.discount != 0)
                       Container(
 
 
@@ -96,6 +126,10 @@ class _CustomCardListState extends State<CustomCardList> {
                             color: Color(AppColorConfig.negativecolor),
                             // backgroundColor:    Color(AppColorConfig.negativelight)
                           ),)),
+
+
+                      if(widget.product?.discount == 0)
+                        SizedBox(height: 40,),
                       //TODO title product
                       Row(
 
@@ -171,7 +205,7 @@ class _CustomCardListState extends State<CustomCardList> {
                             child: Row(
                               children: [
                                 Icon(Icons.star,size: 20,color: Colors.amberAccent,),
-                                Text("${widget.product!.avgRating!.roundToDouble()}",style: TextStyle(
+                                Text("${widget.product!.avgRating!.toStringAsFixed(2)}",style: TextStyle(
 
                                 ),)
                               ],

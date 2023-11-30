@@ -1,5 +1,7 @@
 import 'package:ecommerce/data/network/networkservice.dart';
 import 'package:ecommerce/model/Product/ProductFavModel.dart';
+import 'package:ecommerce/model/Product/SuperDealById.dart';
+import 'package:ecommerce/model/Product/SuperdealModel.dart';
 import 'package:ecommerce/model/Users/MessageRegister.dart';
 import 'package:ecommerce/model/Users/TokenModel.dart';
 import 'package:ecommerce/res/appurl/appurl.dart';
@@ -9,6 +11,36 @@ import '../../model/Product/ProductModel.dart';
 class ProductRepository {
   var url =ApiUrl.producturl;
   NetworkApiService apiService = new NetworkApiService();
+  Future<dynamic> FetchSuperDeal({page}) async {
+
+    try{
+
+
+
+      print(page);
+      var res = await apiService.FetchSuperDeal(page: page);
+      return SuperDealModel.fromJson(res);
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
+  Future<dynamic> FetchSuperSingle(id) async {
+
+    try{
+
+
+      var res = await apiService.FetchSuperDealSingle(id: id);
+      return SuperDealSingle.fromJson(res);
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
   Future<dynamic> FetchProduct({page}) async {
 
     try{
@@ -19,6 +51,21 @@ class ProductRepository {
         print(page);
         var res = await apiService.GetAllproduct(ApiUrl.producturl,"",page: page);
         return ProductModel.fromJson(res);
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
+  Future<dynamic> ProductFavoriteById(uid,pid) async {
+
+    try{
+
+
+
+      var res = await apiService.FetchFavoriteById(uid, pid);
+      return ProductFavModel.fromJson(res);
 
 
     }catch(e) {
@@ -41,6 +88,30 @@ class ProductRepository {
       rethrow ;
     }
   }
+
+
+
+  Future<dynamic> RemoveFavorite (pid,uid) async
+  {
+
+    try{
+
+
+
+      var res = await apiService.RemoveFavorite(pid, uid);
+      return ;
+
+
+    }catch(e) {
+      print(e);
+      rethrow ;
+    }
+  }
+
+
+
+
+
   Future<dynamic> SortProduct(sort,rank,{search,page}) async {
 
     try{

@@ -7,6 +7,7 @@ import 'package:ecommerce/viewmodel/authlogin/login_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../client/Home.dart';
+import '../../widget/LoadingIcon.dart';
 import '../../widget/auth/customlogin.dart';
 import 'dart:math';
 
@@ -46,12 +47,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: BlocConsumer<RegisterBloc, RegisterState>(
           listener: (context, state) {
             // TODO: implement listener
+            print(state);
+            if(state is Registerloading) {
+              print("Loading here");
+              showDialog(context: context, builder: (context) {
+
+
+                return  Center(
+
+                  child: CircularProgressIndicator(
+                    color: Color(AppColorConfig.bgcolor),
+
+                  ),
+                );
+
+              },);
+            }
+
+            else if(state is RegisterValidateError) {
+              showDialog(context: context, builder: (context) {
+
+
+                return  Center(
+
+                  child: CircularProgressIndicator(
+                    color: Color(AppColorConfig.bgcolor),
+
+                  ),
+                );
+
+              },);
+              Future.delayed(Duration(seconds: 2),() =>     context.read<RegisterBloc>().add(RegisterClearState()),);
+
+            }
+
           },
           builder: (context, state) {
             if(state is Registerloading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              return LoadingIcon();
             }
             if(state is RegisterError) {
               return Center(child: Text("Error has occur"),);

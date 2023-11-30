@@ -7,8 +7,6 @@ import 'package:ecommerce/viewmodel/products/address_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import '../../client/NavScreen.dart';
-import '../../widget/Product/CustomButton.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,6 +37,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   var homeadd;
   var city;
   var country;
+
   var userid;
   var iserrordesc = true;
   var txtdesc = TextEditingController();
@@ -60,16 +59,24 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   }
 
   SendLatandLong(lat, long) async {
+    print(lat);
+    print(long);
     mapofaddress = await locationhelper.getPlaceWithLatLng(lat, long);
     setState(() {
       print('call');
       print(mapofaddress);
 
-      print(mapofaddress[5]["address_components"][5]["long_name"]);
+
       homeadd = mapofaddress[0]['formatted_address'];
+      print(homeadd);
+
+      print(mapofaddress[0]["address_components"][5]["long_name"]);
       print(mapofaddress[0]["address_components"][6]["long_name"]);
+
+
+
       country = mapofaddress[0]["address_components"][6]["long_name"];
-      city = mapofaddress[5]["address_components"][5]["long_name"];
+      city = mapofaddress[0]["address_components"][5]["long_name"];
 
 
       print("Position loong ${widget.positionlong}");
@@ -80,11 +87,12 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   Future<void> currentUserLocation() async {
     var location = await Location().getLocation();
     print("User current location");
-    print(location.longitude);
-    print(location.latitude);
 
     widget.positionlong = location.longitude;
     widget.positionlat = location.latitude;
+    setState(() {
+
+    });
   }
 
   @override
@@ -97,6 +105,11 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         print(txtdesc.text);
     });
     checkuserinstance();
+
+
+
+    GetCurrent();
+
     super.initState();
   }
 
@@ -106,7 +119,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
     print('Called Build');
 
-
+    print(mapofaddress);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -196,6 +209,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
           if(state is AddressPostDone) {
             print("THe address is done");
             context.read<AddressBloc>().add(FetchAddress(userid: userid));
+
           }
         },
         child: Column(
@@ -231,13 +245,23 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                   });
                 },
                 markers: {
+                  if(lat == null)
+                  Marker(
+                      markerId: MarkerId('Marker 1'),
+
+                      position: LatLng(widget.positionlat,
+                          widget.positionlong)
+                  ),
+
                   if(lat != null)
                     Marker(
-                        markerId: MarkerId('Marker 1'),
+                        markerId: MarkerId('Marker 2'),
 
                         position: LatLng(lat ?? 11.593430164361337,
                             long ?? 104.8149532927308)
                     ),
+
+
                 },
 
 
@@ -416,6 +440,9 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                         onPressed: () {
                           //TODO bloc address put
                           print("Sending Post Address ${txtdesc.text}" );
+                          print(homeadd);
+                          print(country);
+                          print(lat);
                           if (widget.isupdate == true) {
                             BlocProvider.of<AddressBloc>(context, listen: false)
                                 .add(UpdateAddress(
@@ -460,7 +487,6 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                             "country": country,
                             "city": city,
                             "lat": lat,
-
                             "lon":long
                           });
                         },
@@ -504,5 +530,29 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
 
     userid = prefs!.getInt("userid");
+
+    // setState(() {
+    //   print("Send lat and long");
+    //   SendLatandLong(widget.positionlat, widget.positionlong);
+    //   // long = widget.positionlat;
+    //   // lat = widget.positionlong;
+    //
+    // });
+  }
+
+  void GetCurrent() async {
+    print("User Location is: ");
+    print(widget.positionlat);
+
+    print(widget.positionlong);
+
+    SendLatandLong(widget.positionlat, widget.positionlong);
+
+    setState(() {
+      lat = widget.positionlat;
+      long =  widget.positionlong;
+    });
+
+
   }
 }

@@ -1,5 +1,6 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/authlogin/login_bloc.dart';
+import 'package:ecommerce/views/authentication/Require.dart';
 import 'package:ecommerce/views/client/NavScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -75,6 +76,10 @@ class _VerifyCompletedState extends State<VerifyCompleted> {
                               backgroundColor: Color(AppColorConfig.success)
                           ),
                           onPressed: () {
+    Navigator.pushAndRemoveUntil(context,
+    MaterialPageRoute(builder: (context) {
+    return RequireLoginandSignup();
+    },), (route) => false);
 
                           }, child: Text("Done")),
                     ),

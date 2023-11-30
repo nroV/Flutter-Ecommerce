@@ -26,3 +26,10 @@ class RemoveFavorite extends ProductFavEvent {
 
   RemoveFavorite(this.userid,this.pid);
 }
+class ProductById extends ProductFavEvent {
+
+  var userid;
+  var pid;
+
+  ProductById(this.userid,this.pid);
+}

@@ -1,8 +1,11 @@
 
+import 'package:ecommerce/viewmodel/Resetpassword/reset_bloc.dart';
 import 'package:ecommerce/viewmodel/Review/review_bloc.dart';
+import 'package:ecommerce/viewmodel/Token/token_bloc.dart';
 import 'package:ecommerce/viewmodel/order/stripe_bloc.dart';
 import 'package:ecommerce/viewmodel/products/product_fav_bloc.dart';
 import 'package:ecommerce/viewmodel/validator/form_bloc.dart';
+import 'package:ecommerce/viewmodel/Superdeal/special_deal_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,8 +18,15 @@ import '../viewmodel/image_bloc.dart';
 import '../viewmodel/order/order_bloc.dart';
 import '../viewmodel/products/address_bloc.dart';
 import '../viewmodel/products/product_bloc.dart';
+import '../viewmodel/products/product_search_review_bloc.dart';
 class AppProvider {
   static get allblocprovider =>[
+    BlocProvider<ProductSearchReviewBloc>(
+      create: (BuildContext context) => ProductSearchReviewBloc(),
+    ),
+    BlocProvider<SpecialDealBloc>(
+      create: (BuildContext context) => SpecialDealBloc(),
+    ),
     BlocProvider<FormBloc>(
       create: (BuildContext context) => FormBloc(),
     ),
@@ -53,6 +63,11 @@ class AppProvider {
     BlocProvider<ProductDiscountBloc>(
       create: (BuildContext context) => ProductDiscountBloc(),
     ),
+    BlocProvider<TokenBloc>(
+      create: (BuildContext context) => TokenBloc(),
+    ),
+
+
     BlocProvider<CategoryBlocProduct>(
       create: (BuildContext context) => CategoryBlocProduct(),
     ),
@@ -92,6 +107,9 @@ class AppProvider {
     ),
     BlocProvider<ProductFavBloc>(
       create: (BuildContext context) => ProductFavBloc(),
+    ),
+    BlocProvider<ResetBloc>(
+      create: (BuildContext context) => ResetBloc(),
     ),
   ];
 }

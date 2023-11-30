@@ -23,3 +23,15 @@ var msg;
 
 ProductfavError( { this.msg });
 }
+
+class ProductByIdSuccess extends ProductFavState {
+  ProductFavModel productFavModel;
+
+  ProductByIdSuccess(this.productFavModel);
+  }
+class ProductByIdError  extends ProductFavState {
+
+}
+class ProductByIdLoading extends ProductFavState {
+
+}

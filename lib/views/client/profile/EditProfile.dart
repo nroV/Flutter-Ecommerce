@@ -1,5 +1,6 @@
 import 'dart:io';
-
+import 'package:ecommerce/views/widget/LoadingIcon.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ecommerce/res/appurl/appurl.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/User/user_bloc.dart';
@@ -29,8 +30,8 @@ class _EditingProfileState extends State<EditingProfile> {
   var telephone = "234";
   var txttelephone = TextEditingController();
   var txtusername = TextEditingController();
-
-
+  var formtelephone = GlobalKey<FormState>();
+  var iserror = true;
   String? countries;
   bool istap = false;
 
@@ -52,16 +53,19 @@ class _EditingProfileState extends State<EditingProfile> {
     // TODO: implement build
     print("user image");
     print(  widget.user?.imgid?.images );
+    print("Image uploaded id is  ${imageid}");
+    print(widget.user?.imgid?.id);
     return Scaffold(
       appBar: AppBar(
 
           title: Text("Edit Profile", style: TextStyle(
-              color: Colors.black
+              color: Colors.white
           ),),
-          backgroundColor: Colors.white.withOpacity(0.24),
+          backgroundColor: Colors.black,
+
           centerTitle: true,
           iconTheme: IconThemeData(
-              color: Colors.black
+              color: Colors.white
           ),
           actions: [
             BlocListener<ImageBloc, ImageState>(
@@ -72,7 +76,10 @@ class _EditingProfileState extends State<EditingProfile> {
                   print("Image has been uploaded");
                   print(state.imageResponse?.url!.id);
 
-                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+                  WidgetsBinding.instance.addPostFrameCallback(
+
+                          (timeStamp) {
                     setState(() {
                       imageid = state.imageResponse?.url!.id;
                     });
@@ -93,25 +100,61 @@ class _EditingProfileState extends State<EditingProfile> {
                       print(imageid);
                       print(widget?.user?.id.toString());
 
-                      if (widget?.user?.imgid?.id != null) {
-                        print("Image id is null");
+
+                      if(iserror == true) {
+                        showDialog(context: context, builder: (context) {
+
+
+                          return  Center(
+
+                            child: CircularProgressIndicator(
+                              color: Color(AppColorConfig.bgcolor),
+
+                            ),
+                          );
+
+                        },);
+                        Future.delayed(Duration(seconds: 2),() {
+                          Navigator.pop(context);
+                        },);
+
+                        return;
+                      }
+
+                      if (widget.user?.imgid?.id != null) {
+                        print("Image uploaded id is  ${imageid}");
+                        if(imagefile == null ) {
+                          imageid = widget.user?.imgid?.id;
+                        }
+                        else {
+                          imageid = imageid;
+                        }
+
+                        print("Telephone ${telephone}${txttelephone.text}");
                         BlocProvider.of<UserBloc>(context, listen: false).add(
                             EditUser(
                                 fname: txtfirstname.text,
                                 gender: gender,
                                 telephone: telephone + txttelephone.text,
-                                imgid: widget.user?.imgid!.id!.toString(),
+                                imgid:
+
+
+
+                                imageid.toString(),
                                 userid: widget?.user?.id.toString(),
                                 lastname: txtlname.text,
                                 username: txtusername.text
                             ));
+
+
                       }
                       else {
                         print("Image id is not null");
                         print(imageid);
-                        if(imageid == null) {
-                          imageid = 1;
-                        }
+                        // if(imageid == null) {
+                        //   imageid = 1;
+                        // }
+                        print("Telephone ${telephone}${txttelephone.text}");
                         BlocProvider.of<UserBloc>(context, listen: false).add(
                             EditUser(
                                 fname: txtfirstname.text,
@@ -123,10 +166,12 @@ class _EditingProfileState extends State<EditingProfile> {
                                 lastname: txtlname.text,
                                 username: txtusername.text
                             ));
+
+
                       }
 
 
-                      print("Event Edit");
+
                     },
 
                     child: Padding(
@@ -144,21 +189,50 @@ class _EditingProfileState extends State<EditingProfile> {
           listener: (context, state) {
             print(state);
             // TODO: implement listener}
+
             if (state is LoadingUserDone) {
               print("Edit Profile has been updated");
-              Navigator.pop(context);
+
+              // Navigator.pop(context);
+
+
+
 
 
               WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Profile has been updated")));
+
+                    SnackBar(
+                        content: Text("Profile has been updated"),
+                      backgroundColor: Color(AppColorConfig.success),
+
+
+                    ));
+
+
+
               });
+              Navigator.pop(context);
             }
 
             if (state is LoadingUser) {
-              Center(
-                child: CircularProgressIndicator(),
-              );
+
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                showDialog(context: context, builder: (context) {
+
+
+                  return  Center(
+
+                    child: CircularProgressIndicator(
+                      color: Color(AppColorConfig.bgcolor),
+
+                    ),
+                  );
+
+                },);
+                Future.delayed(Duration(seconds:1),() => Navigator.pop(context),);
+              });
             }
           },
           child: SingleChildScrollView(
@@ -179,54 +253,55 @@ class _EditingProfileState extends State<EditingProfile> {
 
                         child: Column(
                           children: [
-                            widget.user?.imgid?.images == null ?
+                            // widget.user?.imgid?.images == null ?
+                            //
+                            //
+                            // CircleAvatar(
+                            //   radius:
+                            //
+                            //   imagefile == null ?
+                            //   70 : 0,
+                            //   backgroundColor:
+                            //
+                            //   imagefile == null ?
+                            //
+                            //   Color(0xffF0F0F0) : null,
+                            //   child:
+                            //   widget.user?.imgid?.images == null ?
+                            //
+                            //   Icon(Icons.add,
+                            //
+                            //
+                            //     size: imagefile == null ? 30 : 0,
+                            //     color: Colors.black.withOpacity(0.5),) : null ,
+                            //
+                            //
+                            // )
+                            //     :
+                            //
+                            //
+                            // CircleAvatar(
+                            //   radius: 70,
+                            //   backgroundColor: Color(0xffF0F0F0),
+                            //   backgroundImage:
+                            //
+                            //
+                            //   NetworkImage(
+                            //       '${ApiUrl.main}${widget.user?.imgid
+                            //           ?.images }')
+                            //
+                            //
+                            //   ,
+                            //   child:
+                            //   widget.user?.imgid?.images == null ?
+                            //
+                            //   Icon(Icons.add, size: 30,
+                            //     color: Colors.black.withOpacity(0.5),) : null,
+                            //
+                            //
+                            // ),
 
-
-                            CircleAvatar(
-                              radius:
-
-                              imagefile == null ?
-                              70 : 0,
-                              backgroundColor:
-
-                              imagefile == null ?
-
-                              Color(0xffF0F0F0) : null,
-                              child:
-                              widget.user?.imgid?.images == null ?
-
-                              Icon(Icons.add,
-
-
-                                size: imagefile == null ? 30 : 0,
-                                color: Colors.black.withOpacity(0.5),) : null ,
-
-
-                            ) :
-
-
-                            CircleAvatar(
-                              radius: 70,
-                              backgroundColor: Color(0xffF0F0F0),
-                              backgroundImage:
-
-
-                              NetworkImage(
-                                  '${ApiUrl.main}${widget.user?.imgid
-                                      ?.images }')
-
-
-                              ,
-                              child:
-                              widget.user?.imgid?.images == null ?
-
-                              Icon(Icons.add, size: 30,
-                                color: Colors.black.withOpacity(0.5),) : null,
-
-
-                            ),
-
-                            if( imagefile != null )
+                         imagefile != null  ?
 
 
                               CircleAvatar(
@@ -241,7 +316,30 @@ class _EditingProfileState extends State<EditingProfile> {
                                 ,
 
 
-                              ),
+                              ) :
+
+                            CircleAvatar(
+                              radius: 70,
+                              backgroundColor: Color(0xffF0F0F0),
+                              backgroundImage:
+
+
+                              NetworkImage(
+                                  '${"https://django-ecomm-6e6490200ee9.herokuapp.com"}${widget.user?.imgid
+                                      ?.images }')
+
+
+                              ,
+                              child:
+                              widget.user?.imgid?.images == null ?
+
+                              Icon(Icons.add, size: 30,
+                                color: Colors.black.withOpacity(0.5),) : null,
+
+
+                            ),
+
+
                             SizedBox(height: 11,),
                             InkWell(
                               onTap: () => imagepickermethod()
@@ -300,6 +398,7 @@ class _EditingProfileState extends State<EditingProfile> {
                     height: 45,
                     margin: EdgeInsets.only(top: 15),
                     child: TextField(
+
                       style: TextStyle(
 
                           fontSize: 13
@@ -315,14 +414,21 @@ class _EditingProfileState extends State<EditingProfile> {
                       onTap: () {
 
                       },
+
+
+                      textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                           filled: true,
 
+
+
                           fillColor: Color(AppColorConfig.bgfill),
+
                           label: Text("Lastname"),
                           floatingLabelStyle: TextStyle(
                               color: Colors.black
                           ),
+
                           border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.circular(10)
@@ -347,7 +453,8 @@ class _EditingProfileState extends State<EditingProfile> {
                         setState(() {
                           txtfirstname.text = value;
                         });
-                      },
+                      },             cursorColor: Colors.grey,
+                      textInputAction: TextInputAction.next,
 
                       onTap: () {
 
@@ -426,6 +533,8 @@ class _EditingProfileState extends State<EditingProfile> {
                           fontSize: 13
                       ),
                       controller: txtusername,
+                      cursorColor: Colors.grey,
+                      textInputAction: TextInputAction.next,
 
                       onSubmitted: (value) {
                         setState(() {
@@ -514,6 +623,7 @@ class _EditingProfileState extends State<EditingProfile> {
                                     )
                                 ),
                                 showPhoneCode: true,
+
                                 // optional. Shows phone code before the country name.
                                 onSelect: (Country country) {
                                   print(
@@ -529,7 +639,9 @@ class _EditingProfileState extends State<EditingProfile> {
 
                               filled: true,
 
+
                               fillColor: Color(AppColorConfig.bgfill),
+
 
                               floatingLabelStyle: TextStyle(
                                   color: Colors.black
@@ -550,13 +662,16 @@ class _EditingProfileState extends State<EditingProfile> {
                           Expanded(
 
                             child: Container(
-                              height: 50,
+                              height: 200,
 
                               width: double.maxFinite,
-                              child: TextField(
+                              child: TextFormField(
+
+
                                 style: TextStyle(
                                     fontSize: 13
                                 ),
+
 
                                 onTap: () {
                                   setState(() {
@@ -585,44 +700,98 @@ class _EditingProfileState extends State<EditingProfile> {
                           SizedBox(width: 10,),
 
                           Expanded(
+                            //TODO telephone here
                             flex: 2,
                             child: Container(
-                              height: 50,
+                              height: 200,
+
 
                               width: double.maxFinite,
-                              child: TextField(
+                              child: Form(
+                                key: formtelephone,
 
-                                style: TextStyle(
-                                    fontSize: 13
+                                child: TextFormField(
+                                  autovalidateMode: AutovalidateMode.always,
+                                  keyboardType: TextInputType.phone,
+                                  cursorColor: Colors.grey,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      final phoneNumber = RegExp(r'^[1-9][0-9]{7,8}$');
+                                      print("On telephone get call");
+                                      if(txttelephone.text!.length == 0) {
+                                        print("True true");
+                                        iserror = true;
+
+                                      }
+                                      if(phoneNumber!.hasMatch(txttelephone.text!) == false) {
+                                        print("True true");
+                                        iserror = true;
+
+                                      }
+                                      else {
+                                        print("No error anymore");
+                                        iserror = false;
+
+                                      }
+                                    });
+
+                                  },
+
+                                  validator: (value) {
+                                    final phoneNumber = RegExp(r'^[1-9][0-9]{7,8}$');
+
+                                    if(value!.length == 0) {
+                                      iserror = true;
+                                      return "Phone number cannot be blank";
+                                    }
+                                    if(phoneNumber!.hasMatch(value!) == false) {
+                                      iserror = true;
+                                      return "Phone number must be eg:1234567890 without 0";
+                                    }
+                                    else {
+                                      iserror = false;
+                                      return null;
+                                    }
+
+                                  },
+                                  style: TextStyle(
+                                      fontSize: 13
+                                  ),
+
+                                  onTap: () {
+                                    setState(() {
+
+                                    });
+                                  },
+                                  controller: txttelephone,
+
+
+                                  onFieldSubmitted: (value) {
+                                    setState(() {
+                                      if(formtelephone.currentState!.validate()) {
+                                        formtelephone.currentState!.save();
+                                      }
+
+                                      txttelephone.text = value;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+
+                                      filled: true,
+
+
+                                      fillColor: Color(AppColorConfig.bgfill),
+                                      label: Text("Telephone"),
+                                      floatingLabelStyle: TextStyle(
+                                          color: Colors.black
+                                      ),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                          borderRadius: BorderRadius.circular(10)
+                                      )
+                                  ),
+
                                 ),
-
-                                onTap: () {
-                                  setState(() {
-
-                                  });
-                                },
-                                controller: txttelephone,
-                                onSubmitted: (value) {
-                                  setState(() {
-                                    txttelephone.text = value;
-                                  });
-                                },
-                                decoration: InputDecoration(
-
-                                    filled: true,
-
-
-                                    fillColor: Color(AppColorConfig.bgfill),
-                                    label: Text("Telephone"),
-                                    floatingLabelStyle: TextStyle(
-                                        color: Colors.black
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.circular(10)
-                                    )
-                                ),
-
                               ),
                             ),
                           ),

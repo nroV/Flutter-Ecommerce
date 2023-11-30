@@ -38,11 +38,25 @@ class ProductFavBloc extends Bloc<ProductFavEvent, ProductFavState> {
 
 
     });
+    on<ProductById>((event, emit) async {
+      // TODO: implement event handler
+      emit(ProductByIdLoading());
+      try{
+        var response =  await productRepository.ProductFavoriteById(event.userid, event.pid);
+        // print(response);
+        emit(ProductByIdSuccess(response));
+      }catch(error) {
+        print(error.toString());
+        emit(ProductByIdError());
+      }
+
+
+    });
     on<RemoveFavorite>((event, emit) async {
       // TODO: implement event handler
       emit(ProductfavLoading());
       try{
-        var response = await product.RemoveFavorite(event.pid, event.userid);
+        var response = await productRepository.RemoveFavorite(event.pid,event.userid);
         print(response);
         emit(ProductFavSuccess());
       }catch(error) {

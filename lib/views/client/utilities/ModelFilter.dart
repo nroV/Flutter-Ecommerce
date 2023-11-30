@@ -27,7 +27,7 @@ class _ShowModelFilterState extends State<ShowModelFilter> {
     "Best Selling",
     "Popular",
     "Name A-z",
-    "Name z-A",
+    "Name Z-A",
     "Price "
 
   ];
@@ -72,7 +72,7 @@ class _ShowModelFilterState extends State<ShowModelFilter> {
         height: MediaQuery
             .of(context)
             .size
-            .height * 0.75,
+            .height * 0.88,
         padding: EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

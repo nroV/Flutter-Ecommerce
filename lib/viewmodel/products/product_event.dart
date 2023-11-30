@@ -4,7 +4,11 @@ part of 'product_bloc.dart';
 abstract class ProductEvent
 {}
 
+class ClearProductSorting extends ProductEvent {
 
+
+  ClearProductSorting();
+}
 class FetchProduct extends ProductEvent {
 
   var page;

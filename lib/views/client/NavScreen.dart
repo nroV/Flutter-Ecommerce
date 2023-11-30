@@ -104,15 +104,17 @@ class _MyNavScreenState extends State<MyNavScreen> {
 
     showDialog(context: context, builder: (context) {
       return AlertDialog(
+        // backgroundColor: Color(AppColorConfig.primarylight),
         title: Text("Login or Register",style: TextStyle(
-            fontSize: 18,
-            color: Color(AppColorConfig.negativecolor)
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: Color(AppColorConfig.success),
         ),),
         content: Text("Require to login first before you can make an order",style: TextStyle(
-            fontSize: 12.8,
-            fontWeight: FontWeight.w400,
+          fontSize: 12.8,
+          fontWeight: FontWeight.w400,
 
-            color: Colors.black
+          color:Color(AppColorConfig.success),
         ),),
         elevation: 0,
         actions: [
@@ -127,7 +129,7 @@ class _MyNavScreenState extends State<MyNavScreen> {
                 },));
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor:Color(AppColorConfig.negativecolor),
+                  backgroundColor:Color(AppColorConfig.success),
                   elevation: 0,
                   padding: EdgeInsets.all(10),
                   shape: RoundedRectangleBorder(
@@ -141,7 +143,8 @@ class _MyNavScreenState extends State<MyNavScreen> {
 
                   SizedBox(width: 10,),
                   Text("Login",style: TextStyle(
-                    fontSize: 12.8,
+                      fontSize: 14.8,
+                      color: Color(AppColorConfig.primarylight)
 
                   ),)
                 ],
@@ -154,15 +157,17 @@ class _MyNavScreenState extends State<MyNavScreen> {
 
     showDialog(context: context, builder: (context) {
       return AlertDialog(
+        // backgroundColor: Color(AppColorConfig.primarylight),
         title: Text("Login or Register",style: TextStyle(
             fontSize: 18,
-            color: Color(AppColorConfig.negativecolor)
+         fontWeight: FontWeight.w500,
+         color: Color(AppColorConfig.success),
         ),),
         content: Text("Require to login first before you can make an order",style: TextStyle(
             fontSize: 12.8,
             fontWeight: FontWeight.w400,
 
-            color: Colors.black
+          color:Color(AppColorConfig.success),
         ),),
         elevation: 0,
         actions: [
@@ -177,7 +182,7 @@ class _MyNavScreenState extends State<MyNavScreen> {
                 },));
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor:Color(AppColorConfig.negativecolor),
+                  backgroundColor:Color(AppColorConfig.success),
                   elevation: 0,
                   padding: EdgeInsets.all(10),
                   shape: RoundedRectangleBorder(
@@ -191,7 +196,8 @@ class _MyNavScreenState extends State<MyNavScreen> {
 
                   SizedBox(width: 10,),
                   Text("Login",style: TextStyle(
-                    fontSize: 12.8,
+                    fontSize: 14.8,
+                    color: Color(AppColorConfig.primarylight)
 
                   ),)
                 ],

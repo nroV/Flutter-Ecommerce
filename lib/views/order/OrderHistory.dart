@@ -1,5 +1,6 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/order/order_bloc.dart';
+import 'package:ecommerce/views/ErrorPage.dart';
 import 'package:ecommerce/views/order/Tracking.dart';
 import 'package:ecommerce/views/widget/other/EmptyWidget.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 import '../../model/Order/OrderUser.dart';
+import '../widget/LoadingIcon.dart';
 
 class OrderHistory extends StatefulWidget {
    OrderHistory({Key? key}) : super(key: key);
@@ -48,13 +50,20 @@ class _OrderHistoryState extends State<OrderHistory>  with TickerProviderStateMi
         backgroundColor: Colors.white,
         appBar: AppBar(
 
+
+
             title: Text("Order History", style: TextStyle(
-                color: Colors.black
+                color: Colors.white
             ),),
+
             iconTheme: IconThemeData(
-                color: Colors.black
+                color: Colors.white
             ),
+
+
+
             bottom: TabBar(
+
 
               onTap: (value) {
 
@@ -67,31 +76,39 @@ class _OrderHistoryState extends State<OrderHistory>  with TickerProviderStateMi
               controller: _vcontroller,
               labelStyle: TextStyle(
                   fontSize: 14.8,
-                color: Colors.black
+                  color: Colors.white
               ),
 
-              padding: EdgeInsets.all(5),
+              padding: EdgeInsets.all(0),
                 indicatorSize: TabBarIndicatorSize.tab,
               indicatorWeight: 3,
 
+
               indicatorColor:Color(AppColorConfig.success),
+              indicatorPadding: EdgeInsets.all(7),
 
 
-              indicator: UnderlineTabIndicator(
-
-                  borderSide: BorderSide(width:3.0,color:Color(AppColorConfig.success), ),
+              indicator: BoxDecoration(
 
 
-                  insets: EdgeInsets.symmetric(horizontal:16.0),
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.grey.withOpacity(0.3)),
+              // indicator: UnderlineTabIndicator(
+              //
+              //     borderSide: BorderSide(width:5.0,color:Color(AppColorConfig.primarylight), ),
+              //
+              //
+              //     insets: EdgeInsets.symmetric(horizontal:16.0),
+              //
+              // ),
+              labelColor: Colors.white,
 
-              ),
-              labelColor: Colors.black,
 
               unselectedLabelStyle: TextStyle(
                 fontSize: 12.8,
                 color: Colors.grey
               ),
-              unselectedLabelColor: Colors.black,
+              unselectedLabelColor:  Colors.grey,
 
               tabs: [
                 Tab(
@@ -113,7 +130,7 @@ class _OrderHistoryState extends State<OrderHistory>  with TickerProviderStateMi
               ],
             ),
 
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.black,
             elevation: 0),
         body: SafeArea(
 
@@ -130,9 +147,7 @@ class _OrderHistoryState extends State<OrderHistory>  with TickerProviderStateMi
 
 
                   if(state is OrderUserLoading){
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    return LoadingIcon();
 
                   }
                   if(state is OrderUserComplete){
@@ -180,134 +195,325 @@ class _OrderHistoryState extends State<OrderHistory>  with TickerProviderStateMi
                             itemBuilder: (context, index) {
 
                               var order =  results[index];
-                              // var order = history[index];
+                              // varconst order = history[index];
                               var orderdate =DateFormat('dd-MM-yyyy kk:mm').format( DateTime.parse(order!.shippedAt.toString()));
-                              return InkWell(
-                                onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                    fullscreenDialog: true,
-                                    builder: (context) {
-                                      return TrackingScreen(appbar: 'Tracking',orderid: order.id,);
-                                    },));
-                                },
-                                child: Container(
-                                    margin: EdgeInsets.only(bottom: 20),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.grey.withOpacity(0.4)
-                                        )
-                                    ),
 
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 15),
+                                padding: EdgeInsets.all(0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey.withOpacity(0.1)
+                                  )
+                                ),
+                                
+                                child: ListTile(
+                                  onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(
+                                          fullscreenDialog: true,
+                                          builder: (context) {
+                                            return TrackingScreen(appbar: 'Tracking',orderid: order.id,);
+                                          },));
 
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        ListTile(
-                                          style: ListTileStyle.list,
-                                          tileColor:
-                                          order!.status!.toLowerCase() =="pending" ?
-                                          Color(AppColorConfig.negativecolor) :
+                                  },
 
-
-                                          order!.status!.toLowerCase() =="delivering" ?
-
-                                          Colors.blueGrey:
-                                          Color(AppColorConfig.success),
+                                  dense:true,
 
 
 
+                                  contentPadding: EdgeInsets.only(left: 15,right: 15,top: 15,bottom: 15),
+                                  tileColor: Colors.white,
+                                  style: ListTileStyle.list,
+
+                              // leading: Icon(Icons.payments_sharp),
+
+                                  isThreeLine: true,
 
 
-                                          title: Text('Order No # ${order!.id}',
-                                            style: TextStyle(
-                                                fontSize: 16.8,
-                                                color: Colors.white
-                                            ),
+
+                                  // leading: Container(
+                                  //   width: 5,
+                                  //
+                                  //
+                                  //   decoration: BoxDecoration(
+                                  //     color: Color(AppColorConfig.success)
+                                  //   ),
+                                  // ),
 
 
-                                          ),
-                                          subtitle: Text(
-                                            '${order?.address?.street}',
-                                            style: TextStyle(
-                                                fontSize: 10.8,
-                                                color: Colors.white
-                                            ),),
-                                          // trailing: ,
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.all(10),
-                                          child: Column(
+
+
+                                  title: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(bottom: 10),
+
+
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
+                                              Text("Order # ${order.id}",style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500
+                                              ),),
                                               Container(
-
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment
-                                                      .spaceBetween,
-                                                  children: [
-                                                    Text('Payment method ${order!.method}',
-                                                      style: TextStyle(
-                                                          fontSize: 12.8,
-                                                          color: Colors.grey
-                                                      ),
-
-                                                    ),
-                                                    Text('Total : \$ ${order!.amount}')
-
-                                                  ],
+                                                padding: EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                  order.status!.toLowerCase() =="pending" ?
+                                                  Color(AppColorConfig.negativelight) :
+                                                  order.status!.toLowerCase() =="delivering" ?
+                                                  Colors.black:
+                                                  Color(0xffC2E5DF),
                                                 ),
+
+                                                child: Text(
+                                                                          "${order.status}", style: TextStyle(
+                                                                            fontSize: 12.8,
+                                                                            color:
+                                                                            order.status!.toLowerCase() =="pending" ?
+                                                                            Color(AppColorConfig.negativecolor) :
+
+                                                                            order.status!.toLowerCase() =="delivering" ?
+                                                                                Colors.white:
+                                                                            Color(AppColorConfig.success),
+                                                                            fontWeight: FontWeight.w500
+                                                                        ),),
                                               ),
-                                              SizedBox(height: 15,),
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment
-                                                    .spaceBetween,
-                                                children: [
-                                                  Text('Order Date ${orderdate}',
+                                            ],
+                                          )),
+
+                                      Row(
+                                        children: [
 
 
-                                                    style: TextStyle(
-                                                        fontSize: 12.8,
-                                                        color: Colors.grey
-                                                    ),),
-                                                  Container(
-                                                    width: 98,
-                                                    height: 26,
-                                                    alignment: Alignment.center,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                        order.status!.toLowerCase() =="pending" ?
-                                                        Color(AppColorConfig.negativelight) :
-                                                        order.status!.toLowerCase() =="delivering" ?
-                                                        Colors.blueGrey:
-                                                        Color(0xffC2E5DF),
-
-                                                        borderRadius: BorderRadius.circular(
-                                                            6)
-                                                    ),
-                                                    child: Text(
-                                                      "${order.status}", style: TextStyle(
-                                                        fontSize: 12.8,
-                                                        color:
-                                                        order.status!.toLowerCase() =="pending" ?
-                                                        Color(AppColorConfig.negativecolor) :
-
-                                                        order.status!.toLowerCase() =="delivering" ?
-                                                            Colors.white:
-                                                        Color(AppColorConfig.success),
-                                                        fontWeight: FontWeight.w500
-                                                    ),),
-                                                  ),
-                                                ],
-                                              )
+                                          Row(
+                                            children: [
+                                              // Icon(Icons.attach_money_rounded,color: Colors.black,),
+                                              Text("Payment : \$ ${order!.amount}"),
                                             ],
                                           ),
+                                          SizedBox(width: 10,),
+                                          Row(
+                                            children: [
+
+                                              // Icon(Icons.paypal,color: Colors.black,),
+                                              Text("Order Date : ${orderdate}")
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+
+                                      SizedBox(height: 10,)
+                                    ],
+                                  ),
+
+                                  subtitle: Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color:
+                                        order.status!.toLowerCase() =="pending" ?
+                                        Color(AppColorConfig.negativelight) :
+                                        order.status!.toLowerCase() =="delivering" ?
+                                        Colors.black:
+                                        Color(0xffC2E5DF),
+
+                                        borderRadius: BorderRadius.circular(
+                                            0)
+                                    ),
+                                      
+                                    // margin: EdgeInsets.only(top: 10,bottom: 10),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+
+
+                                        Row(
+                                          children: [
+
+                                            Icon(Icons.location_pin,
+                                              color:
+                                              order.status!.toLowerCase() =="pending" ?
+                                              Color(AppColorConfig.negativecolor) :
+                                              order.status!.toLowerCase() =="delivering" ?
+                                              Colors.white:
+                                              Color(AppColorConfig.success),
+
+
+
+                                            ),
+                                            Container(
+                                              width: 290,
+                                              child: Text("     ${order?.address?.street},"
+
+
+
+                                                  ,style:
+
+                                                  TextStyle(
+
+                                                      overflow: TextOverflow.ellipsis,
+                                                    color:
+                                                    order.status!.toLowerCase() =="pending" ?
+                                                    Color(AppColorConfig.negativecolor) :
+                                                    order.status!.toLowerCase() =="delivering" ?
+                                                    Colors.white:
+                                                    Color(AppColorConfig.success),
+
+
+
+                                                  ),   overflow: TextOverflow.ellipsis,maxLines: 1,),
+                                            )
+                                          ],
                                         ),
+
 
 
                                       ],
-                                    )
+                                    ),
+                                  ),
+
+                                  // trailing:
+                                  // Text("Pending",style: TextStyle(
+                                  //   fontSize: 13,
+                                  //
+                                  //   backgroundColor: Color(AppColorConfig.primarylight),
+                                  //
+                                  //
+                                  //
+                                  //
+                                  //   color: Color(AppColorConfig.success)
+                                  // ),),
 
                                 ),
                               );
+                              // return InkWell(
+                              //   onTap: () {
+                              //     Navigator.push(context, MaterialPageRoute(
+                              //       fullscreenDialog: true,
+                              //       builder: (context) {
+                              //         return TrackingScreen(appbar: 'Tracking',orderid: order.id,);
+                              //       },));
+                              //   },
+                              //   child: Container(
+                              //       margin: EdgeInsets.only(bottom: 20),
+                              //       decoration: BoxDecoration(
+                              //           border: Border.all(
+                              //               color: Colors.grey.withOpacity(0.4)
+                              //           )
+                              //       ),
+                              //
+                              //
+                              //       child: Column(
+                              //         crossAxisAlignment: CrossAxisAlignment.start,
+                              //         children: [
+                              //           ListTile(
+                              //             style: ListTileStyle.list,
+                              //             tileColor:
+                              //             order!.status!.toLowerCase() =="pending" ?
+                              //             Color(AppColorConfig.negativecolor) :
+                              //
+                              //
+                              //             order!.status!.toLowerCase() =="delivering" ?
+                              //
+                              //             Colors.blueGrey:
+                              //             Color(AppColorConfig.success),
+                              //
+                              //
+                              //
+                              //
+                              //
+                              //             title: Text('Order No # ${order!.id}',
+                              //               style: TextStyle(
+                              //                   fontSize: 16.8,
+                              //                   color: Colors.white
+                              //               ),
+                              //
+                              //
+                              //             ),
+                              //             subtitle: Text(
+                              //               '${order?.address?.street}',
+                              //               style: TextStyle(
+                              //                   fontSize: 10.8,
+                              //                   color: Colors.white
+                              //               ),),
+                              //             // trailing: ,
+                              //           ),
+                              //           Container(
+                              //             padding: EdgeInsets.all(10),
+                              //             child: Column(
+                              //               children: [
+                              //                 Container(
+                              //
+                              //                   child: Row(
+                              //                     mainAxisAlignment: MainAxisAlignment
+                              //                         .spaceBetween,
+                              //                     children: [
+                              //                       Text('Payment method ${order!.method}',
+                              //                         style: TextStyle(
+                              //                             fontSize: 12.8,
+                              //                             color: Colors.grey
+                              //                         ),
+                              //
+                              //                       ),
+                              //                       Text('Total : \$ ${order!.amount}')
+                              //
+                              //                     ],
+                              //                   ),
+                              //                 ),
+                              //                 SizedBox(height: 15,),
+                              //                 Row(
+                              //                   mainAxisAlignment: MainAxisAlignment
+                              //                       .spaceBetween,
+                              //                   children: [
+                              //                     Text('Order Date ${orderdate}',
+                              //
+                              //
+                              //                       style: TextStyle(
+                              //                           fontSize: 12.8,
+                              //                           color: Colors.grey
+                              //                       ),),
+                              //                     Container(
+                              //                       width: 98,
+                              //                       height: 26,
+                              //                       alignment: Alignment.center,
+                              //                       decoration: BoxDecoration(
+                              //                           color:
+                              //                           order.status!.toLowerCase() =="pending" ?
+                              //                           Color(AppColorConfig.negativelight) :
+                              //                           order.status!.toLowerCase() =="delivering" ?
+                              //                           Colors.blueGrey:
+                              //                           Color(0xffC2E5DF),
+                              //
+                              //                           borderRadius: BorderRadius.circular(
+                              //                               6)
+                              //                       ),
+                              //                       child: Text(
+                              //                         "${order.status}", style: TextStyle(
+                              //                           fontSize: 12.8,
+                              //                           color:
+                              //                           order.status!.toLowerCase() =="pending" ?
+                              //                           Color(AppColorConfig.negativecolor) :
+                              //
+                              //                           order.status!.toLowerCase() =="delivering" ?
+                              //                               Colors.white:
+                              //                           Color(AppColorConfig.success),
+                              //                           fontWeight: FontWeight.w500
+                              //                       ),),
+                              //                     ),
+                              //                   ],
+                              //                 )
+                              //               ],
+                              //             ),
+                              //           ),
+                              //
+                              //
+                              //         ],
+                              //       )
+                              //
+                              //   ),
+                              // );
                             },),
                         ),
                       ) :
@@ -323,15 +529,11 @@ class _OrderHistoryState extends State<OrderHistory>  with TickerProviderStateMi
                     ;
                   }
                   if(state is OrderUserError){
-                    return Center(
-                      child: Text("Error occur"),
-                    );
+                    return  const ErrorPage();
                   }
 
                   else{
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    return LoadingIcon();
                   }
 
                 },

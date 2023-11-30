@@ -7,6 +7,7 @@ class UserModel {
   String? gender;
   Imgid? imgid;
   String? username;
+  String? createdDate;
 
   UserModel(
       {this.id,
@@ -16,7 +17,8 @@ class UserModel {
         this.telephone,
         this.gender,
         this.imgid,
-        this.username});
+        this.username,
+        this.createdDate});
 
   UserModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -27,6 +29,7 @@ class UserModel {
     gender = json['gender'];
     imgid = json['imgid'] != null ? new Imgid.fromJson(json['imgid']) : null;
     username = json['username'];
+    createdDate = json['created_date'];
   }
 
   Map<String, dynamic> toJson() {
@@ -41,6 +44,7 @@ class UserModel {
       data['imgid'] = this.imgid!.toJson();
     }
     data['username'] = this.username;
+    data['created_date'] = this.createdDate;
     return data;
   }
 }

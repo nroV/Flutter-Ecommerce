@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../viewmodel/validator/form_bloc.dart';
+import '../../authentication/ResetPassword/ResetPassword.dart';
 import '../../client/NavScreen.dart';
 
 class LoginForm extends StatefulWidget {
@@ -30,7 +31,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   var istap = true;
-  var showiconpwd = false;
+  var showiconpwd = true ;
 
   var txtemail = TextEditingController();
   var txtpassword = TextEditingController();
@@ -48,6 +49,7 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     // TODO: implement initState
+    setEmailUser();
     super.initState();
 
   }
@@ -139,6 +141,8 @@ class _LoginFormState extends State<LoginForm> {
                       else {
 
                       }
+                      istap = true;
+                      showiconpwd = true;
                     });
                   },
                   onChanged: (value) {
@@ -177,15 +181,26 @@ class _LoginFormState extends State<LoginForm> {
 
 
                   onTap: () {
-                    setState(() {
-                      istap = false;
-                      showiconpwd = false;
-                    });
+
                   },
                   cursorColor: Colors.grey,
                   textInputAction: TextInputAction.next,
+
                   decoration: InputDecoration(
+
+
                       filled: true,
+
+                      suffixIcon: InkWell(
+                        onTap: () => txtemail.clear(),
+                        child: Icon(Icons.clear),
+                      ),
+
+                      suffixStyle: TextStyle(
+                        color: Colors.red
+                      ),
+
+
 
 
                       fillColor: Color(AppColorConfig.bgfill),
@@ -217,9 +232,7 @@ class _LoginFormState extends State<LoginForm> {
                 cursorColor: Colors.grey,
                 controller: txtpassword,
                 obscureText:
-                istap == false ? istap :
-
-                true,
+                istap ,
                 onFieldSubmitted: (value) {
                   setState(() {
                     txtpassword.text = value;
@@ -302,8 +315,8 @@ class _LoginFormState extends State<LoginForm> {
 
                 onTap: () {
                   setState(() {
-                    istap = !istap;
-                    showiconpwd = true;
+
+
                   });
                 },
                 decoration: InputDecoration(
@@ -311,12 +324,26 @@ class _LoginFormState extends State<LoginForm> {
 
                     suffixIcon:
 
-                    showiconpwd == true
-                        ?
-                    istap == true ?
-                    Icon(Icons.remove_red_eye, color: Colors.grey,) :
-                    Icon(Icons.remove_red_eye_outlined, color: Colors.grey,)
-                        : null,
+                    showiconpwd == false  ?
+                    InkWell(
+                        onTap: () {
+                          setState(() {
+                            showiconpwd = true;
+                            istap= true  ;
+                          });
+
+                        },
+                        child: Icon(Icons.remove_red_eye, color: Colors.black,)) :
+                    InkWell(
+                        onTap: () {
+                          setState(() {
+                            showiconpwd = false ;
+                            istap= false ;
+                          });
+
+                        },
+                        child: Icon(Icons.remove_red_eye_outlined, color: Colors.grey,)),
+
 
                     fillColor: Color(AppColorConfig.bgfill),
                     label: Text("Password"),
@@ -335,7 +362,22 @@ class _LoginFormState extends State<LoginForm> {
           ),
           //TODO forget password
           SizedBox(height: 15,),
-          Text('forget password?', textAlign: TextAlign.right,),
+          InkWell(
+              onTap: () async {
+
+                SharedPreferences prefs = await SharedPreferences.getInstance() ;
+
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return ResetPassword(
+                    email: prefs.getString('email'),
+
+
+                  );
+                },));
+              },
+
+
+              child: Text('forget password?', textAlign: TextAlign.right,)),
 
           Container(
 
@@ -351,10 +393,11 @@ class _LoginFormState extends State<LoginForm> {
                 padding: EdgeInsets.all(10),
 
               ),
-              onPressed: () {
+              onPressed: () async {
                 // login.add(LoginUser(txtemail.text, txtpassword.text));
                 print(iserroremail);
                 print(iserrorpass);
+
                 if (formkeypassword.currentState!.validate()) {
 
                   formkeypassword.currentState!.save();
@@ -367,18 +410,70 @@ class _LoginFormState extends State<LoginForm> {
                 }
 
                 if(iserroremail == true || iserrorpass == true) {
+                  print("Either email or pass is null");
+
                   BlocProvider.of<FormBloc>(context).add(CheckValidateevent(
                       iserroremail: iserroremail, iserrorpass: iserrorpass));
                   return;
                 }
+                showDialog(context: context, builder: (context) {
+
+
+                  return  Center(
+
+                    child: CircularProgressIndicator(
+                      color: Color(AppColorConfig.bgcolor),
+
+                    ),
+                  );
+
+                },);
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('email', txtemail.text);
+
                 BlocProvider.of<LoginBloc>(context).add(
                     LoginUser(txtemail.text, txtpassword.text));
               }, child: BlocConsumer<FormBloc,FormStateAD>(
               listener: (context, state) {
                 // TODO: implement listener
                 print(state);
+
+              if(state is FormLoading) {
+                showDialog(context: context, builder: (context) {
+
+
+                  return  Center(
+
+                    child: CircularProgressIndicator(
+                      color: Color(AppColorConfig.bgcolor),
+
+                    ),
+                  );
+
+                },);
+                Future.delayed(Duration(seconds: 2),() => Navigator.pop(context) ,);
+              }
+              if(state is FormError) {
+                print("True");
+                // showDialog(context: context, builder: (context) {
+                //
+                //
+                //   return  Center(
+                //
+                //     child: CircularProgressIndicator(
+                //       color: Color(AppColorConfig.bgcolor),
+                //
+                //     ),
+                //   );
+                //
+                // },);
+                // Future.delayed(Duration(seconds: 2),() => Navigator.pop(context) ,);
+              }
+
+
               },
               builder: (context, state) {
+
                 if(state is FormLoading) {
                   return Container(
                     height: 25,
@@ -458,9 +553,23 @@ class _LoginFormState extends State<LoginForm> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
-                     var googleemail = await auth.signInWithGoogle();
-                      context.read<LoginBloc>().add(LoginSocialAuth(googleemail["email"]));
-                      print("Login google is sent");
+                      try {
+                        var googleemail = await auth.signInWithGoogle();
+                        print("Google email is ${googleemail}");
+
+                        if(googleemail["email"] == null ) {
+                         print("User Cancel");
+                        }
+                        else {
+                          context.read<LoginBloc>().add(LoginSocialAuth(googleemail["email"]));
+                          print("Login google is sent");
+                        }
+
+                      }catch(error) {
+                        print(error);
+                      }
+
+
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -556,5 +665,11 @@ class _LoginFormState extends State<LoginForm> {
     SharedPreferences? prefs = await SharedPreferences.getInstance();
     prefs.setBool("islogin", true);
     print(prefs.getBool("islogin"));
+  }
+
+  void setEmailUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    txtemail.text = prefs?.getString('email') ?? '';
+
   }
 }

@@ -21,6 +21,7 @@ class ReviewRepository {
       url = ApiUrl.reviewpro;
 
       var res = await apiService.GetReviewUser(url, pid);
+        print(res);
       return ReviewModel.fromJson(res);
 
 
@@ -48,12 +49,15 @@ class ReviewRepository {
       //   return ResponseReview.fromJson(res);
       // }
       // print("Review response: ${res }");
+      print("Review Repository ${res}");
+
 
       return ResponseReview.fromJson(res);
 
 
     }catch(e) {
-      print(e);
+      print("Error at review repository");
+      print(e.toString());
 
 
       rethrow ;

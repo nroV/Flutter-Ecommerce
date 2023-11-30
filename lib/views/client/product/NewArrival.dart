@@ -11,6 +11,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+import '../../widget/LoadingIcon.dart';
 import '../../widget/Product/CustomCard.dart';
 
 
@@ -51,8 +52,10 @@ class _NewArrivalSectionState extends State<NewArrivalSection> {
           builder: (context, state) {
 
             if(state is ProductSortLoading) {
+
               return Center(
-                child: CircularProgressIndicator(),
+                  child:LoadingIcon()
+
               );
             }
             if(state is  ProductSortCompleted){

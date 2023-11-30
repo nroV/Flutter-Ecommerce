@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ecommerce/res/appurl/appurl.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/order/order_bloc.dart';
 import 'package:ecommerce/views/order/Tracking.dart';
+import 'package:ecommerce/views/widget/LoadingIcon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
@@ -9,15 +12,20 @@ import 'package:lottie/lottie.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:ecommerce/views/client/NavScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-
+import 'package:flutter_stripe/flutter_stripe.dart';
 import '../../model/Order/OrderDetail.dart';
 import '../../model/Order/OrderRequest.dart';
+import '../../res/constant/stripesecretkey.dart';
+import '../client/ReportBug.dart';
 import '../client/Review/ReviewPopUp.dart';
+import '../client/product/MyProduct.dart';
+import '../client/product/Product.dart';
+import '../widget/Product/PaymentPopUp.dart';
 import 'Success.dart';
 
 
@@ -30,6 +38,10 @@ class TrackingScreen extends StatefulWidget {
   @override
   State<TrackingScreen> createState() => _TrackingScreenState();
 }
+
+
+
+
 void ReviewAlert(BuildContext context,OrderList orderList) {
 
   showDialog(context: context, builder: (context) {
@@ -38,8 +50,15 @@ void ReviewAlert(BuildContext context,OrderList orderList) {
 }
 class _TrackingScreenState extends State<TrackingScreen> {
   int? totalqty = 0;
-
+  List<Productss>? globalitem =[];
   var order;
+  var orderDetail;
+  var initpayment = 0;
+
+  Map<String, dynamic>? paymentintent;
+
+  var uuid;
+
 
   @override
   void initState() {
@@ -73,14 +92,14 @@ class _TrackingScreenState extends State<TrackingScreen> {
       body: SafeArea(
         child: BlocConsumer<OrderBlocUser, OrderState>(
   listener: (context, state) {
+
+    print(state);
     // TODO: implement listener
     if(state is OrderLoading) {
-            Center(
-        child: CircularProgressIndicator(),
-      );
+           LoadingIcon();
     }
     if(state is OrderSuccessCompleted) {
-      print("Success");
+      print("Success Again reorderOrderUserComplete");
       WidgetsBinding.instance!.addPostFrameCallback((_) {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
       });
@@ -97,6 +116,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
       print(  state?.orderDetail?.status!.toLowerCase());
      if(     state?.orderDetail?.status!.toLowerCase() == "completed" ){
        print("THe order again");
+
        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
          ReviewAlert(context,  state!.orderDetail!);
        });
@@ -104,6 +124,37 @@ class _TrackingScreenState extends State<TrackingScreen> {
      }
 
 
+    }
+    if(state is OrderStripePending) {
+      showDialog(context: context, builder: (context) {
+
+
+        return  Center(
+
+          child: CircularProgressIndicator(
+            color: Color(AppColorConfig.bgcolor),
+
+          ),
+        );
+
+      },);
+
+
+
+
+      OrderRequestV2 order = OrderRequestV2(
+
+          customer:uuid,
+
+          method: "Online",
+          productss:globalitem
+
+      );
+
+      BlocProvider.of<OrderBlocUser>(context,listen: false).add(PostOrderEvent( addressid:
+
+      orderDetail
+          ,orderRequestV2: order));
     }
   },
   builder: (context, state) {
@@ -139,9 +190,12 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     //TODO tracking line order here
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
 
                             children: [
                               Column(
@@ -163,9 +217,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
                                 ],
                               ),
                               Expanded(
-                                child: Container(
-
-
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 24),
                                   child: Divider(
 
 
@@ -205,6 +258,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                               ),
                               Expanded(
                                 child: Container(
+                                  padding: const EdgeInsets.only(bottom: 24),
 
 
                                   child: Divider(
@@ -259,21 +313,26 @@ class _TrackingScreenState extends State<TrackingScreen> {
                         fontWeight: FontWeight.w500
                     ),),
 
-                    Container(
-                      padding: EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: Color(0xffF5F5F5),
+                    InkWell(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return ReportScreen();
+                      },)),
+                      child: Container(
+                        padding: EdgeInsets.all(7),
+                        decoration: BoxDecoration(
+                          color: Color(0xffF5F5F5),
 
-                      ),
-                      child: Row(
-                        children: [
-                          Text('Need Help?'),
-                          SizedBox(width: 20,),
-                          Icon(Icons.add_ic_call_sharp, size: 15,),
-                          SizedBox(width: 10,),
-                          Icon(Icons.email, size: 15,),
-                        ],
-                      ),)
+                        ),
+                        child: Row(
+                          children: [
+                            Text('Need Help?'),
+                            SizedBox(width: 20,),
+                            Icon(Icons.add_ic_call_sharp, size: 15,),
+                            SizedBox(width: 10,),
+                            Icon(Icons.email, size: 15,),
+                          ],
+                        ),),
+                    )
 
 
                   ],
@@ -287,6 +346,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                    order= state.orderDetail?.products![index];
+                   var pro = state.orderDetail?.products![index];
 
                   totalqty = (totalqty! + order!.quantity!) as int?;
                   return Container(
@@ -295,29 +355,109 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
 
                     child: ListTile(
-                      onTap: () {
+                      onTap: () async {
+
+                        SharedPreferences prefs= await SharedPreferences.getInstance();
+                        Navigator.push(context,MaterialPageRoute(builder: (context) {
+                          // print(widget.product!.id);
+                          // print( widget.product!.imgid![0].images);
+                          // print(widget.product!.price);
+                          // print(widget.product!.category?.id);
+                          // print( widget.product!.attribution);
+                          // print(widget.product!.discount);
+                          // print(widget.product!.avgRating);
+                          // print(  widget.product!.description);
+                          // print( widget.product!.sellRating);
+                          // print( widget.product!.productname);
+                          // print( widget.product!.stockqty);
+
+                          return ProductDetailScreen(
+                              userid: prefs.getInt("userid"),
+                              isorderview: true,
+                              productss: MyProductDetail(
+                                  id:pro?.product?.id ,
+                                  imgid: pro?.product?.imgid,
+                                  price: pro?.product?.price,
+                                  categoryid:pro?.product?.category?.id,
+                                  attribution: pro?.product?.attribution,
+                                  discount:  pro?.product?.discount,
+                                  avgRating:  pro?.product?.avgRating,
+                                  description:  pro?.product?.description,
+                                  sellRating: pro?.product?.sellRating,
+                                  productname: pro?.product?.productname,
+                                  stockqty: pro?.product?.stockqty
+                              ));
+
+                        },));
 
                       },
 
 
                       contentPadding: EdgeInsets.all(0),
-                      leading: Image.network(
-                        '${ApiUrl.main}${order.colorselection?.imgid?.images}'
-
-                        , fit: BoxFit.contain,
+                      leading:
+                      CachedNetworkImage(
+                        // imageUrl: "https://fakeimg.pl/300x150?text=+",
+                        imageUrl: "https://django-ecomm-6e6490200ee9.herokuapp.com"+ order.colorselection!.imgid!.images!.toString(),
                         width: 100,
-                        height: double.maxFinite,
+                        height: double.maxFinite
+                          , fit: BoxFit.contain,
+
+                        progressIndicatorBuilder: (context, url, downloadProgress) =>
+                            Center(child:
+                            Image.network( "https://fakeimg.pl/300x150?text=+"
+                              ,fit: BoxFit.cover,width: double.maxFinite,height: double.maxFinite,)
+
+                            ),
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
                       ),
+                      // Image.network(
+                      //   '${ApiUrl.main}${order.colorselection?.imgid?.images}'
+                      //
+                      //   , fit: BoxFit.contain,
+                      //   width: 100,
+                      //   height: double.maxFinite,
+                      // ),
 
                       title: Text('${order?.product?.productname}', style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500
                       ),),
-                      subtitle: Text('\$ ${order?.product?.price}', style: TextStyle(
-                          fontSize: 16.8,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xff508A7B)
-                      ),),
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+
+                          Text('\$ ${
+                              (order.colorselection?.price  - (  order.colorselection?.price
+                                  *  state.orderDetail?.products![index].product?.discount / 100)).toStringAsFixed(2)
+
+
+                          }',
+                            style: TextStyle(
+                              fontSize: 14.8,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff508A7B)
+                          ),),
+                          Row(
+                            children: [
+                              Text("Total: ",style: TextStyle(
+                                  fontSize: 14.8,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xff508A7B)
+                              ),),
+                              Text('\$ ${
+                                  (order.colorselection?.price  * (  order.quantity )).toStringAsFixed(2)
+
+
+                              }', style: TextStyle(
+                                  fontSize: 14.8,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xff508A7B)
+                              ),),
+                            ],
+                          )
+
+                        ],
+                      ),
                       trailing: Text('Qty: ${order?.quantity}', style: TextStyle(
                           fontSize: 12.8,
 
@@ -362,14 +502,20 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     ),
                     Container(
                       margin: EdgeInsets.only(bottom: 15),
-                      child: Row(
+                      child:
+
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Promotion Discount', style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12.8
+                          Text('Delivery Fees', style: TextStyle(
+
+                              color: Colors.grey
                           ),),
-                          Text('0%'),
+                          Text(' FREE ', style: TextStyle(
+
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500
+                          ),)
                         ],
                       ),
                     ),
@@ -384,9 +530,15 @@ class _TrackingScreenState extends State<TrackingScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('SubTotal', style: TextStyle(
-                              color: Colors.black
+                              color: Color(AppColorConfig.success),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500
                           ),),
-                          Text('\$ ${state.orderDetail?.amount}'),
+                          Text('\$ ${state.orderDetail?.amount}',style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Color(AppColorConfig.success),
+                            fontSize: 18,
+                          ),),
                         ],
                       ),
                     ),
@@ -407,14 +559,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
       );
     }
     if(state is OrderDetailLoading){
-      return Center(
-        child:  CircularProgressIndicator(),
-      );
+      return        LoadingIcon();
     }
     else{
-      return Center(
-        child:  CircularProgressIndicator(),
-      );
+      return        LoadingIcon();
     }
 
 
@@ -426,41 +574,48 @@ class _TrackingScreenState extends State<TrackingScreen> {
     print(state);
     print("The state is ${state}");
     // TODO: implement listener
-    // if(state is OrderLoading) {
-    //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //     Center(
-    //       child: CircularProgressIndicator(),
-    //     );
-    //   });
-    //
-    // }
-    // if(state is OrderSuccessCompleted) {
-    //   print("Success");
-    //
-    //     Navigator.pushReplacement(context,
-    //
-    //         MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
-    //
-    //   //TODO use this whenever u want to push neww screen after state updated
-    //   // Navigator.push(context, MaterialPageRoute(
-    //   //   builder: (context) {
-    //   //   return Success();
-    //   // },));
-    // }
-  },
-  builder: (context, state) {
-    if(state is OrderSuccessCompleted) {
-      print("Success");
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
+    if(state is OrderLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        Center(
+          child: CircularProgressIndicator(),
+        );
       });
+
+    }
+    if(state is OrderSuccessCompleted) {
+      print("Success reorder");
+
+        // Navigator.pushReplacement(context,
+        //
+        //     MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
+
+
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+         return Success(order: state?.orderReponse,);
+        },), (route) => false);
+
       //TODO use this whenever u want to push neww screen after state updated
       // Navigator.push(context, MaterialPageRoute(
       //   builder: (context) {
       //   return Success();
       // },));
     }
+  },
+  builder: (context, state) {
+    // if(state is OrderSuccessCompleted) {
+    //   print("Success");
+    //   WidgetsBinding.instance!.addPostFrameCallback((_) {
+    //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => Success(order: state?.orderReponse,)));
+    //   });
+    //   //TODO use this whenever u want to push neww screen after state updated
+    //   // Navigator.push(context, MaterialPageRoute(
+    //   //   builder: (context) {
+    //   //   return Success();
+    //   // },));
+    // }
     if(state is OrderDetailSuccess) {
+
+      print("Order Succes Here");
       return Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
@@ -495,27 +650,78 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
                       ));
                     }
+                    //TODO gloabl here
+                    globalitem?.addAll(item);
+                    orderDetail =   state!.orderDetail!.address!.id;
+
+
                     print("Item in cart");
                     print(item.length);
                     //TODO orderrequest
                     print(item);
                     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+                    uuid = prefs.getInt('userid');
 
 
-                    OrderRequestV2 order = OrderRequestV2(
 
-                        customer:prefs.getInt("userid"),
 
-                        method: "Cash",
-                        products:item
+                   initpayment = await showDialog(context: context, builder: (context)
 
-                    );
+                    {
+                        return PaymentPopUp();
+                    },);
 
-                    BlocProvider.of<OrderBlocUser>(context,listen: false).add(PostOrderEvent( addressid:
+                   setState(() {
+                     print(initpayment);
+                   });
+                   if(initpayment == null) {
+                     return;
+                   }
 
-                    state!.orderDetail!.address?.id
-                        ,orderRequestV2: order));
+                   if(initpayment == 0) {
+                     OrderRequestV2 order = OrderRequestV2(
+
+                         customer:prefs.getInt("userid"),
+
+                         method: "Cash",
+                         productss:item
+
+                     );
+
+                    context.read<OrderBlocUser>().add(PostOrderEvent( addressid:
+
+                     state!.orderDetail!.address?.id
+                         ,orderRequestV2: order));
+
+
+                   }
+                   if(initpayment == 1) {
+                     makePayment(currency:"USD",totalamount:double.parse(state.orderDetail!.amount!).ceil().toString()).then((value) {
+                       print("Success");
+
+
+
+                     }).catchError((err) {
+                       print(err);
+
+                     });
+                     // OrderRequestV2 order = OrderRequestV2(
+                     //
+                     //     customer:prefs.getInt("userid"),
+                     //
+                     //     method: "Online",
+                     //     productss:item
+                     //
+                     // );
+                     //
+                     // BlocProvider.of<OrderBlocUser>(context,listen: false).add(PostOrderEvent( addressid:
+                     //
+                     // state!.orderDetail!.address?.id
+                     //     ,orderRequestV2: order));
+                   }
+
+
 
 
 
@@ -534,9 +740,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     }
 
     else{
-      return Center(
-        child: CircularProgressIndicator(),
-      );
+      return        LoadingIcon();
     }
 
   },
@@ -544,4 +748,92 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
     );
   }
+
+
+  String calculateAmount(String amount) {
+    return ((int.parse(amount)) * 100).toString();
+  }
+
+  Future<void> makePayment({totalamount,currency}) async {
+    print("payment");
+    try {
+      paymentintent = await createPaymentIntent(totalamount.toString(), 'USD');
+      await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+              paymentIntentClientSecret: paymentintent!['client_secret'],
+              style: ThemeMode.light,
+              merchantDisplayName: 'Adnan')).then((value) {
+
+      });
+      // applePay: const PaymentSheetApplePay(merchantCountryCode: '+92'),
+      // googlePay: const PaymentSheetGooglePay(merchantCountryCode: )
+      //after successfully paid
+      displayPaymentSheet();
+      // Navigator.pop(context);
+    } catch (err) {
+      print('send response error');
+      print(err.toString());
+    }
+  }
+
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet(
+
+      ).then((value) {
+
+        showDialog(context: context, builder: (context) {
+          return AlertDialog(
+            title: Text('Payment Successfully'),
+          );
+        },);
+        paymentintent = null;
+        context.read<OrderBloc>().add(OrderStripe());
+        Navigator.pop(context);
+      }).onError((error, stackTrace) {
+        print("error is --- ${error}");
+      });
+    } on StripeException catch (e) {
+      print("Stripe error catching ${e}");
+      await Stripe.instance.presentPaymentSheet(
+
+      ).then((value) {
+        showDialog(context: context, builder: (context) {
+          return AlertDialog(
+            title: Text('Error has been occur'),
+          );
+        },);
+        paymentintent = null;
+      }).onError((error, stackTrace) {
+        print("error is --- ${error}");
+      });
+    }
+  }
+
+
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': calculateAmount(amount),
+        'currency': currency,
+        'payment_method_types[]': 'card'
+      };
+      var res = await http.
+      post(Uri.parse('https://api.stripe.com/v1/payment_intents'),
+          headers: {
+            'Authorization': 'Bearer ${SecretKey.key}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: body
+      );
+      print("Payment body: ${res.body.toString()}");
+      return json.decode(res.body);
+    } catch (error) {
+      print('  createPaymentIntentresponse error');
+      print(error.toString());
+    }
+  }
+
+
+
 }

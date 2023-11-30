@@ -5,12 +5,12 @@ abstract class LoginState extends Equatable{}
 class LoginInitial extends LoginState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 }
 class LoginLoading extends LoginState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 }
 
 class LoginCompleted extends  LoginState {

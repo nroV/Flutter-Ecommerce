@@ -32,6 +32,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
   var txttelephone = TextEditingController();
   var formtelephone = GlobalKey<FormState>();
   var iserror = true;
+  var fnodetele = FocusNode();
   String? countries;
   @override
   void initState() {
@@ -79,11 +80,12 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
             // print(userphone);
 
               if(widget.email !=null || widget.id  !=null){
-                print("Send user auth to");
+                print("Send user google to");
                 print(userphone);
                 print(widget.username);
                 print(widget.email);
-                BlocProvider.of<RegisterBloc>(context,listen: false).add(RegisterAuth(
+
+              context.read<RegisterBloc> ().add(RegisterAuth(
                   password: widget.id,
                   email: widget.email,
                   telephone: userphone,
@@ -92,6 +94,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                 ));
               }
               else {
+                print("credential user google to");
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return CredentialScreen(
 
@@ -126,6 +129,42 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
           return VerifyScreen();
         },), (route) => false);
+      });
+    }
+
+    if(state is RegisterGoogleAuthCompleted) {
+      print("Google Register true");
+      storeemailandpass(widget.email,widget.id);
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+          return VerifyScreen();
+        },), (route) => false);
+      });
+    }
+
+    if(state is RegisterGoogleAuthLoading) {
+
+      print("Loading Auth Register here");
+      showDialog(context: context, builder: (context) {
+
+
+        return  Center(
+
+          child: CircularProgressIndicator(
+            color: Color(AppColorConfig.bgcolor),
+
+          ),
+        );
+
+      },);
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+        Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
+        );
       });
     }
   },
@@ -177,6 +216,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                                   margin: EdgeInsets.only(top:0,bottom: 0),
                                   child: TextField(
                                     readOnly: true,
+                                    focusNode: fnodetele,
 
                                     style: TextStyle(
                                         fontSize: 13
@@ -188,7 +228,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
 
                                       countryListTheme: CountryListThemeData(
                                           backgroundColor: Colors.white,
-                                          bottomSheetHeight: constraints.maxWidth*0.9,
+                                          bottomSheetHeight: 700,
                                           searchTextStyle: TextStyle(
                                               fontSize: 12.8
                                           ),
@@ -228,6 +268,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                                         setState(() {
                                           countries = country.name;
                                           telephone = country.phoneCode;
+                                          fnodetele.nextFocus();
 
                                         });
                                       },
@@ -372,6 +413,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                                           }
 
                                           txttelephone.text = value;
+
                                         });
                                       },
                                       decoration: InputDecoration(

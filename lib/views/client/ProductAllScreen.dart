@@ -1,10 +1,13 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/category/category_bloc.dart';
+import 'package:ecommerce/views/ErrorPage.dart';
+import 'package:ecommerce/views/client/product/MyProduct.dart';
 import 'package:ecommerce/views/client/product/Product.dart';
 import 'package:ecommerce/views/client/utilities/SearchPage.dart';
 import 'package:ecommerce/views/client/utilities/searchscreen.dart';
+import 'package:ecommerce/views/widget/LoadingIcon.dart';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../model/Category/CategoryModel.dart';
 import '../widget/Product/GridCardItem.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,13 +38,13 @@ class _ProductAllPageState extends State<ProductAllPage> {
     // TODO: implement initState
     print(widget.selectedcategory );
     // http://127.0.0.1:8000/product/sort?search=Men&popular=asc
-    BlocProvider.of<CategoryBlocProduct>(context).add(FetchCategoryProduct(categoryid:widget.selectedcategory ));
+
     super.initState();
   }
 
     Widget build(BuildContext context) {
       // TODO: implement build
-
+      BlocProvider.of<CategoryBlocProduct>(context).add(FetchCategoryProduct(categoryid:widget.selectedcategory ));
       return Scaffold(
         appBar: AppBar(
           titleSpacing: 0,
@@ -226,7 +229,8 @@ class _ProductAllPageState extends State<ProductAllPage> {
 
                     return InkWell(
                       onTap: () {
-                        context.read<CategoryBlocProduct>().add(FetchCategoryProduct(categoryid: widget.category![index].id));
+                        context.read<CategoryBlocProduct>().add(FetchCategoryProduct(
+                            categoryid: widget.category![index].id));
                         print(widget.category![index].id);
                         setState(() {
                           widget.selectedcategory = widget.category![index].id;
@@ -287,11 +291,12 @@ class _ProductAllPageState extends State<ProductAllPage> {
               child: BlocConsumer<CategoryBlocProduct, CategoryState>(
   listener: (context, state) {
     // TODO: implement listener
+    print("Category stae is ${state}");
   },
   builder: (context, state) {
     if(state is CategoryByidLoading){
-      return Center(
-        child: CircularProgressIndicator(),
+      return const  Center(
+        child:LoadingIcon(),
       );
     }
     if(state is CategoryByidCompleted){
@@ -325,16 +330,30 @@ class _ProductAllPageState extends State<ProductAllPage> {
           var product = state.product?.product![index];
 
           return InkWell(
-            onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return ProductDetailScreen (
+            onTap: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ProductDetailScreen(
+                    userid: prefs.getInt("userid"),
+                    productss: MyProductDetail(
 
-                  productv2:product ,
+                        id: product!.id,
+                        imgid: product!.imgid,
 
 
+                        price: product!.price,
+                        categoryid:product!.category?.id,
+                        attribution: product!.attribution,
+                        discount:  product!.discount,
 
-                    );
-                },));
+                        avgRating: product!.avgRating,
+
+                        description:  product!.description,
+                        sellRating: product!.sellRating,
+                        productname: product!.productname,
+                        stockqty: product!.stockqty
+                    ));
+              },));
             },
             child: Container(
               height: 300,
@@ -409,8 +428,14 @@ class _ProductAllPageState extends State<ProductAllPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8,top: 9),
-                      child: Text("${product.productname}",style: TextStyle(
+                      child: Text("${product.productname}",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+
+
+                        style: TextStyle(
                           fontSize: 16,
+
                           fontWeight: FontWeight.w500
                       ),),
                     ),
@@ -466,13 +491,11 @@ class _ProductAllPageState extends State<ProductAllPage> {
       );
     }
     if(state is CategoryByidError){
-      return Center(
-        child: Text("Error has occur"),
-      );
+      return ErrorPage();
     }
 
     return Center(
-      child: CircularProgressIndicator(),
+      child: const LoadingIcon()
     );
 
   },

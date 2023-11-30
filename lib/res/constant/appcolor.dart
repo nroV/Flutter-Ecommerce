@@ -11,6 +11,7 @@ class AppColorConfig {
 
   static var negativecolor = 0xffF04438;
   static var negativelight = 0xffFFEBE5;
+  static var negativecolorv2= 0xffE33E33;
   static var primaryswatch = 0xffF0F0F0;
   static var bgfill = 0xffF1F1F1;
 

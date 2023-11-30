@@ -1,7 +1,7 @@
 
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/products/address_bloc.dart';
-import 'package:ecommerce/views/order/GoogleMap/GoogleMapScreen.dart';
+
 import 'package:ecommerce/views/order/Success.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,14 +11,20 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/res/constant/stripesecretkey.dart';
 import '../../helper/GoogleLocation.dart';
+import '../../helper/HexColorConverter.dart';
+import '../../helper/StripeService.dart';
+import '../../model/Address.dart';
 import '../../model/Order/OrderRequest.dart';
 import '../../model/Product/CartModel.dart';
+import '../../service/GoogleMap/GoogleMapScreen.dart';
 import '../../viewmodel/order/order_bloc.dart';
+import '../Address/AddressScreen.dart';
 import '../testpayment.dart';
+import '../widget/LoadingIcon.dart';
 import '../widget/Product/FloatingAction.dart';
-
+import 'package:lottie/lottie.dart';
 import 'package:location/location.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'CompleteOrder.dart';
 class Checkout extends StatefulWidget {
   List<CartItem>? cartitem;
@@ -46,6 +52,21 @@ class _CheckoutState extends State<Checkout> {
  var initpayment = 0;
  var selectedmethod = 0;
   int? addressid;
+  var userinput = TextEditingController();
+  var long;
+  var lat;
+  var mapofaddress;
+  var istap = true;
+  var showiconpwd = false;
+  var homeadd;
+  var city;
+  var country;
+  var userid;
+  var iserrordesc = true;
+  var txtdesc = TextEditingController();
+  var formdesc =  GlobalKey<FormState>();
+    var add ;
+  LocationHelper locationhelper = LocationHelper();
   @override
   void initState() {
     // TODO: implement initState
@@ -64,21 +85,110 @@ class _CheckoutState extends State<Checkout> {
 
     super.didChangeDependencies();
   }
+  SendLatandLong(lat, long) async {
+
+    mapofaddress = await locationhelper.getPlaceWithLatLng(lat, long);
+
+      print('call');
+      print(mapofaddress);
+
+      print(mapofaddress[5]["address_components"][5]["long_name"]);
+      homeadd = mapofaddress[0]['formatted_address'];
+      // print(mapofaddress[0]["address_components"][6]["long_name"]);
+      country = mapofaddress[0]["address_components"][6]["long_name"];
+      city = mapofaddress[5]["address_components"][5]["long_name"];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    BlocProvider.of<AddressBloc>(context, listen: false)
+        .add(PostAddress(
+        add: AddressBody(
+          city: city,
+          country: country,
+          lat:lat,
+          lon: long,
+          street: homeadd,
+
+
+
+        ),
+        userid: prefs?.getInt('userid'),
+        desc: txtdesc.text
+    ));
+
+  }
+
+  void PopUpUnauthorize(BuildContext context) {
+
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text("Missing Delivery Address",
+          textAlign: TextAlign.center,
+
+          style: TextStyle(
+            fontSize:22,
+            fontWeight: FontWeight.w500,
+
+            color: Color(AppColorConfig.success),
+          ),),
+        content: Text("Please select your delivering address first ",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 12.8,
+              fontWeight: FontWeight.w400,
+
+              color: Colors.black
+          ),),
+        elevation: 0,
+        actions: [
+          ElevatedButton(
+
+              onPressed: () {
+
+                // Navigator.pop(context);
+
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor:Color(AppColorConfig.success),
+                  elevation: 0,
+                  padding: EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black.withOpacity(0.14)),
+                      borderRadius: BorderRadius.circular(3)
+                  )
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                  SizedBox(width: 10,),
+                  Text("Comfirm",style: TextStyle(
+                    fontSize: 12.8,
+
+                  ),)
+                ],
+              ))
+        ],
+      );
+    },);
+  }
+
+
   Widget build(BuildContext context) {
 
     // TODO: implement build
     var cart = widget.cartitem;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar:AppBar(
 
         title: Text('Check Out',style: TextStyle(
-            color: Colors.black
+            color: Colors.white
         ),),
         centerTitle: true,
         iconTheme: IconThemeData(
-            color: Colors.black
+            color: Colors.white
         ),
-        backgroundColor: Colors.white.withOpacity(0.34),
+        backgroundColor: Colors.black,
         elevation: 0,
 
 
@@ -89,14 +199,30 @@ class _CheckoutState extends State<Checkout> {
     print("State google is updated");
     print(state);
     if(state is OrderStripePending) {
+      showDialog(context: context, builder: (context) {
+
+
+        return  Center(
+
+          child: CircularProgressIndicator(
+            color: Color(AppColorConfig.bgcolor),
+
+          ),
+        );
+
+      },);
       List<Productss>? item =[];
 
       for(int index=0;index<cart!.length;index++) {
+        // print(cart[index].sizeid);
+        // print(cart[index].colorid.id);
         item.add(Productss(
           id: cart![index].productid,
           quantity:  cart![index].qty,
-          colorselection: cart![index].colorid,
+          colorselection: cart![index].colorid.id,
           size:  cart![index].sizeid,
+
+
 
 
         ));
@@ -108,7 +234,7 @@ class _CheckoutState extends State<Checkout> {
           method:
           "online" ,
 
-          products:item
+          productss:item
 
       );
 
@@ -117,9 +243,7 @@ class _CheckoutState extends State<Checkout> {
   },
   builder: (context, state) {
     if(state is OrderLoading) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
+      return Text('');
     }
     if(state is OrderSuccessCompleted) {
       print("Success");
@@ -144,21 +268,33 @@ class _CheckoutState extends State<Checkout> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Free Shipping",style: TextStyle(
-                  fontSize: 12.8,
-                  fontWeight: FontWeight.w500,
-                  color: Color(AppColorConfig.success)
-                ),),
+                // Text("Free Shipping",style: TextStyle(
+                //   fontSize: 12.8,
+                //   fontWeight: FontWeight.w500,
+                //   color: Color(AppColorConfig.success)
+                // ),),
                 SizedBox(height: 20,),
                 //TODO list product
-                SizedBox(
-                  height: MediaQuery.of(context).size.height*0.25,
+                LimitedBox(
+                  maxHeight: double.maxFinite,
+
                   child: ListView.builder(
+                    shrinkWrap: true,
+
+
                     itemCount:cart?.length ?? 0,
+
+                    physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
+                      Color colorcode = HexColor(cart?[index].colorid.code);
+                      // print(colorcode);
+                      // print(cart?.length);
                   return Container(
 
                     margin: EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+
+                    ),
 
 
                     child: ListTile(
@@ -177,17 +313,110 @@ class _CheckoutState extends State<Checkout> {
 
                       title: Text('${cart![index].producttitle}',style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w500
-                      ),),
-                      subtitle: Text('\$  ${cart![index].price}',style: TextStyle(
-                          fontSize: 16.8,
-                          fontWeight: FontWeight.w500,
-                        color: Color(0xff508A7B)
-                      ),),
-                      trailing: Text('Qty: ${cart![index].qty}',style: TextStyle(
-                          fontSize: 12.8,
+                        fontWeight: FontWeight.w400,
 
-                          fontWeight: FontWeight.w400
+                      ),),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 2,),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Size: ${cart[index].sizetext} ', style: TextStyle(
+                                fontSize: 11.8,
+
+                              ),),
+                              Text('Color:  ', style: TextStyle(
+                                fontSize: 11.8,
+
+                              ),),
+                              Container(
+                                width: 12.5,
+                                margin: EdgeInsets.only(right: 5),
+                                height: 12.5,
+                                // child: Text(attri?.colorid[index].code),
+                                decoration: BoxDecoration(
+                                    color:colorcode,
+
+                                    borderRadius: BorderRadius.circular(3),
+                                    border: Border.all(
+                                        color: Colors.grey.withOpacity(0.5)
+                                    ),
+
+
+                                ),
+
+                              ),
+                              Text('\ Total: \$ ${ (cart[index].price * (cart[index].qty)).toStringAsFixed(2)}',
+
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(AppColorConfig.success)
+                              ),),
+                            ],
+                          ),
+                          SizedBox(height: 10,),
+                          Container(
+
+
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.max,
+
+                              children: [
+                                Text('\$ ${cart[index].price.toStringAsFixed(2)}',style: TextStyle(
+                                    fontSize: 18.9,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(AppColorConfig.success)
+                                ),),
+                                // Text('\ Total:  \$ ${ (cart[index].price * (cart[index].qty)).toStringAsFixed(2)}',style: TextStyle(
+                                //     fontSize: 12.5,
+                                //     fontWeight: FontWeight.w500,
+                                //     color: Color(AppColorConfig.success)
+                                // ),),
+                                // Container(
+                                //   padding: EdgeInsets.only(left: 15,right: 15),
+                                //
+                                //   decoration: BoxDecoration(
+                                //     color: Color(AppColorConfig.primarylight),
+                                //     borderRadius: BorderRadius.circular(25),
+                                //
+                                //
+                                //
+                                //   ),
+                                //   child: Row(
+                                //     children: [
+                                //
+                                //
+                                //       SizedBox(width: 16,),
+                                //       Text('${cart[index].qty}',style: TextStyle(
+                                //           fontSize: 18,
+                                //           color: Colors.black
+                                //       ),),
+                                //       SizedBox(width: 16,),
+                                //
+                                //     ],
+                                //   ),
+                                // ),
+                              ],
+                            ),
+                          ),
+
+                        ],
+                      ),
+
+
+                      // subtitle: Text('\$  ${cart![index].price}',style: TextStyle(
+                      //     fontSize: 16.8,
+                      //     fontWeight: FontWeight.w500,
+                      //   color: Color(0xff508A7B)
+                      // ),),
+                      trailing: Text('Qty: x ${cart![index].qty}',style: TextStyle(
+                          fontSize: 12.8,
+                          color: Colors.black
                       ),),
 
                     ),
@@ -199,9 +428,11 @@ class _CheckoutState extends State<Checkout> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: 30,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+
                         Text("Delivery Address",style: TextStyle(
 
                           fontSize: 18,
@@ -271,8 +502,8 @@ class _CheckoutState extends State<Checkout> {
                         // )
                       ],
                     ),
-                    Divider(),
-                    SizedBox(height: 10,),
+
+                    SizedBox(height: 30,),
                     //TODO address
 
         //           Container(
@@ -306,10 +537,16 @@ class _CheckoutState extends State<Checkout> {
         // ),
               Container(
                 width: double.maxFinite,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                        color: Colors.grey.withOpacity(0.2)
+                    )
+                ),
                 height:
 
 
-                310,
+                300,
 
                 child: BlocConsumer<AddressBloc, AddressState>(
                   listener: (context, state) {
@@ -317,16 +554,17 @@ class _CheckoutState extends State<Checkout> {
                     print("The State of Address is ${state}");
                     if(state is AddressPostDone) {
                       print("THe address is done");
+
+                      // Future.delayed(Duration(seconds: 2),() => Navigator.pop(context),);
                       context.read<AddressBloc>().add(FetchAddress(userid: widget.uid));
+
                     }
                   },
                   builder: (context, state) {
 
                     if(state is AddressLoading) {
                       return Center(
-                        child: CircularProgressIndicator(
-
-                        ),
+                        child:LoadingIcon()
                       );
 
                     }
@@ -343,13 +581,27 @@ class _CheckoutState extends State<Checkout> {
                       var len =  state.add?.results?.length;
                       print(len);
                       var previewimages;
+
                       if( state.add?.results!.length != 0 ) {
 
-                        previewimages =  LocationHelper.staticmapurl(latitute: double.parse( state.add!.results![len!-1].latitude!),longtitute:
+                        if(add == null) {
+                          previewimages =  LocationHelper.staticmapurl(latitute:
+                          double.parse( state.add!.results![len!-1].latitude!),longtitute:
 
-                        double.parse( state.add!.results![len!-1].longitude!)
+                          double.parse( state.add!.results![len!-1].longitude!)
 
-                        );
+                          );
+                        }
+                        else {
+                          previewimages =  LocationHelper.staticmapurl(latitute:
+                          double.parse(add['latitute']),longtitute:
+
+                          double.parse( add['longtitute']!)
+
+                          );
+                        }
+
+
                       }
 
                       return     state.add?.results?.length  == 0?
@@ -369,10 +621,11 @@ class _CheckoutState extends State<Checkout> {
 
                           children: [
                             Container(
+
                               padding:EdgeInsets.all(10) ,
                               child:
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   InkWell(
 
@@ -385,7 +638,52 @@ class _CheckoutState extends State<Checkout> {
                                         ),)
                                       ],
                                     ),
-                                    onTap: () {
+                                    onTap: () async {
+
+                                      showDialog(context: context, builder: (context) {
+
+
+                                        return  Center(
+
+                                          child: CircularProgressIndicator(
+                                            color: Color(AppColorConfig.bgcolor),
+
+                                          ),
+                                        );
+
+                                      },);
+                                      Future.delayed(Duration(seconds: 2),() => Navigator.pop(context),);
+                                      print("On Tap called");
+                                      print("Tap");
+
+
+                                      var location = await Location().getLocation();
+                                      print(location.latitude);
+                                      print(location.longitude);
+                                      SendLatandLong(location.latitude,location.longitude);
+                                      print("Get Location latitute and longitutee");
+                                      print(mapofaddress);
+
+                                      setState(() {
+                                        // if(mapofaddress!=null || mapofaddress != '') {
+                                        //   print("Send here");
+                                        //   BlocProvider.of<AddressBloc>(context, listen: false)
+                                        //       .add(PostAddress(
+                                        //       add: AddressBody(
+                                        //         city: city,
+                                        //         country: country,
+                                        //         lat:lat,
+                                        //         lon: long,
+                                        //         street: homeadd,
+                                        //
+                                        //
+                                        //
+                                        //       ),
+                                        //       userid: userid,
+                                        //       desc: txtdesc.text
+                                        //   ));
+                                        // }
+                                      });
 
                                     },
                                   ),
@@ -398,6 +696,7 @@ class _CheckoutState extends State<Checkout> {
                                             ,color: Colors.white,
                                           size: 20,
                                         ),
+                                        SizedBox(width: 10,),
                                         Text("Select On Map",style: TextStyle(
                                             fontSize: 12.8
                                             ,color: Colors.white
@@ -405,16 +704,13 @@ class _CheckoutState extends State<Checkout> {
                                       ],
                                     ),
                                     onTap: () async {
-                                      // InkWell(
-                                      //   onTap: () {
-                                      //
-                                      //   },
-                                      //   child: InkWell(
-                                      //       onTap: () async {
+
+
                                       var location = await Location().getLocation();
                                       print("User current location");
                                       print(location.longitude);
                                       print(location.latitude);
+
 
 
                                       address = await Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -427,14 +723,9 @@ class _CheckoutState extends State<Checkout> {
                                       setState(() {
                                         print("Got Address back");
                                         print(address);
+                                        // Navigator.pop(context);
                                       });
-                                      //
-                                      //
-                                      //       },
-                                      //       child: Text('Add New',style: TextStyle(
-                                      //         fontSize: 11
-                                      //       ),)),
-                                      // )
+
                                     },
                                   )
 
@@ -443,15 +734,43 @@ class _CheckoutState extends State<Checkout> {
                               decoration: BoxDecoration(
                                 color: Color(AppColorConfig.success)
                               ),
+                              width: double.maxFinite,
                             ),
-                            SizedBox(height: 85,),
-                            Center(child: Text('You have no address picked yet',
+
+                            Center(child:
+
+                            InkWell(
+
+                              child: Container(
+
+                                child: Lottie.asset('assets/logo/Animation - 1698223136592.json',
+                                fit: BoxFit.cover
+                                ),
+                                height: 178,
+
+                              ),
+                              onTap: () async {
+                                var location = await Location().getLocation();
+                                print("User current location");
+                                print(location.longitude);
+                                print(location.latitude);
 
 
-                            style: TextStyle(
-                              fontSize: 12.8
+                                address = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                  return GoogleMapScreen(positionlong:     location.longitude,
+                                    positionlat:    location.latitude,
+                                  );
+
+                                },));
+
+                                setState(() {
+                                  print("Got Address back");
+                                  print(address);
+                                });
+                              },
+                            )
+
                             ),
-                            )),
 
 
 
@@ -462,12 +781,12 @@ class _CheckoutState extends State<Checkout> {
 
                           ],
                         ),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                                color: Colors.grey.withOpacity(0.2)
-                            )
-                        ),
+                        // decoration: BoxDecoration(
+                        //     // color: Colors.white,
+                        //     border: Border.all(
+                        //         // color: Colors.grey.withOpacity(0.2)
+                        //     )
+                        // ),
                       )  :
                      ListView.builder(
                         scrollDirection: Axis.vertical,
@@ -475,7 +794,13 @@ class _CheckoutState extends State<Checkout> {
                         itemCount:  state.add?.results!.length  ?? 0  ,
 
                         itemBuilder: (context, index) {
-                          addressid =   state.add?.results?[len!-1].id;
+                          if(add == null ) {
+                            addressid =   state.add?.results?[len!-1].id;
+                          }
+                          else {
+                            addressid =   add['addressid'];
+                          }
+
                           return
 
 
@@ -503,20 +828,93 @@ class _CheckoutState extends State<Checkout> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                                         children: [
-                                          InkWell(
 
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.location_on),
-                                                Text("Current Location",style: TextStyle(
-                                                  fontSize: 12.8
-                                                ),)
-                                              ],
+
+                                            InkWell(
+                                              onTap: () async {
+                                                // InkWell(
+                                                //   onTap: () {
+                                                //
+                                                //   },
+                                                //   child: InkWell(
+                                                //       onTap: () async {
+                                                // var location = await Location().getLocation();
+                                                // print("User current location");
+                                                // print(location.longitude);
+                                                // print(location.latitude);
+                                                //
+                                                //
+                                                // address = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                //   return GoogleMapScreen(positionlong:     location.longitude,
+                                                //     positionlat:    location.latitude,
+                                                //   );
+                                                //
+                                                // },));
+                                                //
+                                                // setState(() {
+                                                //   print("Got Address back");
+                                                //   print(address);
+                                                // });
+                                                //
+                                                //
+                                                //       },
+                                                //       child: Text('Add New',style: TextStyle(
+                                                //         fontSize: 11
+                                                //       ),)),
+                                                // )
+                                           //TODO choose location here
+                                           //
+                                           //      showDialog(context: context, builder: (context) {
+                                           //
+                                           //
+                                           //        return  Center(
+                                           //
+                                           //          child: CircularProgressIndicator(
+                                           //            color: Color(AppColorConfig.bgcolor),
+                                           //
+                                           //          ),
+                                           //        );
+                                           //
+                                           //      },);
+                                           //      Future.delayed(Duration(seconds: 2),() => Navigator.pop(context),);
+
+                                                add =   await Navigator.push(
+                                                    context, MaterialPageRoute(builder: (context) {
+
+                                                  return AddressProductScr(
+                                                    ischoice: true  ,
+                                                    userid:    widget.uid ,
+
+                                                  );
+                                                },));
+
+                                             setState(() {
+                                               print("Got Address id: ");
+                                               print(add);
+
+                                               print("Click location");
+                                               print(add['latitute']);
+                                               print(add['longtitute']);
+                                               // SendLatandLong(  double.parse(add['latitute']),   double.parse(add['longtitute']));
+
+                                               addressid = add['addressid'];
+                                               print("The location is ${addressid}");
+                                             });
+
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  Icon(Icons.location_on),
+                                                  Text("Choose Locations",style: TextStyle(
+                                                    fontSize: 12.8
+                                                  ),)
+                                                ],
+                                              ),
                                             ),
-                                            onTap: () {
 
-                                            },
-                                          ),
+
+
+
                                           InkWell(
 
 
@@ -535,7 +933,12 @@ class _CheckoutState extends State<Checkout> {
                                               //   },
                                               //   child: InkWell(
                                               //       onTap: () async {
+
+
+
+
                                                       var location = await Location().getLocation();
+
                                                       print("User current location");
                                                       print(location.longitude);
                                                       print(location.latitude);
@@ -551,6 +954,7 @@ class _CheckoutState extends State<Checkout> {
                                                       setState(() {
                                                         print("Got Address back");
                                                         print(address);
+
                                                       });
                                               //
                                               //
@@ -630,7 +1034,13 @@ class _CheckoutState extends State<Checkout> {
 
                                     SizedBox(height: 10,),
 
-                                    Text('${state.add?.results![len!-1].street}', style: TextStyle(
+                                    Text('${
+                                        add == null ?
+
+                                        state.add?.results![len!-1].street :
+                                        add['street']
+
+                                    }', style: TextStyle(
                                         fontSize: 14.8,
                                         color: Colors.black
                                     ),)
@@ -638,12 +1048,12 @@ class _CheckoutState extends State<Checkout> {
 
                                   ],
                                 ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                    color: Colors.grey.withOpacity(0.2)
-                                  )
-                                ),
+                                // decoration: BoxDecoration(
+                                //   color: Colors.white,
+                                //   border: Border.all(
+                                //     color: Colors.grey.withOpacity(0.2)
+                                //   )
+                                // ),
                               ),
                             );
                         },);
@@ -671,124 +1081,207 @@ class _CheckoutState extends State<Checkout> {
 
                       ],
                     ),
-                    Divider(),
+                    SizedBox(height: 20,),
 
-                    Container(
-                      padding: EdgeInsets.only(left: 15,top: 10,bottom: 30),
-                      margin: EdgeInsets.only(top: 5),
-
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Text("Please select your method of payment",style: TextStyle(
-                          //
-                          //   fontSize: 12.8,
-                          // ),),
-                          SizedBox(height: 20,),
-
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                            children: [
-
-                //TODO by Cash
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    initpayment  = 0;
-
-                                  });
-                                },
-                                child: Container(
-
-                                  decoration: BoxDecoration(
-                                    color:
-
-                                    selectedmethod == initpayment?
-                                        Color(AppColorConfig.success) :
-                                    Colors.white,
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  alignment: Alignment.center,
-                                  width: 121.08,
-                                  height: 89,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset('assets/logo/Money icon.png',
-
-                                      width: 50,
-                                          height: 50,
-                                      ),
-                                      Text('Cash',style: TextStyle(
-                                        color:
-                                        initpayment == 0?
-                                        Colors.white :
-
-                                          Color(AppColorConfig.success)
-                                      ),)
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 10,),
-                              //TODO by payment method
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    initpayment = 1;
-
-                                  });
-                                },
-                                child: Container(
-
-                                  decoration: BoxDecoration(
-                                      color:
-                                      initpayment == 1?
-                                      Color(AppColorConfig.success) :
-                                      Colors.white,
-                                      borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  alignment: Alignment.center,
-                                  width: 121.08,
-                                  height: 89,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset('assets/logo/Credit Card Icon.png',
-
-                                        width: 50,
-                                        height: 50,
-                                      color:
+                    //TODO payment type
 
 
-                                      initpayment == 1?
-                                      Colors.white:
-                                      Colors.black,
 
-                                      ),
-                                      Text('MasterCard ',style: TextStyle(
-                                        color:
-                                        initpayment == 1?
-                                        Colors.white:
-                                        Colors.black,
+                    ListTile(
+                      style: ListTileStyle.list,
+                      onTap: () {
+                        setState(() {
+                          initpayment = 0;
+                          print(initpayment);
 
-
-                                      ),)
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                        });
+                      },
+                      selected: initpayment == 1 ,
+                      // selectedTileColor: Color(AppColorConfig.primaryswatch),
+                      tileColor: Color(AppColorConfig.primarylight),
+                      shape: Border.all(
+                          color: Colors.grey.withOpacity(0.25)
                       ),
-                      decoration: BoxDecoration(
-                          color: Color(0xffF5F5F5)
+                      contentPadding: EdgeInsets.all(10),
+
+                      leading:           Image.asset('assets/logo/Money icon.png',
+
+                        width: 50,
+                        height: 50,
                       ),
+                      title: Text("Cash on Delivery",style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500
+                      ),),
+                      subtitle: Text("Pay when product arrive",style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12.8,
+                          fontWeight: FontWeight.w400
+
+                      ),),
                     ),
+                    SizedBox(height: 10,),
+                    ListTile(
+                      style: ListTileStyle.list,
+                      onTap: () {
+                        setState(() {
+                          initpayment = 1;
+                          print(initpayment);
+
+                        });
+                      },
+                      selected: initpayment == 1 ,
+
+                      selectedTileColor: Color(AppColorConfig.primarylight),
+                      // tileColor: Color(AppColorConfig.primarylight),
+                      shape: Border.all(
+                          color: Colors.grey.withOpacity(0.25)
+                      ),
+                      contentPadding: EdgeInsets.all(10),
+
+                      leading:      Image.asset('assets/logo/Credit Card Icon.png',
+
+                        width: 50,
+                        height: 50,
+                        color: Colors.black,
+                        // color:
+                        //
+                        //
+                        // initpayment == 1?
+                        // Colors.white:
+                        // Colors.black,
+
+                      ),
+                      title: Text("Credit or Debit Card",style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500
+                      ),),
+                      subtitle: Text("Visa or Mastercard",style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12.8,
+                          fontWeight: FontWeight.w400
+
+                      ),),
+                    ),
+                    SizedBox(height: 20,),
+
+
+                //     Container(
+                //       padding: EdgeInsets.only(left: 15,top: 10,bottom: 30),
+                //       margin: EdgeInsets.only(top: 5),
+                //
+                //       child: Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         children: [
+                //           // Text("Please select your method of payment",style: TextStyle(
+                //           //
+                //           //   fontSize: 12.8,
+                //           // ),),
+                //           SizedBox(height: 20,),
+                //
+                //           Row(
+                //             crossAxisAlignment: CrossAxisAlignment.start,
+                //
+                //             children: [
+                //
+                // //TODO by Cash
+                //               InkWell(
+                //                 onTap: () {
+                //                   setState(() {
+                //                     initpayment  = 0;
+                //
+                //                   });
+                //                 },
+                //                 child: Container(
+                //
+                //                   decoration: BoxDecoration(
+                //                     color:
+                //
+                //                     selectedmethod == initpayment?
+                //                         Color(AppColorConfig.success) :
+                //                     Colors.white,
+                //                     borderRadius: BorderRadius.circular(10)
+                //                   ),
+                //                   alignment: Alignment.center,
+                //                   width: 121.08,
+                //                   height: 89,
+                //                   child: Column(
+                //                     mainAxisAlignment: MainAxisAlignment.center,
+                //                     children: [
+                //                       Image.asset('assets/logo/Money icon.png',
+                //
+                //                       width: 50,
+                //                           height: 50,
+                //                       ),
+                //                       Text('Cash',style: TextStyle(
+                //                         color:
+                //                         initpayment == 0?
+                //                         Colors.white :
+                //
+                //                           Color(AppColorConfig.success)
+                //                       ),)
+                //
+                //                     ],
+                //                   ),
+                //                 ),
+                //               ),
+                //               SizedBox(width: 10,),
+                //               //TODO by payment method
+                //               InkWell(
+                //                 onTap: () {
+                //                   setState(() {
+                //                     initpayment = 1;
+                //
+                //                   });
+                //                 },
+                //                 child: Container(
+                //
+                //                   decoration: BoxDecoration(
+                //                       color:
+                //                       initpayment == 1?
+                //                       Color(AppColorConfig.success) :
+                //                       Colors.white,
+                //                       borderRadius: BorderRadius.circular(10)
+                //                   ),
+                //                   alignment: Alignment.center,
+                //                   width: 121.08,
+                //                   height: 89,
+                //                   child: Column(
+                //                     mainAxisAlignment: MainAxisAlignment.center,
+                //                     children: [
+                //                       Image.asset('assets/logo/Credit Card Icon.png',
+                //
+                //                         width: 50,
+                //                         height: 50,
+                //                       color:
+                //
+                //
+                //                       initpayment == 1?
+                //                       Colors.white:
+                //                       Colors.black,
+                //
+                //                       ),
+                //                       Text('MasterCard ',style: TextStyle(
+                //                         color:
+                //                         initpayment == 1?
+                //                         Colors.white:
+                //                         Colors.black,
+                //
+                //
+                //                       ),)
+                //
+                //                     ],
+                //                   ),
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ],
+                //       ),
+                //       decoration: BoxDecoration(
+                //           color: Color(0xffF5F5F5)
+                //       ),
+                //     ),
                     SizedBox(height: 40,),
                     //TODO Product Details
 
@@ -818,7 +1311,10 @@ class _CheckoutState extends State<Checkout> {
                               Text('Product Qty',style: TextStyle(
                                 color: Colors.grey
                               ),),
-                              Text('x ${widget.qtytotal}'),
+                              Text('x ${widget.qtytotal}',style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500
+                              ),),
                             ],
                           ),
                         ),
@@ -828,23 +1324,45 @@ class _CheckoutState extends State<Checkout> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('Total ',style: TextStyle(
+
                                   color: Colors.grey
                               ),),
-                              Text('\$ ${widget.subtotal}'),
+                              Text('\$ ${widget.subtotal}',style: TextStyle(
+                                  // color: Color(AppColorConfig.success),
+                                  // fontSize: 18,
+                                  // fontWeight: FontWeight.w500
+                                // fontWeight: FontWeight.w500,
+                                // color: Color(AppColorConfig.success),
+                                // fontSize: 18,
+                              ),),
                             ],
                           ),
                         ),
-                        Container(
-                          margin: EdgeInsets.only(bottom: 15),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Promotion Discount',style: TextStyle(
-                                  color: Colors.grey
-                              ),),
-                              Text('${widget.discount}'),
-                            ],
-                          ),
+                        // Container(
+                        //   margin: EdgeInsets.only(bottom: 15),
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //     children: [
+                        //       Text('Promotion Discount',style: TextStyle(
+                        //           color: Colors.grey
+                        //       ),),
+                        //       Text(' % ${widget?.discount ?? 0}'),
+                        //     ],
+                        //   ),
+                        // ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Delivery Fees', style: TextStyle(
+
+                                color: Colors.grey
+                            ),),
+                            Text(' FREE ', style: TextStyle(
+
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500
+                            ),)
+                          ],
                         ),
                         Divider(),
                         Container(
@@ -857,9 +1375,15 @@ class _CheckoutState extends State<Checkout> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('SubTotal',style: TextStyle(
-                                  color: Colors.black
+                                  color: Color(AppColorConfig.success),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500
                               ),),
-                              Text('\$ ${widget.subtotal}'),
+                              Text('\$ ${widget.subtotal}',style: TextStyle(
+                                  color: Color(AppColorConfig.success),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500
+                              ),),
                             ],
                           ),
                         ),
@@ -877,7 +1401,15 @@ class _CheckoutState extends State<Checkout> {
       );
   },
 ),
-      bottomNavigationBar:      Padding(
+      bottomNavigationBar:  BlocConsumer<OrderBloc, OrderState>(
+  listener: (context, state) {
+    // TODO: implement listener
+  },
+  builder: (context, state) {
+    if(state is OrderLoading) {
+      return Text('');
+    }
+    return Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
 
@@ -887,45 +1419,83 @@ class _CheckoutState extends State<Checkout> {
                   backgroundColor: Color(AppColorConfig.success),
 
                   elevation: 0,
+                  
                   isExtended: true,
-                  extendedPadding: EdgeInsets.all(0),
 
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)
+                  extendedPadding: EdgeInsets.all(0),
+                  shape: BeveledRectangleBorder(
+                    borderRadius: BorderRadius.circular(0)
                   ),
+                  //
+                  // shape: RoundedRectangleBorder(
+                  //     borderRadius: BorderRadius.circular(14)
+                  // ),
                   onPressed: () {
                     //TODO submit order
+                    print("Submit Order");
+                    print("USer address id is ${addressid}");
+
+                    if(addressid == null ) {
+                      print("True True");
+                      PopUpUnauthorize(context);
+                      return ;
+                    }
                     //TODO do some event
 
+                    showDialog(context: context, builder: (context) {
+
+
+                      return  Center(
+
+                        child: CircularProgressIndicator(
+                          color: Color(AppColorConfig.bgcolor),
+
+                        ),
+                      );
+
+                    },);
                     List<Productss>? item =[];
 
+
                     for(int index=0;index<cart!.length;index++) {
+
+                      print( cart![index].colorid.id,);
                       item.add(Productss(
                         id: cart![index].productid,
                         quantity:  cart![index].qty,
-                        colorselection: cart![index].colorid,
+
+                        colorselection: cart![index].colorid.id,
                         size:  cart![index].sizeid,
+
 
 
                       ));
                     }
+                    print("Error");
+
                     print("Item in cart");
                     print(item.length);
                     //TODO orderrequest
                     print(item);
 
+
+
                     print(widget.uid);
                     print(initpayment);
+                    print("SAda");
+
 
                     if(initpayment == 1) {
                       print("What is our init state");
                       double total = 0;
                       var qtytotal = 0;
                       cart!?.forEach((element) {
+                        print(element.price);
                         total += (element!.price * element.qty);
                         qtytotal += element!.qty!;
 
                       });
+                      //TODO stripe payment function
                       makePayment(currency:"USD",totalamount:total.ceil().toString()).then((value) {
                         print("Success");
 
@@ -936,43 +1506,48 @@ class _CheckoutState extends State<Checkout> {
 
                       });
 
-                        // Navigator.push(context, MaterialPageRoute(builder: (context) {
-                        //   return TestScreen(currency: 'USD',total: total.ceil(),);
-                        // },));
+                      // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                      //   return TestScreen(currency: 'USD',total: total.ceil(),);
+                      // },));
 
                     }
                     //
 
                     else{
+                      print(item[0].colorselection);
+                      print(item[0].quantity);
+
                       OrderRequestV2 order = OrderRequestV2(
 
                           customer:widget.uid,
+
 
                           method:
                           initpayment == 0?
                           "Cash" :
                           "online",
-                          products:item
+
+
+                          productss:item
 
                       );
 
-                      BlocProvider.of<OrderBloc>(context,listen: false).add(PostOrderEvent( addressid:addressid ,orderRequestV2: order));
+                      BlocProvider.of<OrderBloc>(context,listen: false).add(PostOrderEvent(
+                          addressid:addressid ,orderRequestV2:
+                      order));
                     }
 
 
 
-
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    //   return Success();
-                    // },));
-
                   }, label:Text('Place Order',style: TextStyle(
-                  fontSize: 12.8
+                  fontSize: 15.8
               ),)),
             ),
           ],
         ),
-      ),
+      );
+  },
+),
 
 
 
@@ -990,7 +1565,7 @@ class _CheckoutState extends State<Checkout> {
       var res = await http.
       post(Uri.parse('https://api.stripe.com/v1/payment_intents'),
           headers: {
-            'Authorization': 'Bearer ${SecretKey.key}',
+            'Authorization': 'Bearer ${StripeService.clientkey}',
             'Content-Type': 'application/x-www-form-urlencoded'
           },
           body: body
@@ -1016,12 +1591,13 @@ class _CheckoutState extends State<Checkout> {
               paymentIntentClientSecret: paymentintent!['client_secret'],
               style: ThemeMode.light,
               merchantDisplayName: 'Adnan')).then((value) {
+        displayPaymentSheet();
 
       });
       // applePay: const PaymentSheetApplePay(merchantCountryCode: '+92'),
       // googlePay: const PaymentSheetGooglePay(merchantCountryCode: )
       //after successfully paid
-      displayPaymentSheet();
+      Navigator.pop(context);
     } catch (err) {
       print('send response error');
       print(err.toString());

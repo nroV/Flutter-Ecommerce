@@ -31,14 +31,16 @@ class EmptyCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          // SizedBox(height: 70,),
+          SizedBox(height: 50,),
           Expanded(
               flex: 1,
 
               child: Column(children: [
                 Image.asset('${img}'
                   ,fit: BoxFit.contain,
-                  width: 300,
-                  height: 240,
+                  width: 160,
+                  height: 180,
                 ),
                 SizedBox(height: 40,),
                 Text("${maintitle}",style: Theme.of(context)
@@ -77,8 +79,8 @@ class EmptyCard extends StatelessWidget {
                 }, child: Text("${btntitle}",style: TextStyle(
                 fontSize: 15.8
             ),)),
-          )
-
+          ),
+          SizedBox(height: 30,),
 
 
         ],

@@ -58,5 +58,27 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(UserPatchError());
       }
     });
+    on<SendMessage>((event, emit) async {
+      // TODO: implement event handler
+      var idimg ;
+
+      emit(UserMessageLoading());
+      try {
+        var res = await userRepository.SendMessage(title: event.message,userid: event.userid);
+        print(res);
+        try{
+          var response = await userRepository.FetchUser(event.userid!);
+          print(response);
+          emit(UserMessageCompleted());
+        }catch(error) {
+          emit(UserMessageError());
+        }
+
+
+      }
+      catch(error) {
+        emit(UserPatchError());
+      }
+    });
   }
 }

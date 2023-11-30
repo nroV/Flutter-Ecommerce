@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:ecommerce/repository/Product/ProductRepository.dart';
+import 'package:ecommerce/views/client/product/SuperDeal.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
@@ -25,31 +26,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     emit(ProductInitial());
     emit(ProductLoading());
 
-    //
-    // try{
-    //
-    //   var response = await productRepository.FetchProduct(page: 1);
-    //   print("Product bloc here");
-    //   print(response);
-    //
-    //
-    //   emit(ProductCompleted(product:response));
-    //
-    // }catch(error) {
-    //   print(error.toString());
-    //   emit(ProductError());
-    // }
+
 
   }
 
 
-
-
-
-
-
-
 }
+
+
+
 
 
 class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
@@ -60,6 +45,15 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
     on<SortProductSearch>((event, emit) => SortingProductSearchV2(event,emit) ,);
     on<DiscountProduct>((event, emit) => DiscountProductSort(event,emit) ,);
     on<ProductFilter>((event, emit) => ProductFilering(event,emit) ,);
+    on<ClearProductSorting>((event, emit) {
+
+      emit(ProductClear());
+
+
+
+
+
+    },);
   }
 
   SortingProductV2(SortProduct event, Emitter<ProductState> emit) async {
@@ -75,7 +69,7 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
 
 
       print("Product Sorting Event Send to");
-      print(response);
+      // print(response);
 
 
       emit((ProductSortCompleted(product:response)));
@@ -93,7 +87,7 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
     try{
       var response = await productRepository.FetchProductDiscount( );
       print("Discount event sent");
-      print(response);
+      // print(response);
 
 
       emit( ProductSortCompleted(product:response));
@@ -109,7 +103,7 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
     try{
       var response = await productRepository.QueryProduct(event.title,page: event.page);
       print("Product query event send");
-      print(response);
+      // print(response);
 
 
       emit(ProductSortCompleted(product:response));
@@ -141,7 +135,7 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
 
 
       print("Product Filter Event Send to");
-      print(response);
+      // print(response);
 
 
       emit((ProductSortCompleted(product:response)));
@@ -162,6 +156,7 @@ class ProductBlocSorting extends Bloc<ProductEvent, ProductState> {
 
 
 }
+
 
 class ProductBlocBestSell extends Bloc<ProductEvent, ProductState> {
 
@@ -378,6 +373,9 @@ class ProductDiscountBloc extends Bloc<ProductEvent, ProductState> {
 
 
 
+
+
+
 FetchingProduct(FetchProduct event, Emitter<ProductState> emit) async {
 
 
@@ -389,7 +387,7 @@ FetchingProduct(FetchProduct event, Emitter<ProductState> emit) async {
 
     var response = await productRepository.FetchProduct(page: event.page);
     print("Product bloc here");
-    print(response);
+    // print(response);
 
 
     emit(ProductCompleted(product:response));
@@ -409,7 +407,7 @@ SortingProduct(SortProduct event, Emitter<ProductState> emit) async {
   try{
     var response = await productRepository.SortProduct(event.sortname,event.rank);
     print("Product sort bloc send here");
-    print(response);
+    //print(response);
 
 
     emit(ProductCompleted(product:response));
@@ -428,8 +426,8 @@ QueryProductSearch(QueryProduct event, Emitter<ProductState> emit) async {
   emit(ProductSearchLoading());
   try{
     var response = await productRepository.QueryProduct(event.search);
-    print("Product query event send");
-    print(response);
+    //print("Product query event send");
+    //print(response);
 
 
     emit(ProductSerachCompleted(product:response));

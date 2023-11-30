@@ -10,6 +10,13 @@ class ProductInitialSearch extends ProductState {
   List<Object?> get props =>[];
 
 }
+
+class ProductClear extends ProductState {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
 class ProductInitial extends ProductState {
   @override
   // TODO: implement props

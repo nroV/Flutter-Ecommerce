@@ -6,13 +6,13 @@ abstract class CategoryState extends Equatable{}
 class CategoryInitial extends CategoryState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props  => [];
 
 }
 class CategoryLoading extends CategoryState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 
 }
@@ -32,11 +32,18 @@ class CategoryCompleted  extends CategoryState {
 class CategoryError extends CategoryState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 
 }
 
+class CategoryNoNetwork  extends CategoryState {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+
+}
 class CategoryByidCompleted  extends CategoryState {
 
   CategoryProduct? product;

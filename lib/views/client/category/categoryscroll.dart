@@ -2,6 +2,7 @@
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/category/category_bloc.dart';
 import 'package:ecommerce/viewmodel/products/product_bloc.dart';
+import 'package:ecommerce/views/ErrorPage.dart';
 import 'package:ecommerce/views/client/ProductAllScreen.dart';
 import 'package:ecommerce/views/client/category/category.dart';
 import 'package:ecommerce/views/client/product/BestSelling.dart';
@@ -13,6 +14,8 @@ import 'package:carousel_indicator/carousel_indicator.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+
+import '../../widget/LoadingIcon.dart';
 
 class CardCategoryScroll extends StatefulWidget{
   CardCategoryScroll();
@@ -42,13 +45,13 @@ class _CardCategoryScrollState extends State<CardCategoryScroll> {
       // Do nothing
       print("true");
 
+
+
     }
   },
   builder: (context, state) {
     if(state is CategoryLoading){
-        return Center(
-          child: CircularProgressIndicator(),
-        );
+      return const LoadingIcon();
     }
     if(state is CategoryCompleted ){
       var len = state.category!.results!.length;
@@ -63,8 +66,11 @@ class _CardCategoryScrollState extends State<CardCategoryScroll> {
              onTap: () {
                print(category.id);
                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return ProductAllPage(category:  state.category!.results,
-                    selectedcategory:  category.id,);
+                  return ProductAllPage(
+                    category:  state.category!.results,
+                    selectedcategory:  category.id,
+
+                  );
                },));
              },
             child: Container(
@@ -75,11 +81,18 @@ class _CardCategoryScrollState extends State<CardCategoryScroll> {
                   //TODO image here
                   CircleAvatar(
                     radius: 40,
+                    backgroundColor: Colors.grey.shade300,
 
-                    backgroundImage: NetworkImage('${category.imgid!.images}'),
+                    backgroundImage:
+                    NetworkImage('${category.imgid!.images}'),
                   ),
+
+
                   SizedBox(height: 10,),
-                  Text("${category.categoryname}",style: Theme.of(context).textTheme.headlineSmall,)
+
+                  Text("${category.categoryname}",style: TextStyle(
+                    fontSize: 12.8
+                  ),)
                 ],
               ),
             ),
@@ -87,14 +100,10 @@ class _CardCategoryScrollState extends State<CardCategoryScroll> {
         },);
     }
     if(state is CategoryError){
-      return Center(
-        child: Text("Error during fetching"),
-      );
+      return ErrorPage();
     }
     else{
-      return Center(
-        child: CircularProgressIndicator(),
-      );
+      return Center(child: LoadingIcon());
     }
 
   },

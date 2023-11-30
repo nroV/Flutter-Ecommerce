@@ -3,6 +3,7 @@ import 'package:ecommerce/viewmodel/products/product_bloc.dart';
 import 'package:ecommerce/views/client/category/category.dart';
 import 'package:ecommerce/views/client/utilities/searchscreen.dart';
 import 'package:ecommerce/views/order/Cart.dart';
+import 'package:ecommerce/views/widget/LoadingIcon.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:carousel_indicator/carousel_indicator.dart';
@@ -76,7 +77,8 @@ class _PopularSectionState extends State<PopularSection> {
 
                   if(state is ProductLoading) {
                     return Center(
-                      child: CircularProgressIndicator(),
+                        child:LoadingIcon()
+
                     );
                   }
                   if(state is ProductCompleted) {

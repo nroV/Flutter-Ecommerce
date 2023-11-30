@@ -6,6 +6,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../widget/LoadingIcon.dart';
 import 'CredentialScreen.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:flutter/material.dart';
@@ -59,26 +60,68 @@ class _CredentialScreenState extends State<CredentialScreen> {
   listener: (context, state) {
     // TODO: implement listener
     print(state);
+    if(state is Registerloading) {
+      // showDialog(context: context, builder: (context) {
+      //
+      //
+      //   return  Center(
+      //
+      //     child: CircularProgressIndicator(
+      //       color: Color(AppColorConfig.bgcolor),
+      //
+      //     ),
+      //   );
+      //
+      // },);
+      // showDialog(context: context, builder: (context) {
+      //
+      //
+      //   return  Center(
+      //
+      //     child: CircularProgressIndicator(
+      //       color: Color(AppColorConfig.bgcolor),
+      //
+      //     ),
+      //   );
+      //
+      // },);
+      // Future.delayed(Duration(seconds: 2), () => Navigator.pop(context),);
+
+
+    }
+    if(state is RegisterDuplicate) {
+      // showDialog(context: context, builder: (context) {
+      //
+      //
+      //   return  Center(
+      //
+      //     child: CircularProgressIndicator(
+      //       color: Color(AppColorConfig.bgcolor),
+      //
+      //     ),
+      //   );
+      //
+      // },);
+      // Future.delayed(Duration(seconds: 2), () => Navigator.pop(context),);
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        PopUpUnauthorize(context);
+      });
+    }
   },
   builder: (context, state) {
 
-    if(state is Registerloading) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
+    if(state is RegisterError) {
+     print("Email already exist");
     }
     if(state is RegisterCompleted) {
+      Navigator.pop(context);
       storeemailandpass(txtemail.text,txtpassword.text);
 
 
       return VerifyScreen();
 
     }
-    if(state is RegisterError) {
-      return Center(
-        child: Text("Email is already existed"),
-      );
-    }
+
     else{
       return SingleChildScrollView(
 
@@ -376,6 +419,7 @@ class _CredentialScreenState extends State<CredentialScreen> {
                   // await Future.delayed(Duration(
                   //   seconds: 2
                   // ));
+
                   if (formkeypassword.currentState!.validate()) {
 
                     formkeypassword.currentState!.save();
@@ -388,8 +432,22 @@ class _CredentialScreenState extends State<CredentialScreen> {
                   }
                   if(iserroremail == true || iserrorpass == true  ) {
                     print("Error is happening");
+                    showDialog(context: context, builder: (context) {
+
+
+                      return  Center(
+
+                        child: CircularProgressIndicator(
+                          color: Color(AppColorConfig.bgcolor),
+
+                        ),
+                      );
+
+                    },);
+                    Future.delayed(Duration(seconds: 2), () => Navigator.pop(context),);
                     return;
                   }
+
 
                   BlocProvider.of<RegisterBloc>(context,listen: false).add(OnRegister(
                       widget.firstname, widget.lastname,
@@ -428,7 +486,61 @@ class _CredentialScreenState extends State<CredentialScreen> {
       ),
     );
   }
+  void PopUpUnauthorize(BuildContext context) {
+  Navigator.pop(context);
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text("Email Duplicate",
+          textAlign: TextAlign.center,
 
+          style: TextStyle(
+            fontSize:22,
+            fontWeight: FontWeight.w500,
+
+            color: Color(AppColorConfig.success),
+          ),),
+        content: Text("Sorry, an email has already registered, please try another one",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 12.8,
+              fontWeight: FontWeight.w400,
+
+              color: Colors.black
+          ),),
+        elevation: 0,
+        actions: [
+          ElevatedButton(
+
+              onPressed: () {
+
+                // Navigator.pop(context);
+
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor:Color(AppColorConfig.success),
+                  elevation: 0,
+                  padding: EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black.withOpacity(0.14)),
+                      borderRadius: BorderRadius.circular(3)
+                  )
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                  SizedBox(width: 10,),
+                  Text("Comfirm",style: TextStyle(
+                    fontSize: 12.8,
+
+                  ),)
+                ],
+              ))
+        ],
+      );
+    },);
+  }
   void storeemailandpass(email,pass) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("email",email);

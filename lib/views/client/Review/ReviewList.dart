@@ -2,8 +2,9 @@
 import 'package:ecommerce/model/Product/CartModel.dart';
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/viewmodel/Review/review_bloc.dart';
+import 'package:ecommerce/views/widget/LoadingIcon.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import '../../../model/Category/ProductCategory.dart';
 import '../../../model/Product/ProductModel.dart';
 import '../../../model/Review/ReviewModel.dart';
@@ -24,8 +25,9 @@ class ReviewList extends StatefulWidget {
   var pid;
   var pname;
   var pimage;
+  var star;
 
-  ReviewList({this.pid,this.pname,this.pimage});
+  ReviewList({this.pid,this.pname,this.pimage,this.star});
 
   @override
   State<ReviewList> createState() => _ReviewListState();
@@ -67,12 +69,12 @@ class _ReviewListState extends State<ReviewList> {
           ),
           // centerTitle: true,
           backgroundColor: Colors.white.withOpacity(0.34),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.all(11.0),
-              child: Icon(Icons.edit_sharp,size: 22,),
-            )
-          ],
+          // actions: [
+          //   Padding(
+          //     padding: const EdgeInsets.all(11.0),
+          //     child: Icon(Icons.edit_sharp,size: 22,),
+          //   )
+          // ],
           elevation: 0),
       body: SafeArea(
         child: Padding(
@@ -84,14 +86,16 @@ class _ReviewListState extends State<ReviewList> {
         },
           builder: (context, state) {
             if(state is ReviewLoading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              return LoadingIcon();
             }
             if(state is ReviewCompleted){
               var review = state.review;
               var count  = state.review?.count;
-
+              double avvgtotal = 0;
+              for(int i =0 ;i<count! ;i ++) {
+                avvgtotal= ((avvgtotal+ state!.review!.results![i].rating!)/2);
+              }
+              print(avvgtotal);
 
               return
 
@@ -107,28 +111,64 @@ class _ReviewListState extends State<ReviewList> {
                             crossAxisAlignment: CrossAxisAlignment.center,
 
                             children: [
-                              for(int index =0 ;index < state.review!.results!.length ; index ++)
-                              Text("${state.review!.results![index].rating}",style: TextStyle(
-                                  fontSize: 40
+                              // for(int index =0 ;index < state.review!.results!.length ; index ++)
+                              // Text("${state.review!.results![index].rating}",style: TextStyle(
+                              //     fontSize: 30
+                              // ),),
+
+
+                              Text("${review!.results![0].product?.avgRating?.toStringAsFixed(2)}",style: TextStyle(
+                                  fontSize: 30
                               ),),
-                              for(int index =0 ;index < state.review!.results!.length ; index ++)
-                              Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: liststar.map((e) {
-                                    return
+                              // for(int index =0 ;index < state.review!.results!.length ; index ++)
+                              // Center(
+                              //   child: Row(
+                              //     mainAxisAlignment: MainAxisAlignment.center,
+                              //     children: liststar.map((e) {
+                              //       return
+                              //
+                              //         Icon(Icons.star,size: 25,color:
+                              //
+                              //         state.review!.results![index].rating! > liststar.indexOf(e) ?
+                              //         Color(0xff508A7B) :
+                              //         Colors.grey
+                              //           ,);
+                              //     }).toList(),
+                              //   ),
+                              // ),
 
-                                      Icon(Icons.star,size: 25,color:
+                              RatingBar.builder(
+                                initialRating:double.parse(widget.star) ?? 0,
+                                minRating: 1,
+                                glowColor: Colors.green,
 
-                                      state.review!.results![index].rating! > liststar.indexOf(e) ?
-                                      Color(0xff508A7B) :
-                                      Colors.grey
-                                        ,);
-                                  }).toList(),
-                                ),
+
+                                direction: Axis.horizontal,
+                                allowHalfRating: true  ,
+
+
+
+                                itemCount: 5,
+                                tapOnlyMode: true ,
+                                ignoreGestures: true  ,
+                                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                                itemBuilder: (context, _) => Icon(
+                                  Icons.star,
+                                  color: Color(AppColorConfig.success),
+                                ), onRatingUpdate: (double value) {
+
+
+                              },
+
+                                // onRatingUpdate: (rating) {
+                                //   setState(() {
+                                //     overall = rating.toInt();
+                                //     print(overall);
+                                //   });
+                                // },
                               ),
                               SizedBox(height: 5,),
-                              Text("Based on ${state.review?.results?.length} reviewers ",style: TextStyle(
+                              Text("Based on ${state.review?.results?.length} reviewer ",style: TextStyle(
                                   fontSize: 12.8
                               ),),
                             ],
@@ -204,9 +244,13 @@ class _ReviewListState extends State<ReviewList> {
 
 
     },
+        
     style: ElevatedButton.styleFrom(
+      padding: EdgeInsets.all(15),
+
     backgroundColor: Color(AppColorConfig.success),
     elevation: 0,
+    
     shape: RoundedRectangleBorder(
     side: BorderSide(color: Colors.black.withOpacity(0.14)),
     borderRadius: BorderRadius.circular(3)
@@ -218,7 +262,7 @@ class _ReviewListState extends State<ReviewList> {
       Icon(Icons.edit_sharp,size: 20,),
       SizedBox(width: 5,),
       Text("Write A Review",style: TextStyle(
-        fontSize: 12.8
+        fontSize: 14.8
       ),)
 
     ],

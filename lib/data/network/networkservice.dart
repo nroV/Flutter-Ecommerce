@@ -13,19 +13,97 @@ import '../../model/Order/OrderRequest.dart';
 class NetworkApiService {
   var url = '${ApiUrl.userloginurl}';
 
+  Future<dynamic> FetchSuperDeal({page}) async
+  {
+    try {
+
+
+      var res = await http.get(Uri.parse(ApiUrl.superdealurl),
+
+      );
+      print(res.statusCode);
+      // print(res.body);
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+
+      }
+      if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      throw "No Internet";
+      print("No internet during communication");
+    }
+  }
+  Future<dynamic> FetchSuperDealSingle({id}) async
+  {
+    try {
+
+
+      var res = await http.get(Uri.parse(ApiUrl.superdealsingleurl+id.toString()),
+
+      );
+      print(res.statusCode);
+      // print(res.body);
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+
+      }
+      if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      throw "No Internet";
+      print("No internet during communication");
+    }
+  }
+  Future<dynamic> ObtainToken(String? token) async
+  {
+    try {
+      print("Inside network api");
+
+      var res = await http.post(Uri.parse(ApiUrl.refreshtoken),
+          body: {
+            "refresh": "${token}",
+          }
+      );
+      print(res.statusCode);
+      print(res.body);
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+
+      }
+      if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+       throw "No Internet";
+      print("No internet during communication");
+    }
+  }
+
   Future<dynamic> AuthUser(String? email, String? password) async {
     try {
-      var res = await http.post(Uri.parse(url),
+      var res = await http.post(Uri.parse("https://django-ecomm-6e6490200ee9.herokuapp.com/auth/login"),
           body: {
             "email": "${email}",
             "password": "${password}"
           }
       );
-      // print(res.statusCode);
-      print(res.body.toString());
+      print(res.statusCode);
+      print(res.body);
       if (res.statusCode == 200) {
         return json.decode(res.body);
-        print(res.body);
+
       }
       if (res.statusCode == 401) {
         return json.decode(res.body);
@@ -46,13 +124,16 @@ class NetworkApiService {
           }
       );
       print(res.statusCode);
-      print(res.body.toString());
+
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         return json.decode(res.body);
         print(res.body);
       }
       if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      if(res.statusCode == 400) {
         return json.decode(res.body);
       }
       else {
@@ -66,7 +147,94 @@ class NetworkApiService {
     try {
       var res = await http.get(Uri.parse(url!));
       // print(res.statusCode);
-      print(res.body.toString());
+
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+        print(res.body);
+      }
+      if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+
+
+  Future<dynamic> SendCode(String? url,email) async {
+    try {
+      var res = await http.post(Uri.parse(url!),
+
+      body: {
+        "email":"${email}",
+      }
+      );
+      print(res.statusCode);
+
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+        print(res.body);
+      }
+      if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      if (res.statusCode == 202) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+
+  Future<dynamic> VerifyCode(String? url,email,code) async {
+    try {
+      var res = await http.post(Uri.parse(url!),
+
+          body: {
+            "email":"${email}",
+            "code":"${code}"
+          }
+      );
+      print(res.statusCode);
+
+      if (res.statusCode == 200) {
+        return json.decode(res.body);
+        print(res.body);
+      }
+      if (res.statusCode == 202) {
+        return json.decode(res.body);
+        print(res.body);
+      }
+      if (res.statusCode == 401) {
+        return json.decode(res.body);
+      }
+      if (res.statusCode == 400) {
+        return json.decode(res.body);
+      }
+      else {
+        print("Error during communication");
+      }
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+  Future<dynamic> Changepassword(String? url,email,pass) async {
+    try {
+      var res = await http.post(Uri.parse(url!),
+
+          body: {
+            "email":"${email}",
+            "password":"${pass}"
+          }
+      );
+      print(res.statusCode);
+
       if (res.statusCode == 200) {
         return json.decode(res.body);
         print(res.body);
@@ -113,7 +281,15 @@ class NetworkApiService {
       // print("Register user");
       print(telephone);
       var tel = "+" + telephone.toString();
-          var res = await http.post(Uri.parse(ApiUrl.authsignup),
+
+      print("Network service");
+      print(fname);
+      print(lname);
+      print(username);
+
+
+          var res = await http.post(Uri.parse('https://django-ecomm-6e6490200ee9.herokuapp.com/auth/register'),
+
 
 
           body: {
@@ -129,11 +305,16 @@ class NetworkApiService {
             "username": username
           }
       );
+          print('The state in register is');
+      print(res.body);
       print(res.statusCode);
       print(res.body.toString());
       if (res.statusCode == 201) {
         return json.decode(res.body);
-        print(res.body);
+
+      }
+      if(res.statusCode == 401) {
+        return json.decode(res.body);
       }
       else {
         print("Error during communication");
@@ -256,12 +437,31 @@ class NetworkApiService {
         Uri.parse("${url}${userid}"),
         body:{
           "description": "${desc}",
-          "rating": "${rating}",
+          "rating": "${rating.toInt()}",
           "product": "${productid}"
         }
 
       );
-      print("User id review");
+      print("Post Review Status");
+      print(res.statusCode);
+      print(res.body.toString()); //
+      return json.decode(responseStatusCheck(res));
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+  Future<dynamic> Postmessage(url,userid,title) async {
+    try {
+
+
+      var res = await http.post(
+          Uri.parse("${url}${userid}"),
+          body:{
+            "title": "${title}"
+
+          }
+
+      );
       print(res.statusCode);
       print(res.body.toString()); //
       return json.decode(responseStatusCheck(res));
@@ -370,7 +570,7 @@ class NetworkApiService {
         // }
       );
       print(res.statusCode);
-      print(res.body.toString());
+
       return json.decode(responseStatusCheck(res));
     } on SocketException {
       print("No internet during communication");
@@ -463,6 +663,28 @@ class NetworkApiService {
         // }
       );
       print(res.statusCode);
+      print(res.body.toString());
+      return json.decode(responseStatusCheck(res));
+    } on SocketException {
+      print("No internet during communication");
+    }
+  }
+
+
+  Future<dynamic> FetchFavoriteById(uid,pid) async  {
+    try {
+
+
+      var res = await http.get(Uri.parse('${ApiUrl.productfavbyid}${pid}/${uid}'),
+
+        //     headers: {
+        //       'Content-type': 'application/json',
+        //       'Accept': 'application/json'
+        //       // "Authorization": "Some token"
+        //
+        // }
+      );
+      // print(res.statusCode);
       // print(res.body.toString());
       return json.decode(responseStatusCheck(res));
     } on SocketException {
@@ -518,10 +740,12 @@ class NetworkApiService {
       var res = await http.get(Uri.parse(url),
 
       );
+      print("The category ");
       print(res.statusCode);
       // print(res.body.toString());
       return json.decode(responseStatusCheck(res));
     } on SocketException {
+      print("Category server break down");
       print("No internet during communication");
     }
   }
@@ -584,7 +808,7 @@ class NetworkApiService {
       print("Null error");
       return;
     }
-    List<Map<String, dynamic>> jsonList = orderRequestV2!.products!.map((item) => item.toJson()).toList();
+    List<Map<String, dynamic>> jsonList = orderRequestV2!.productss!.map((item) => item.toJson()).toList();
 
     //  print(jsonList);
     request.body = json.encode({

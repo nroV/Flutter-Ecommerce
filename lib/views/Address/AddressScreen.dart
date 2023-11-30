@@ -3,13 +3,17 @@ import 'package:ecommerce/viewmodel/products/address_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:location/location.dart';
 
-import '../order/GoogleMap/GoogleMapScreen.dart';
 import 'package:lottie/lottie.dart';
+import 'package:ecommerce/helper/GoogleLocation.dart';
+import '../../service/GoogleMap/GoogleMapScreen.dart';
+import '../widget/LoadingIcon.dart';
 
 class AddressProductScr extends StatefulWidget {
   var userid;
-  AddressProductScr({Key? key,this.userid}) : super(key: key);
+  var ischoice;
+  AddressProductScr({Key? key,this.userid,this.ischoice}) : super(key: key);
 
   @override
   State<AddressProductScr> createState() => _AddressProductScrState();
@@ -17,7 +21,20 @@ class AddressProductScr extends StatefulWidget {
 
 class _AddressProductScrState extends State<AddressProductScr> {
   var address;
-
+  var userinput = TextEditingController();
+  var long;
+  var lat;
+  var mapofaddress;
+  var istap = true;
+  var showiconpwd = false;
+  var homeadd;
+  var city;
+  var country;
+  var userid;
+  var iserrordesc = true;
+  var txtdesc = TextEditingController();
+  var formdesc =  GlobalKey<FormState>();
+  LocationHelper locationhelper = LocationHelper();
   @override
   void initState() {
     // TODO: implement initState
@@ -27,11 +44,13 @@ class _AddressProductScrState extends State<AddressProductScr> {
 
 
   }
+
   Widget build(BuildContext context) {
     // TODO: implement build
     BlocProvider.of<AddressBloc>(context).add(FetchAddress(userid: widget.userid));
     print("State updated");
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
 
         title: Text('Address', style: TextStyle(
@@ -41,7 +60,7 @@ class _AddressProductScrState extends State<AddressProductScr> {
             color: Colors.black
         ),
         centerTitle: true,
-        backgroundColor: Colors.white.withOpacity(0.34),
+        backgroundColor: Colors.white,
         elevation: 0,
 
       ),
@@ -55,10 +74,34 @@ class _AddressProductScrState extends State<AddressProductScr> {
               SizedBox(height: 7,),
               InkWell(
                 onTap: () async {
+                  showDialog(context: context, builder: (context) {
+
+
+                    return  Center(
+
+                      child: CircularProgressIndicator(
+                        color: Color(AppColorConfig.bgcolor),
+
+                      ),
+                    );
+
+                  },);
                   var location = await Location().getLocation();
                   print("User current location");
                   print(location.longitude);
                   print(location.latitude);
+                  showDialog(context: context, builder: (context) {
+
+
+                    return  Center(
+
+                      child: CircularProgressIndicator(
+                        color: Color(AppColorConfig.bgcolor),
+
+                      ),
+                    );
+
+                  },);
 
 
                   address = await Navigator.push(
@@ -69,8 +112,10 @@ class _AddressProductScrState extends State<AddressProductScr> {
                   },));
 
                   setState(() {
+                    Navigator.pop(context);
                     print("Got Address back");
                     print(address);
+                    Navigator.pop(context);
                   });
                 },
 
@@ -100,19 +145,11 @@ class _AddressProductScrState extends State<AddressProductScr> {
                 },
                 builder: (context, state) {
                   if(state is AddressLoading) {
-                    return Center(
-                      child: CircularProgressIndicator(
-
-                      ),
-                    );
+                    return LoadingIcon();
 
                   }
                   if(state is AddressError) {
-                    return Center(
-                      child: CircularProgressIndicator(
-
-                      ),
-                    );
+                    return LoadingIcon();
                   }
                   if(state is AddressDone) {
                     print(    state.add?.results?.length);
@@ -132,105 +169,142 @@ class _AddressProductScrState extends State<AddressProductScr> {
                       itemBuilder: (context, index) {
                         return
 
-                          Container(
-                          width: double.maxFinite,
-                          margin: EdgeInsets.only(bottom: 10),
+                          InkWell(
+                            onTap: () {
+                              // print(index);
+                              print( state.add?.results![index].id);
+                              Map<String,dynamic> add =  {
 
-                          padding: EdgeInsets.only(
-                              top: 35, bottom: 35, left: 15, right: 15),
+                                "latitute":state.add?.results![index].latitude,
+                                "longtitute":state.add?.results![index].longitude,
+                                "addressid":state.add?.results![index].id,
+                                "street":state.add?.results![index].street
+                              };
+                              Navigator.pop(context,add);
 
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                            },
+                            child: Container(
+                            width: double.maxFinite,
+                            margin: EdgeInsets.only(bottom: 10),
 
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('${state.add?.results![index].description}', style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500
-                                  ),),
+                            padding: EdgeInsets.only(
+                                top: 35, bottom: 35, left: 15, right: 15),
+                            decoration: BoxDecoration(
+                                color: Color(AppColorConfig.primarylight)
+                            ),
 
-                                  SizedBox(height: 10,),
-                                  Row(
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
-                                        },
-                                        child: InkWell(
-                                            onTap: () async {
-                                              var location = await Location()
-                                                  .getLocation();
-                                              print("User current location");
-                                              print(location.longitude);
-                                              print(location.latitude);
+                              children: [
+                                Icon(Icons.location_on,size:35,color: Color(AppColorConfig.success),),
 
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
 
-                                              address = await Navigator.push(context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) {
-                                                      return GoogleMapScreen(
-                                                        positionlong: location
-                                                            .longitude,
-                                                        positionlat: location
-                                                            .latitude,
-                                                        isupdate: true,
-                                                        addid:state.add?.results![index].id ,
-                                                        label:state.add?.results![index].description ,
+                                    Text('${state.add?.results![index].description}',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      softWrap: false,
 
-                                                      );
-                                                    },));
+                                      style: TextStyle(
+                                        fontSize: 16,
 
-                                              setState(() {
-                                                print("Got Address back");
-                                                print(address);
-                                              });
-                                            },
-                                         child: Icon(Icons.edit,color: Color(AppColorConfig.success),)),
-                                      ),
-                                      SizedBox(width: 10,),
-                                      InkWell(
-                                        onTap: () {
-                                          print(state.add?.results![index].id);
-                                          context.read<AddressBloc>()
-                                              .add(DeleteAddress(id: state.add?.results![index].id));
-
-                                        },
-                                        child: InkWell(
-
-                                            child: Icon(Icons.delete,color: Colors.red.shade700,)),
-                                      ),
-                                    ],
-                                  )
+                                        color: Color(AppColorConfig.success),
+                                        fontWeight: FontWeight.w600,
 
 
+                                    ),
 
-                                ],
-                              ),
-
-
-
-                              Text('${state.add?.results![index].street}', style: TextStyle(
-                                  fontSize: 12.8,
-                                  color: Colors.grey
-                              ),)
+                                    ),
 
 
-                            ],
-                          ),
-                          decoration: BoxDecoration(
-                              color: Color(0xffF5F5F5)
-                          ),
-                        );
+                                    Row(
+                                      children: [
+                                        Container(
+
+                                          child: Text('${state.add?.results![index].street}',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            softWrap: true  ,
+
+                                            style: TextStyle(
+                                              fontSize: 12.8,
+                                              overflow: TextOverflow.ellipsis,
+                                            color: Color(AppColorConfig.success),
+                                          ),),
+                                          width: 220,
+                                        ),
+                                      ],
+                                    )
+
+
+                                  ],
+                                ),
+
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+
+                                      },
+                                      child: InkWell(
+                                          onTap: () async {
+                                            var location = await Location()
+                                                .getLocation();
+                                            print("User current location");
+                                            print(location.longitude);
+                                            print(location.latitude);
+
+
+                                            address = await Navigator.push(context,
+                                                MaterialPageRoute(
+                                                  builder: (context) {
+                                                    return GoogleMapScreen(
+                                                      positionlong: location
+                                                          .longitude,
+                                                      positionlat: location
+                                                          .latitude,
+                                                      isupdate: true,
+                                                      addid:state.add?.results![index].id ,
+                                                      label:state.add?.results![index].description ,
+
+                                                    );
+                                                  },));
+
+                                            setState(() {
+                                              print("Got Address back");
+                                              print(address);
+                                            });
+                                          },
+                                          child: Icon(Icons.edit,color: Color(AppColorConfig.success),)),
+                                    ),
+                                    SizedBox(width: 5,),
+
+                                    InkWell(
+                                      onTap: () {
+                                        print(state.add?.results![index].id);
+                                        context.read<AddressBloc>()
+                                            .add(DeleteAddress(id: state.add?.results![index].id));
+
+                                      },
+                                      child: InkWell(
+
+                                          child: Icon(Icons.delete,color: Colors.red.shade700,)),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                        ),
+                          );
                       },);
                   }
                   else{
-                    return Center(
-                      child: CircularProgressIndicator(
-
-                      ),
-                    );
+                    return LoadingIcon();
                   }
                 },
               ))

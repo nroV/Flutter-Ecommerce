@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../res/appurl/appurl.dart';
 import '../../Address/AddressScreen.dart';
+import '../../ErrorPage.dart';
 import '../../authentication/Require.dart';
 import '../../authentication/ResetPassword/ResetPassword.dart';
 import '../../order/Cart.dart';
-import '../../order/GoogleMap/GoogleMapScreen.dart';
+
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../widget/LoadingIcon.dart';
+import '../ReportBug.dart';
 import 'MyWishList.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -75,7 +78,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       return AlertDialog(
         title: Text("Login or Register", style: TextStyle(
             fontSize: 18,
-            color: Color(AppColorConfig.negativecolor)
+            color: Color(AppColorConfig.success)
         ),),
         content: Text("Require to login first before you can make an order",
           style: TextStyle(
@@ -93,7 +96,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(AppColorConfig.negativecolor),
+                  backgroundColor: Color(AppColorConfig.success),
                   elevation: 0,
                   padding: EdgeInsets.all(10),
                   shape: RoundedRectangleBorder(
@@ -123,6 +126,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
     BlocProvider.of<UserBloc>(context).add(FetchUser( uid));
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
 
           title: Text("My Account", style: TextStyle(
@@ -132,9 +136,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               color: Colors.black
           ),
 
-          backgroundColor: Colors.white.withOpacity(0.34),
+          backgroundColor: Colors.white,
           elevation: 0),
       body: SafeArea(
+
         child: BlocConsumer<UserBloc, UserState>(
           listener: (context, state) {
             // TODO: implement listener
@@ -145,14 +150,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           builder: (context, state) {
 
             if(state is LoadingUser){
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              return LoadingIcon();
             }
             if(state is LoadingUserError){
-              return Center(
-                child: Text(state.error),
-              );
+           return const ErrorPage();
             }
             if(state is LoadingUserDone){
               return SingleChildScrollView(
@@ -169,6 +170,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         children: [
                           ListTile(
                             leading: CircleAvatar(
+                              backgroundColor: Colors.grey.shade300,
                               backgroundImage:
 
 
@@ -177,17 +179,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
                                   state.user?.imgid?.images == null ?
                                       'https://i.pinimg.com/originals/f2/12/06/f21206832d2993b70a015fc1e56ee72c.jpg':
-                                  '${ApiUrl.main}${state.user?.imgid?.images}'
+                                  '${"https://django-ecomm-6e6490200ee9.herokuapp.com"}${state.user?.imgid?.images}'
 
                               ),
 
 
                             ),
-                            title: Text('${state.user?.username}', style: TextStyle(
+                            title: Text('${state.user?.username.toString().toUpperCase()}', style: TextStyle(
                                 color: Colors.black
                             ),),
                             subtitle: Text(
-                              'Customer Since ', style: TextStyle(
+                              'Customer Since ${state.user?.createdDate.toString().substring(0,4)}', style: TextStyle(
                                 fontSize: 12.8
                             ),),
                             trailing: InkWell(
@@ -268,24 +270,24 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               },));
                             },
                           ),
-                          Divider(),
-                          ListTile(
-                            leading: Image.asset('assets/logo/Wallet.png',
-                              fit: BoxFit.cover,
-                              width: 24,
-                              height: 24,
-
-
-                              alignment: Alignment.center,
-
-                            ),
-
-                            title: Text('Payment Method', style: TextStyle(
-                                color: Colors.black
-                            ),),
-
-                            trailing: Icon(Icons.arrow_forward_ios, size: 15,),
-                          ),
+                          // Divider(),
+                          // ListTile(
+                          //   leading: Image.asset('assets/logo/Wallet.png',
+                          //     fit: BoxFit.cover,
+                          //     width: 24,
+                          //     height: 24,
+                          //
+                          //
+                          //     alignment: Alignment.center,
+                          //
+                          //   ),
+                          //
+                          //   title: Text('Payment Method', style: TextStyle(
+                          //       color: Colors.black
+                          //   ),),
+                          //
+                          //   trailing: Icon(Icons.arrow_forward_ios, size: 15,),
+                          // ),
                           Divider(),
                           ListTile(
 
@@ -324,15 +326,16 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 return MyWishScreen(uid: uid,);
                               },));
                             },
-                            leading: Image.asset('assets/logo/Favorite_fill.png',
-                              fit: BoxFit.cover,
-                              width: 24,
-                              height: 24,
-
-
-                              alignment: Alignment.center,
-
-                            ),
+                            // leading: Image.asset('assets/logo/Favorite_fill.png',
+                            //   fit: BoxFit.cover,
+                            //   width: 24,
+                            //   height: 24,
+                            //
+                            //
+                            //   alignment: Alignment.center,
+                            //
+                            // ),
+                            leading: Icon(Icons.favorite,color: Colors.black,),
 
                             title: Text('My WishList', style: TextStyle(
                                 color: Colors.black
@@ -343,8 +346,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           Divider(),
                           ListTile(
                             onTap: () {
+                              print(state?.user?.email);
                               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                return ResetPassword();
+                                return ResetPassword(
+                                  email: state?.user?.email,
+
+
+                                );
                               },));
                             },
                             leading: Image.asset('assets/logo/eye.png',
@@ -365,6 +373,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           ),
                           Divider(),
                           ListTile(
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
+                              return ReportScreen(
+
+                                uid: state.user?.id,
+                              );
+                            },)),
                             leading: Image.asset('assets/logo/volume-2.png',
                               fit: BoxFit.cover,
                               width: 24,
@@ -415,9 +429,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               );
             }
             else{
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              return LoadingIcon();
             }
 
           },

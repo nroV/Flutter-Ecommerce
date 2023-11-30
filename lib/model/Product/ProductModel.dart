@@ -46,7 +46,6 @@ class Results {
   Attribution? attribution;
   String? productname;
   double? price;
-  bool? isfavorite;
   int? stockqty;
   double? avgRating;
   int? discount;
@@ -61,7 +60,6 @@ class Results {
         this.attribution,
         this.productname,
         this.price,
-        this.isfavorite,
         this.stockqty,
         this.avgRating,
         this.discount,
@@ -85,7 +83,6 @@ class Results {
         : null;
     productname = json['productname'];
     price = json['price'];
-    isfavorite = json['isfavorite'];
     stockqty = json['stockqty'];
     avgRating = json['avg_rating'];
     discount = json['discount'];
@@ -110,7 +107,6 @@ class Results {
     }
     data['productname'] = this.productname;
     data['price'] = this.price;
-    data['isfavorite'] = this.isfavorite;
     data['stockqty'] = this.stockqty;
     data['avg_rating'] = this.avgRating;
     data['discount'] = this.discount;
@@ -187,6 +183,7 @@ class Attribution {
   List<Colorid>? colorid;
   List<Size>? size;
   double? weight;
+  String? unit;
   String? brand;
   String? model;
   String? materialName;
@@ -196,6 +193,7 @@ class Attribution {
         this.colorid,
         this.size,
         this.weight,
+        this.unit,
         this.brand,
         this.model,
         this.materialName});
@@ -215,6 +213,7 @@ class Attribution {
       });
     }
     weight = json['weight'];
+    unit = json['unit'];
     brand = json['brand'];
     model = json['model'];
     materialName = json['material_name'];
@@ -230,6 +229,7 @@ class Attribution {
       data['size'] = this.size!.map((v) => v.toJson()).toList();
     }
     data['weight'] = this.weight;
+    data['unit'] = this.unit;
     data['brand'] = this.brand;
     data['model'] = this.model;
     data['material_name'] = this.materialName;
@@ -241,14 +241,27 @@ class Colorid {
   int? id;
   Imgid? imgid;
   String? color;
+  String? code;
+  double? price;
+  int? stockqty;
   String? desc;
 
-  Colorid({this.id, this.imgid, this.color, this.desc});
+  Colorid(
+      {this.id,
+        this.imgid,
+        this.color,
+        this.code,
+        this.price,
+        this.stockqty,
+        this.desc});
 
   Colorid.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     imgid = json['imgid'] != null ? new Imgid.fromJson(json['imgid']) : null;
     color = json['color'];
+    code = json['code'];
+    price = json['price'];
+    stockqty = json['stockqty'];
     desc = json['desc'];
   }
 
@@ -259,6 +272,9 @@ class Colorid {
       data['imgid'] = this.imgid!.toJson();
     }
     data['color'] = this.color;
+    data['code'] = this.code;
+    data['price'] = this.price;
+    data['stockqty'] = this.stockqty;
     data['desc'] = this.desc;
     return data;
   }

@@ -1,13 +1,17 @@
 import 'package:ecommerce/model/Product/ProductModel.dart';
 import 'package:ecommerce/viewmodel/products/product_bloc.dart';
+import 'package:ecommerce/views/ErrorPage.dart';
+import 'package:ecommerce/views/widget/LoadingIcon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../res/constant/appcolor.dart';
 import '../../client/ProductAllScreen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../client/product/MyProduct.dart';
 import '../../client/product/Product.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GridCardItem extends StatefulWidget {
   var iscroll ;
@@ -111,9 +115,7 @@ var totalpage;
       builder: (context, state) {
         //
         if(state is ProductLoading) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+          return LoadingIcon();
         }
         if(state is ProductCompleted) {
           print(listofproduct.length);
@@ -249,9 +251,39 @@ var totalpage;
                           ),
 
                           child: InkWell(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                return ProductDetailScreen(product:product,);
+                            onTap: () async {
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                              
+                              Navigator.push(context,MaterialPageRoute(builder: (context) {
+                                // print(widget.product!.id);
+                                // print( widget.product!.imgid![0].images);
+                                // print(widget.product!.price);
+                                // print(widget.product!.category?.id);
+                                // print( widget.product!.attribution);
+                                // print(widget.product!.discount);
+                                // print(widget.product!.avgRating);
+                                // print(  widget.product!.description);
+                                // print( widget.product!.sellRating);
+                                // print( widget.product!.productname);
+                                // print( widget.product!.stockqty);
+                                
+                    
+                                return ProductDetailScreen(
+                                  userid: prefs.getInt("userid"),
+                                    productss: MyProductDetail(
+                                        id: product!.id,
+                                        imgid: product!.imgid,
+                                        price: product!.price,
+                                        categoryid:product!.category?.id,
+                                        attribution:  product!.attribution,
+                                        discount:  product!.discount,
+                                        avgRating:  product!.avgRating,
+                                        description: product!.description,
+                                        sellRating: product!.sellRating,
+                                        productname:  product!.productname,
+                                        stockqty: product!.stockqty
+                                    ));
+
                               },));
                             },
                             child: Padding(
@@ -264,14 +296,29 @@ var totalpage;
 
                                   Stack(
                                     children: [
+                                      CachedNetworkImage(
+                                        // imageUrl: "http://via.placeholder.com/350x150",
+                                        imageUrl:product!.imgid![0].images.toString(),
+                                          width: double.maxFinite,
+                                          height: 180,
+                                        fit: BoxFit.cover,
 
-                                      Image.network('${product!.imgid![0].images} ',fit: BoxFit.cover,
-                                        width: double.maxFinite,
-                                        height: 180,
+                                        progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                            Center(child:
+                                            CircularProgressIndicator(
+                                                color: Color(AppColorConfig.success),
 
-
-
+                                                value: downloadProgress.progress)),
+                                        errorWidget: (context, url, error) => const Icon(Icons.error),
                                       ),
+                                      // Image.network('${product!.imgid![0].images} ',fit: BoxFit.cover,
+                                      //
+                                      //   width: double.maxFinite,
+                                      //   height: 180,
+                                      //
+                                      //
+                                      //
+                                      // ),
                                       Positioned(
                                         top: 5,
                                         right: 0,
@@ -281,7 +328,7 @@ var totalpage;
                                             children: [
                                               Icon(Icons.star, size: 20,
                                                 color: Colors.amberAccent,),
-                                              Text("${product.avgRating!.roundToDouble()}", style: TextStyle(
+                                              Text("${product.avgRating!.toStringAsFixed(2)}", style: TextStyle(
 
                                               ),)
                                             ],
@@ -398,10 +445,12 @@ var totalpage;
             ),
           );
         }
-        else{
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+        if(state is ProductError){
+
+          return const ErrorPage();
+        }
+        else {
+          return LoadingIcon();
         }
 
 

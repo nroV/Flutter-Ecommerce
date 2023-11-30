@@ -9,7 +9,12 @@ class FetchUser extends UserEvent {
 
   FetchUser(this.userid);
 }
+class SendMessage extends UserEvent {
+  var message;
+  var userid;
 
+  SendMessage(this.message,this.userid);
+}
 class EditUser extends UserEvent {
   var userid;
   var username;

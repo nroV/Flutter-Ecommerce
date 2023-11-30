@@ -11,6 +11,13 @@ class CartToAdd extends CartEvent{
 
 
 }
+
+
+class CartToLoaded extends CartEvent{
+
+
+
+}
 class CartClear extends CartEvent{
 
 

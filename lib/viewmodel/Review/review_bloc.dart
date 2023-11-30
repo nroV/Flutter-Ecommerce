@@ -33,10 +33,12 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
         emit(ReviewPostLoading());
 
         var res = await reviewRepository.PostReviewUser(event.pid,event.uid,event.desc,event.rating);
+        print("Review in Bloc");
+        print(res);
 
           emit(ReviewPostCompleted(responseReview: res));
-
-        // if(res['message'] != null) {
+        //
+        // if(res != null) {
         //   print("true agai ");
         //
         //   emit(ReviewPostErrorMessage(res["message"]));
@@ -48,11 +50,13 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
         //   print(response.rating);
         //   emit(ReviewPostCompleted(responseReview: res));
         // }
+        print("Make it");
 
 
 
 
       }catch(error) {
+        print("Error here");
         print(error);
         emit(ReviewPostError(error.toString()));
 

@@ -2,10 +2,12 @@
 
 import 'package:ecommerce/res/constant/appcolor.dart';
 import 'package:ecommerce/res/constant/stripesecretkey.dart';
+import 'package:ecommerce/viewmodel/authlogin/register_bloc.dart';
 import 'package:ecommerce/views/authentication/Register/PhoneNumberScreen.dart';
 import 'package:ecommerce/views/client/NavScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -39,6 +41,7 @@ class _RegisterFormState extends State<RegisterForm> {
   var isfnameerror = true;
   var islnameerror = true;
   var isusernameerror = true;
+  var openmenu = false;
   AuthService auth = AuthService();
   @override
   void initState() {
@@ -76,21 +79,27 @@ class _RegisterFormState extends State<RegisterForm> {
                      print(user["email"]);
                      print(user["id"]);
                      print(user["displayname"]);
+                     if(user["email"] == null ) {
+                       print("User Cancel");
+                     }
+                     else {
+                       if(user!=null) {
+                         //TODO push to telephone number
+                         Navigator.push(context, MaterialPageRoute(builder: (context) {
+                           return  PhoneNumberScreen(
+                             email: user["email"],
+                             username: user["displayname"],
+                             id: user["id"],
+
+                             isowner: false,
+
+                           );
+                         },));
+                       }
+                     }
 
 
-                      if(user!=null) {
-                        //TODO push to telephone number
-                        Navigator.push(context, MaterialPageRoute(builder: (context) {
-                          return  PhoneNumberScreen(
-                            email: user["email"],
-                            username: user["displayname"],
-                            id: user["id"],
 
-                            isowner: false,
-
-                          );
-                        },));
-                      }
 
                     },
                     style: ElevatedButton.styleFrom(
@@ -198,6 +207,7 @@ class _RegisterFormState extends State<RegisterForm> {
             margin: EdgeInsets.only(top: 25),
             child: Form(
               key: formfnamekey,
+
               child: TextFormField(
                 style: TextStyle(
                     fontSize: 13
@@ -241,8 +251,14 @@ class _RegisterFormState extends State<RegisterForm> {
                     istap =false;
                   });
                 },
+                textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
                     filled: true,
+                    // suffixIcon: InkWell(
+                    //   onTap: () => fname.clear(),
+                    //   child: Icon(Icons.clear),
+                    // ),
+
 
                     fillColor: Color(AppColorConfig.bgfill),
                     label: Text("Firstname"),
@@ -276,6 +292,8 @@ class _RegisterFormState extends State<RegisterForm> {
                   });
                 },
                 controller: lname,
+                textInputAction: TextInputAction.next,
+
                 autovalidateMode:  AutovalidateMode.onUserInteraction,
                 validator: (value) {
                   if(value.toString().length == 0 ||value!.isEmpty ) {
@@ -306,16 +324,22 @@ class _RegisterFormState extends State<RegisterForm> {
                       formlnamekey.currentState!.save();
                     }
                     lname.text = value;
+
                   });
                 },
                 decoration: InputDecoration(
                     filled: true,
+                    // suffixIcon: InkWell(
+                    //   onTap: () => lname.clear(),
+                    //   child: Icon(Icons.clear),
+                    // ),
 
                     fillColor: Color(AppColorConfig.bgfill),
                     label: Text("lastname"),
                     floatingLabelStyle: TextStyle(
                         color: Colors.black
                     ),
+
                     border: OutlineInputBorder(
                         borderSide: BorderSide.none,
                         borderRadius: BorderRadius.circular(10)
@@ -330,6 +354,7 @@ class _RegisterFormState extends State<RegisterForm> {
             margin: EdgeInsets.only(top: 25),
             child: Form(
               key: formusernamekey,
+
               child: TextFormField(
                 cursorColor: Colors.grey,
                 style: TextStyle(
@@ -388,6 +413,10 @@ class _RegisterFormState extends State<RegisterForm> {
 
                 decoration: InputDecoration(
                     filled: true,
+                    // suffixIcon: InkWell(
+                    //   onTap: () => username.clear(),
+                    //   child: Icon(Icons.clear),
+                    // ),
 
 
 
@@ -413,6 +442,7 @@ class _RegisterFormState extends State<RegisterForm> {
           Container(
             width: double.maxFinite,
             margin: EdgeInsets.only(top: 15),
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: Color(0xffF1F1F1),
               borderRadius: BorderRadius.circular(6),
@@ -420,28 +450,46 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             child: DropdownButton(
               elevation: 0,
+              dropdownColor: Color(AppColorConfig.primarylight),
+
+              autofocus: true,
+
               padding: EdgeInsets.only(left: 10,right: 10,top: 0,bottom: 0),
               underline: SizedBox(),
+          onTap: () {
+            print("True");
+            setState(() {
+              openmenu = true;
+              print("F");
+            });
+          },
 
 
               // Initial Value
               value:gender  ,
 
 
+
               // Down Arrow Icon
               icon: const Icon(Icons.keyboard_arrow_down),
-              alignment: Alignment.center,
+
               isExpanded: true,
+
+
               style: TextStyle(
                   fontSize: 12.8,color: Colors.black,
-                  fontWeight: FontWeight.w400
+                  fontWeight: FontWeight.w400,
+
 
               ),
 
               // Array list of items
               items: genderlist.map((items) {
                 return DropdownMenuItem(
+                  enabled: true,
+
                   value: items,
+                  // alignment: Alignment.center,
                   child: Text(items.toString()),
                 );
               }).toList(),
@@ -458,19 +506,16 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
           ),
           SizedBox(height: 15,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Remember me',textAlign: TextAlign.right,style: TextStyle(
-                color: Colors.grey,
-                fontSize: 12.8
-              ),),
-              Text('forget password?',textAlign: TextAlign.right,style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12.8
-              ),),
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //
+          //     Text('forget password?',textAlign: TextAlign.right,style: TextStyle(
+          //         color: Colors.black,
+          //         fontSize: 12.8
+          //     ),),
+          //   ],
+          // ),
           SizedBox(height: 5,),
 
           Container(
@@ -509,12 +554,37 @@ class _RegisterFormState extends State<RegisterForm> {
 
 
                 if(isusernameerror == true || islnameerror == true || isusernameerror == true){
+                  // showDialog(context: context, builder: (context) {
+                  //
+                  //
+                  //   return  Center(
+                  //
+                  //     child: CircularProgressIndicator(
+                  //       color: Color(AppColorConfig.bgcolor),
+                  //
+                  //     ),
+                  //   );
+                  //
+                  // },);
+                  Future.delayed(Duration(seconds: 2),() => Navigator.pop(context),);
+               context.read<RegisterBloc>().add(RegisterValidate());
                         return;
                 }
 
 
 
+                showDialog(context: context, builder: (context) {
 
+
+                  return  Center(
+
+                    child: CircularProgressIndicator(
+                      color: Color(AppColorConfig.bgcolor),
+
+                    ),
+                  );
+
+                },);
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return  PhoneNumberScreen(
                     firstname: fname.text,
@@ -524,6 +594,8 @@ class _RegisterFormState extends State<RegisterForm> {
                     gender: gender,
                   );
                 },));
+
+
 
               }, child:Text("Register",
               textAlign: TextAlign.center,

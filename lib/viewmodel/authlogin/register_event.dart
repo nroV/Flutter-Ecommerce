@@ -9,6 +9,14 @@ class OnVerify extends RegisterEvent {
 
   OnVerify(this.email, this.password);
 }
+
+class RegisterValidate extends RegisterEvent {
+
+}
+
+class RegisterClearState extends RegisterEvent {
+
+}
 class OnRegister extends RegisterEvent{
 var fname;
 var lname;

@@ -7,21 +7,40 @@ abstract class RegisterState extends Equatable{}
 class RegisterInitial extends RegisterState {
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props =>[];
 
 
 }
+class RegisterGoogleAuthCompleted extends RegisterState {
+  @override
+  // TODO: implement props
+  List<Object?> get props =>[];
 
+
+}
 class Registerloading extends RegisterState {
   @override
   // TODO: implement props
   List<Object?> get props =>[ ];
 
 }
+class RegisterDuplicate extends RegisterState {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+
+}
 class RegisterCompleted extends RegisterState {
   @override
   // TODO: implement props
   List<Object?> get props => [];
+
+}
+class RegisterValidateError extends RegisterState {
+  @override
+  // TODO: implement props
+  List<Object?> get props =>  [];
 
 }
 class RegisterError extends RegisterState {
@@ -33,6 +52,19 @@ class RegisterError extends RegisterState {
   @override
   // TODO: implement props
   List<Object?> get props =>[message];
+
+}
+
+class RegisterGoogleAuthLoading extends RegisterState {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
+class RegisterGoogleAuthError extends RegisterState {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
 
 }
 class RegisterAuthLoading extends RegisterState {
@@ -49,7 +81,7 @@ class RegisterAuthComplete extends RegisterState {
 
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 
 
 

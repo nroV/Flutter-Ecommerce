@@ -20,7 +20,13 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
             event.fname, event.lname, event.email, event.pass,event.tele,
             event.username,event.gender);
         print(responsebody);
-        emit(RegisterCompleted());
+        if(responsebody.toString().contains("Email has already exist, try a new one")) {
+          emit(RegisterDuplicate());
+        }
+        else {
+          emit(RegisterCompleted());
+        }
+
       }catch(error) {
         print(error.toString());
         emit(RegisterError(error.toString()));
@@ -30,19 +36,34 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
     on<RegisterAuth>((event, emit) async {
       print("Event on register send");
-      emit(RegisterAuthLoading());
+      emit(RegisterGoogleAuthLoading());
       try{
         print(event.password);
         // fname,lname,String? email,String? password,telephone,username
         var responsebody = await user.SocialAuthRegister(email: event.email,telephone: event.telephone,password: event.password,username: event.fullname);
         print(responsebody);
-        emit(RegisterAuthComplete());
+        emit(RegisterGoogleAuthCompleted());
       }catch(error) {
         print(error.toString());
         emit(RegisterAuthError(error.toString()));
       }
       // TODO: implement event handler
     });
+
+    on<RegisterValidate>((event, emit) async {
+      print("Event on register send");
+      emit(RegisterValidateError());
+
+      // TODO: implement event handler
+    });
+
+    on<RegisterClearState>((event, emit) async {
+      print("Event on register send");
+      emit(RegisterInitial());
+
+      // TODO: implement event handler
+    });
+
     // on<OnVerify>((event, emit) async {
     //   print("Event on register send");
     //   emit(Registerloading());

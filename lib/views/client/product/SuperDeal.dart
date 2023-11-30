@@ -11,6 +11,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+import '../../widget/LoadingIcon.dart';
 import '../Home.dart';
 import '../ProductAllScreen.dart';
 
@@ -75,7 +76,8 @@ class _SuperDealListState extends State<SuperDealList> {
 
                   if(state is ProductLoadingDiscount) {
                     return Center(
-                      child: CircularProgressIndicator(),
+                        child:LoadingIcon()
+
                     );
                   }
                   if(state is ProductDiscountCompleted) {

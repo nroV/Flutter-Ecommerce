@@ -42,7 +42,10 @@ class SpecialScreen extends StatelessWidget {
 
                         child:
                         Image.network(
-                            'https://cdn1.clickthecity.com/wp-content/uploads/2021/09/02154327/foodpanda-Eatventures-1024x1024.jpg')),
+                            'https://cdn1.clickthecity.com/wp-content/uploads/2021/09/02154327/foodpanda-Eatventures-1024x1024.jpg')
+
+
+                    ),
                     //  Row(
                     //    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     //    children: [

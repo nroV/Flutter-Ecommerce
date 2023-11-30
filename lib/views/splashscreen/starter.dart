@@ -9,7 +9,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../model/Splash.dart';
 import '../../res/constant/appcolor.dart';
 import '../authentication/Require.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class StartScreen extends StatefulWidget {
   var apptitle;
 
@@ -27,13 +27,16 @@ class _StartScreenState extends State<StartScreen> {
 
   var listofcontent = [
 
-    Splash(buttontitle: "Get Started",headertitle:  "Welcome to Gem Store",body: "An advance ecommerce system that allow you purchase items with just a click and done "),
+    Splash(buttontitle: "Get Started",headertitle:  "Welcome to Tenh Ey Store",body: "An advance ecommerce system that allow you purchase items with just a click and done "),
     Splash(buttontitle:"Continue",headertitle:      "Find your product you love",body: "An advance ecommerce system that allow you purchase items with just a click and done "),
     Splash(buttontitle: "Ready",headertitle:     "Click and enjoy your time",body: "An advance ecommerce system that allow you purchase items with just a click and done "),
   ];
   @override
+
+
   Widget build(BuildContext context) {
     // TODO: implement build
+    changefirstuse();
     return Scaffold(
         appBar: null,
 
@@ -162,5 +165,13 @@ class _StartScreenState extends State<StartScreen> {
           ),
         )
     );
+  }
+
+  void changefirstuse() async  {
+
+    SharedPreferences? prefs = await SharedPreferences.getInstance();
+    if(prefs.getBool("firstuse") == null ) {
+        prefs.setBool("firstuse", false);
+    }
   }
 }

@@ -65,3 +65,32 @@ class UserPatchComplete extends UserState {
   List<Object?> get props => [userResponse];
 
 }
+
+class UserMessageLoading extends UserState  {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
+
+class UserMessageCompleted extends UserState  {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
+
+
+class UserMessageError extends UserState  {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
+
+class UserMessageNoInternet extends UserState  {
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+
+}
