@@ -1,6 +1,6 @@
 class ApiUrl {
 
-  static var main = "https://django-ecomm-6e6490200ee9.herokuapp.com/";
+  static var main = "https://django-api-ecommerce-50c3b7e699ce.herokuapp.com/";
   static var authlogin = "${main}auth/login";
   // https://django-ecomm-6e6490200ee9.herokuapp.com/auth/register
 
